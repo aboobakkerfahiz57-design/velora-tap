@@ -410,33 +410,51 @@ $("loginForm").addEventListener("submit",async event=>{
 });
 
 async function verifyAdmin(){
- if(!currentUser){
-  $("loginScreen").classList.remove("hidden");
-  $("app").classList.add("hidden");
-  return;
- }
 
- const {data,error}=await db
-  .from("admin_profiles")
-  .select("user_id,is_admin")
-  .eq("user_id",currentUser.id)
-  .maybeSingle();
+    if(!currentUser){
+        $("loginScreen").classList.remove("hidden");
+        $("app").classList.add("hidden");
+        return;
+    }
 
- if(error || !data || data.is_admin!==true){
-  await db.auth.signOut();
-  currentUser=null;
-  $("loginError").textContent=
-   "This account does not have administrator access. Contact the system owner.";
-  return;
- }
+    const {data, error} = await db
+        .from("admin_profiles")
+        .select("user_id,is_admin")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
 
- $("loginScreen").classList.add("hidden");
- $("app").classList.remove("hidden");
- $("adminEmail").textContent=currentUser.email || "Administrator";
- $("sessionInfo").textContent="Signed in as "+currentUser.email;
- await loadDashboard();
+    console.log("ADMIN CHECK:", {
+        loggedInUser: currentUser.id,
+        email: currentUser.email,
+        adminData: data,
+        adminError: error
+    });
+
+    if(error){
+        $("loginError").textContent =
+            "Database permission error: " + error.message;
+        return;
+    }
+
+    if(!data){
+        $("loginError").textContent =
+            "No admin profile found for: " + currentUser.email;
+        return;
+    }
+
+    if(data.is_admin !== true){
+        $("loginError").textContent =
+            "Admin profile found, but is_admin is not true.";
+        return;
+    }
+
+    $("loginScreen").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("adminEmail").textContent = currentUser.email;
+    $("sessionInfo").textContent = "Signed in as " + currentUser.email;
+
+    await loadDashboard();
 }
-
 async function restoreSession(){
  const {data,error}=await db.auth.getSession();
 
