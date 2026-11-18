@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VELORA TAP | Analytics</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #080808;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 20px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #493b25;
+    }
+    .brand { color: #e7ca88; font-weight: bold; letter-spacing: 3px; }
+    button {
+      background: #c9a45c;
+      color: #080808;
+      border: 0;
+      padding: 11px 17px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    main { max-width: 1150px; margin: auto; padding: 35px 5%; }
+    .eyebrow { color: #c9a45c; letter-spacing: 3px; font-size: 11px; }
+    h1 { margin-bottom: 8px; }
+    .muted { color: #999; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 30px 0;
+    }
+    .stat, .panel {
+      background: #141414;
+      border: 1px solid #40321f;
+      border-radius: 9px;
+      padding: 22px;
+    }
+    .stat p { color: #aaa; margin: 0 0 12px; font-size: 13px; }
+    .stat h2 { color: #e7ca88; font-size: 30px; margin: 0; }
+    .panel { margin-bottom: 22px; overflow-x: auto; }
+    .panel h2 { color: #e7ca88; font-size: 19px; }
+    table { width: 100%; border-collapse: collapse; min-width: 550px; }
+    th, td { padding: 13px; text-align: left; border-bottom: 1px solid #333; }
+    th { color: #c9a45c; font-size: 12px; }
+    td { color: #ddd; font-size: 13px; }
+    #message { color: #e7ca88; margin: 20px 0; }
+    @media(max-width:650px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .stat { padding: 16px; }
+      .stat h2 { font-size: 24px; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="brand">VELORA TAP</div>
+  <button id="logout">Logout</button>
+</header>
+
+<main>
+  <p class="eyebrow">BUSINESS PERFORMANCE</p>
+  <h1>Analytics Dashboard</h1>
+  <p class="muted">Monitor business profile visits and customer interactions.</p>
+
+  <p id="message">Checking admin access...</p>
+
+  <section class="stats">
+    <div class="stat"><p>Total Profile Visits</p><h2 id="visits">—</h2></div>
+    <div class="stat"><p>Google Reviews Clicks</p><h2 id="google">—</h2></div>
+    <div class="stat"><p>Website Clicks</p><h2 id="website">—</h2></div>
+    <div class="stat"><p>WhatsApp Clicks</p><h2 id="whatsapp">—</h2></div>
+    <div class="stat"><p>Instagram Clicks</p><h2 id="instagram">—</h2></div>
+    <div class="stat"><p>Total Link Clicks</p><h2 id="total-clicks">—</h2></div>
+  </section>
+
+  <section class="panel">
+    <h2>Business Performance</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Business</th>
+          <th>Profile Visits</th>
+          <th>Link Clicks</th>
+        </tr>
+      </thead>
+      <tbody id="business-stats">
+        <tr><td colspan="3">Loading...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Recent Activity</h2>
+    <table>
+      <thead>
+        <tr><th>Business</th><th>Event</th><th>Action</th><th>Date</th></tr>
+      </thead>
+      <tbody id="recent-events">
+        <tr><td colspan="4">Loading...</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script src="config.js"></script>
+<script>
+(async function () {
+  const db = window.supabaseClient;
+  const message = document.getElementById("message");
+
+  function setText(id, value) {
+    document.getElementById(id).textContent = value;
+  }
+
+  function addCell(row, value) {
+    const cell = document.createElement("td");
+    cell.textContent = value ?? "—";
+    row.appendChild(cell);
+  }
+
+  if (!db) {
+    message.textContent = "Supabase connection unavailable.";
+    return;
+  }
+
+  const { data: auth } = await db.auth.getUser();
+
+  if (!auth.user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  const { data: profile, error: profileError } = await db
+    .from("admin_profiles")
+    .select("is_admin")
+    .eq("user_id", auth.user.id)
+    .single();
+
+  if (profileError || profile?.is_admin !== true) {
+    message.textContent = "Admin access required.";
+    return;
+  }
+
+  message.textContent = "Analytics loaded.";
+
+  document.getElementById("logout").addEventListener("click", async () => {
+    await db.auth.signOut();
+    window.location.replace("index.html");
+  });
+
+  const { data: events, error } = await db
+    .from("business_events")
+    .select("business_id, event_type, action_key, created_at")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    message.textContent = "Unable to load analytics: " + error.message;
+    return;
+  }
+
+  const { data: businesses, error: businessError } = await db
+    .from("businesses")
+    .select("id, name");
+
+  if (businessError) {
+    message.textContent = "Unable to load businesses: " + businessError.message;
+    return;
+  }
+
+  const records = events || [];
+  const profiles = businesses || [];
+
+  const count = (type, action = null) =>
+    records.filter(e =>
+      e.event_type === type &&
+      (action === null || e.action_key === action)
+    ).length;
+
+  setText("visits", count("profile_view"));
+  setText("google", count("link_click", "google_reviews"));
+  setText("website", count("link_click", "website"));
+  setText("whatsapp", count("link_click", "whatsapp"));
+  setText("instagram", count("link_click", "instagram"));
+  setText("total-clicks", count("link_click"));
+
+  const statsBody = document.getElementById("business-stats");
+  statsBody.replaceChildren();
+
+  profiles.forEach(business => {
+    const businessEvents = records.filter(e => e.business_id === business.id);
+    const row = document.createElement("tr");
+
+    addCell(row, business.name);
+    addCell(row, businessEvents.filter(e => e.event_type === "profile_view").length);
+    addCell(row, businessEvents.filter(e => e.event_type === "link_click").length);
+
+    statsBody.appendChild(row);
+  });
+
+  if (!profiles.length) {
+    const row = document.createElement("tr");
+    addCell(row, "No businesses found");
+    statsBody.appendChild(row);
+  }
+
+  const recentBody = document.getElementById("recent-events");
+  recentBody.replaceChildren();
+
+  records.slice(0, 20).forEach(event => {
+    const business = profiles.find(b => b.id === event.business_id);
+    const row = document.createElement("tr");
+
+    addCell(row, business?.name || "Unknown business");
+    addCell(row, event.event_type);
+    addCell(row, event.action_key || "—");
+    addCell(row, new Date(event.created_at).toLocaleString());
+
+    recentBody.appendChild(row);
+  });
+
+  if (!records.length) {
+    const row = document.createElement("tr");
+    addCell(row, "No activity recorded yet");
+    recentBody.appendChild(row);
+  }
+})();
+</script>
+</body>
+</html>
