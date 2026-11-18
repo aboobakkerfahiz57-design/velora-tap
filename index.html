@@ -1,0 +1,3787 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5f0e6">
+<meta name="description" content="VELORA TAP - Premium NFC digital business cards. Tap, connect and grow.">
+<title>VELORA TAP | Tap. Connect. Grow.</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+:root {
+    --green: #064b35;
+    --green-dark: #032d21;
+    --green-light: #0c694a;
+    --gold: #c49a4b;
+    --gold-light: #e6c98c;
+    --cream: #f7f2e8;
+    --cream-dark: #eee5d5;
+    --beige: #e2d3ba;
+    --white: #fffdf8;
+    --text: #20352b;
+    --muted: #758077;
+    --shadow: 0 25px 70px rgba(22, 52, 38, .12);
+    --radius: 24px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
+
+body {
+    font-family: "DM Sans", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+body.menu-open {
+    overflow: hidden;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+button, a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+img {
+    max-width: 100%;
+}
+
+.container {
+    width: min(1160px, 90%);
+    margin: auto;
+}
+
+.section {
+    padding: 110px 0;
+    position: relative;
+}
+
+.section-heading {
+    max-width: 680px;
+    margin: 0 auto 55px;
+    text-align: center;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--green-light);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.eyebrow::before,
+.eyebrow::after {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: var(--gold);
+}
+
+.section-heading h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(35px, 5vw, 54px);
+    line-height: 1.13;
+    color: var(--green-dark);
+    margin-bottom: 17px;
+}
+
+.section-heading p {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.gold-text {
+    color: var(--gold);
+}
+
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 11px;
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    font-size: 13px;
+    transition: .3s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--green);
+    color: white;
+    box-shadow: 0 12px 25px rgba(6, 75, 53, .18);
+}
+
+.btn-primary:hover {
+    background: var(--green-light);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(6, 75, 53, .25);
+}
+
+.btn-outline {
+    color: var(--green);
+    border-color: rgba(6, 75, 53, .3);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: var(--green);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.btn-gold {
+    color: var(--green-dark);
+    background: linear-gradient(135deg, #e8d09e, #bf9444);
+}
+
+.btn-gold:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(196, 154, 75, .25);
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(35px);
+}
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 15px 0;
+    transition: .35s;
+    border-bottom: 1px solid transparent;
+}
+
+.navbar.scrolled {
+    background: rgba(247, 242, 232, .94);
+    backdrop-filter: blur(18px);
+    border-bottom-color: rgba(6, 75, 53, .09);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .04);
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.brand-mark {
+    width: 43px;
+    height: 43px;
+    border-radius: 14px;
+    background: var(--green);
+    color: var(--gold-light);
+    display: grid;
+    place-items: center;
+    font-family: "Playfair Display", serif;
+    font-size: 29px;
+    font-weight: 700;
+    box-shadow: 0 7px 20px rgba(6, 75, 53, .2);
+    position: relative;
+}
+
+.brand-mark::after {
+    content: ")))";
+    font-family: Arial, sans-serif;
+    font-size: 8px;
+    position: absolute;
+    top: 6px;
+    right: 3px;
+    color: var(--gold-light);
+    transform: rotate(-35deg);
+}
+
+.brand-name {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--green-dark);
+}
+
+.brand-name small {
+    display: block;
+    font-size: 8px;
+    letter-spacing: 2.5px;
+    color: var(--gold);
+    margin-top: 2px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 29px;
+    list-style: none;
+}
+
+.nav-links a {
+    font-size: 12px;
+    font-weight: 700;
+    color: #526057;
+    transition: .25s;
+}
+
+.nav-links a:hover {
+    color: var(--green-light);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-actions .btn {
+    padding: 12px 19px;
+    font-size: 11px;
+}
+
+.menu-toggle {
+    display: none;
+    width: 43px;
+    height: 43px;
+    border: 1px solid rgba(6, 75, 53, .2);
+    background: transparent;
+    border-radius: 50%;
+    color: var(--green);
+    font-size: 18px;
+}
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.hero {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 130px 0 85px;
+    background:
+        radial-gradient(ellipse at 80% 45%, rgba(226, 211, 186, .7), transparent 40%),
+        linear-gradient(125deg, #f9f5ed 0%, #f1e8d9 100%);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -230px;
+    left: -220px;
+    width: 620px;
+    height: 390px;
+    background: var(--green-dark);
+    border-radius: 0 0 65% 0;
+    transform: rotate(-8deg);
+    opacity: .98;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    right: -160px;
+    bottom: -300px;
+    width: 780px;
+    height: 470px;
+    background: var(--green);
+    border-radius: 70% 0 0 0;
+    transform: rotate(-12deg);
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+    align-items: center;
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 4;
+}
+
+.hero-label {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    background: rgba(6, 75, 53, .08);
+    border: 1px solid rgba(6, 75, 53, .1);
+    padding: 9px 15px;
+    border-radius: 50px;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    margin-bottom: 27px;
+}
+
+.hero-label span {
+    height: 7px;
+    width: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px rgba(196, 154, 75, .13);
+}
+
+.hero h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(45px, 6vw, 75px);
+    line-height: 1.06;
+    letter-spacing: -2px;
+    color: var(--green-dark);
+    max-width: 620px;
+}
+
+.hero h1 em {
+    color: var(--green-light);
+    font-style: normal;
+}
+
+.hero-copy > p {
+    margin-top: 25px;
+    max-width: 470px;
+    line-height: 1.9;
+    font-size: 15px;
+    color: #6d786f;
+}
+
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-top: 32px;
+}
+
+.hero-trust {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 42px;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #59665d;
+}
+
+.trust-item i {
+    color: var(--gold);
+    font-size: 15px;
+}
+
+/* =========================================
+   3D PRODUCT STAGE
+========================================= */
+
+.hero-stage {
+    min-height: 540px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    perspective: 1300px;
+    z-index: 3;
+}
+
+.stage-glow {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196, 154, 75, .23), transparent 70%);
+    filter: blur(10px);
+}
+
+.stage-ring {
+    position: absolute;
+    width: 410px;
+    height: 410px;
+    border: 1px solid rgba(6, 75, 53, .15);
+    border-radius: 50%;
+    transform: rotateX(68deg) rotateZ(-20deg);
+    box-shadow: 0 0 0 25px rgba(6, 75, 53, .025),
+                0 0 0 50px rgba(6, 75, 53, .02);
+}
+
+.stage-ring::before,
+.stage-ring::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: var(--gold);
+    border-radius: 50%;
+    top: 50%;
+    left: -5px;
+}
+
+.stage-ring::after {
+    left: auto;
+    right: -5px;
+}
+
+.card-float {
+    position: relative;
+    z-index: 3;
+    transform-style: preserve-3d;
+    animation: cardFloat 5s ease-in-out infinite;
+    transition: transform .15s ease-out;
+}
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotateY(-15deg) rotateX(8deg); }
+    50% { transform: translateY(-22px) rotateY(-8deg) rotateX(3deg); }
+}
+
+.nfc-card {
+    width: 340px;
+    height: 215px;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 80% 10%, rgba(224, 190, 116, .16), transparent 35%),
+        linear-gradient(135deg, #07553b, #032b20 70%);
+    box-shadow:
+        0 35px 70px rgba(0, 0, 0, .28),
+        inset 0 1px 2px rgba(255, 255, 255, .4),
+        inset 0 -2px 5px rgba(0, 0, 0, .3);
+    border: 1px solid rgba(226, 201, 140, .65);
+    padding: 24px;
+    color: white;
+    transform-style: preserve-3d;
+}
+
+.nfc-card::before {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border: 1px solid rgba(220, 191, 128, .25);
+    border-radius: 50%;
+    right: -130px;
+    top: -130px;
+    box-shadow: 0 0 0 20px rgba(220, 191, 128, .04),
+                0 0 0 40px rgba(220, 191, 128, .03);
+}
+
+.nfc-card::after {
+    content: "";
+    position: absolute;
+    height: 200%;
+    width: 60%;
+    top: -50%;
+    left: -90%;
+    transform: rotate(30deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+    animation: cardShine 5s ease-in-out infinite;
+}
+
+@keyframes cardShine {
+    0%, 25% { left: -90%; }
+    65%, 100% { left: 150%; }
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.card-logo {
+    font-family: "Playfair Display", serif;
+    font-size: 23px;
+    font-weight: 700;
+    color: var(--gold-light);
+}
+
+.card-waves {
+    color: var(--gold-light);
+    font-size: 24px;
+}
+
+.card-middle {
+    position: relative;
+    z-index: 2;
+    margin-top: 42px;
+}
+
+.card-middle h3 {
+    font-size: 20px;
+    letter-spacing: 2px;
+    font-weight: 800;
+}
+
+.card-middle p {
+    color: #dfd1b6;
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-top: 6px;
+}
+
+.card-bottom {
+    position: absolute;
+    bottom: 22px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gold-light);
+    font-size: 9px;
+    letter-spacing: 2px;
+    z-index: 2;
+}
+
+.card-chip {
+    width: 29px;
+    height: 23px;
+    border: 1px solid var(--gold-light);
+    border-radius: 5px;
+    background: linear-gradient(135deg, #e9d6a8, #987339);
+    position: relative;
+}
+
+.card-chip::before,
+.card-chip::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(65, 55, 30, .55);
+    border-radius: 3px;
+    inset: 5px;
+}
+
+.card-chip::after {
+    inset: 0 10px;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.stage-phone {
+    position: absolute;
+    width: 145px;
+    height: 275px;
+    border: 7px solid #26382f;
+    background: #fffdf7;
+    border-radius: 27px;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    transform: rotateY(-15deg) rotateZ(8deg);
+    box-shadow: 0 25px 45px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    transition: .8s;
+}
+
+.stage-phone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55px;
+    height: 13px;
+    background: #26382f;
+    border-radius: 0 0 10px 10px;
+    z-index: 2;
+}
+
+.phone-screen {
+    height: 100%;
+    padding: 25px 9px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.phone-avatar {
+    height: 43px;
+    width: 43px;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--gold-light);
+    display: grid;
+    place-items: center;
+    font-family: "Playfair Display", serif;
+    font-size: 20px;
+    margin: 10px 0 8px;
+}
+
+.phone-screen h4 {
+    font-size: 10px;
+    color: var(--green);
+}
+
+.phone-screen p {
+    font-size: 7px;
+    color: #929b91;
+    margin: 4px 0 12px;
+}
+
+.phone-link {
+    background: #edf1e9;
+    color: var(--green);
+    border-radius: 6px;
+    width: 100%;
+    padding: 7px;
+    font-size: 7px;
+    margin-bottom: 6px;
+}
+
+.phone-link:first-of-type {
+    background: var(--green);
+    color: white;
+}
+
+.tap-button {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: none;
+    z-index: 8;
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 10px 18px;
+    background: var(--gold);
+    color: var(--green-dark);
+    font-weight: 800;
+    border-radius: 50px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+}
+
+.tap-button:hover {
+    transform: translateX(-50%) scale(1.06);
+}
+
+.tap-ripple {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hero-stage.tapping .tap-ripple {
+    animation: ripple 1s ease-out 3;
+}
+
+.hero-stage.tapping .card-float {
+    animation: none;
+    transform: translate(70px, 80px) rotateY(5deg) rotateX(0deg) scale(.65);
+}
+
+.hero-stage.tapping .stage-phone {
+    transform: rotateY(0) rotateZ(0) scale(1.1);
+    box-shadow: 0 0 0 10px rgba(196,154,75,.13), 0 25px 45px rgba(0,0,0,.2);
+}
+
+@keyframes ripple {
+    0% { transform: scale(.5); opacity: .8; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
+
+.tap-message {
+    position: absolute;
+    bottom: -25px;
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0;
+    transition: .3s;
+}
+
+.hero-stage.tapping .tap-message {
+    opacity: 1;
+}
+
+/* =========================================
+   MARQUEE
+========================================= */
+
+.marquee {
+    background: var(--green-dark);
+    padding: 17px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 5;
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+}
+
+.marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 0 30px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.marquee-item i {
+    color: #fff;
+    font-size: 10px;
+}
+
+@keyframes marquee {
+    to { transform: translateX(-50%); }
+}
+
+/* =========================================
+   ABOUT
+========================================= */
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 70px;
+    align-items: center;
+}
+
+.about-visual {
+    min-height: 450px;
+    border-radius: 30px;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(226,201,140,.3), transparent 55%),
+        linear-gradient(145deg, #0b563c, #032d21);
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-visual::before {
+    content: "";
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    border: 1px solid rgba(226,201,140,.3);
+    border-radius: 50%;
+    box-shadow: 0 0 0 30px rgba(226,201,140,.04),
+                0 0 0 60px rgba(226,201,140,.03);
+}
+
+.about-logo {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    color: var(--gold-light);
+}
+
+.about-logo .big-v {
+    font-family: "Playfair Display", serif;
+    font-size: 190px;
+    line-height: 1;
+    text-shadow: 0 20px 40px rgba(0,0,0,.25);
+}
+
+.about-logo p {
+    letter-spacing: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.about-copy h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(35px, 5vw, 48px);
+    line-height: 1.15;
+    color: var(--green-dark);
+    margin: 15px 0 22px;
+}
+
+.about-copy > p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 16px;
+}
+
+.about-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 30px 0;
+}
+
+.about-point {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+}
+
+.about-point i {
+    color: var(--gold);
+    margin-top: 4px;
+}
+
+.about-point strong {
+    display: block;
+    color: var(--green);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.about-point span {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   HOW IT WORKS
+========================================= */
+
+.steps-section {
+    background: var(--cream-dark);
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.step-card {
+    background: var(--white);
+    border: 1px solid rgba(6,75,53,.07);
+    border-radius: var(--radius);
+    padding: 34px 26px;
+    position: relative;
+    transition: .35s;
+}
+
+.step-card:hover {
+    transform: translateY(-9px);
+    box-shadow: var(--shadow);
+}
+
+.step-number {
+    font-family: "Playfair Display", serif;
+    color: rgba(6,75,53,.08);
+    font-size: 55px;
+    font-weight: 700;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.step-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--green);
+    color: var(--gold-light);
+    display: grid;
+    place-items: center;
+    font-size: 23px;
+    border-radius: 18px;
+    margin-bottom: 26px;
+}
+
+.step-card h3 {
+    color: var(--green-dark);
+    font-size: 17px;
+    margin-bottom: 12px;
+}
+
+.step-card p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* =========================================
+   FEATURES
+========================================= */
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.feature-card {
+    padding: 30px;
+    background: var(--white);
+    border: 1px solid rgba(6,75,53,.07);
+    border-radius: 20px;
+    transition: .3s;
+}
+
+.feature-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-7px);
+    box-shadow: var(--shadow);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: #edf1e8;
+    color: var(--green);
+    font-size: 19px;
+    margin-bottom: 22px;
+}
+
+.feature-card h3 {
+    font-size: 15px;
+    color: var(--green);
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+/* =========================================
+   3D EXPERIENCE SECTION
+========================================= */
+
+.experience {
+    background:
+        radial-gradient(circle at 20% 50%, rgba(196,154,75,.12), transparent 40%),
+        linear-gradient(135deg, #052f23, #064b35);
+    color: white;
+    overflow: hidden;
+}
+
+.experience .section-heading h2 {
+    color: white;
+}
+
+.experience .section-heading p {
+    color: #c2d0c6;
+}
+
+.experience .eyebrow {
+    color: var(--gold-light);
+}
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 60px;
+}
+
+.experience-copy h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 38px;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.experience-copy p {
+    color: #c2d0c6;
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 20px;
+}
+
+.experience-list {
+    list-style: none;
+    margin: 25px 0 30px;
+}
+
+.experience-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #e3e9e3;
+    font-size: 12px;
+    margin: 14px 0;
+}
+
+.experience-list i {
+    color: var(--gold-light);
+}
+
+.experience-visual {
+    min-height: 390px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    perspective: 1000px;
+}
+
+.experience-visual .nfc-card {
+    transform: rotateY(-25deg) rotateX(12deg);
+    animation: experienceCard 6s ease-in-out infinite;
+}
+
+@keyframes experienceCard {
+    0%, 100% { transform: rotateY(-25deg) rotateX(12deg) translateY(0); }
+    50% { transform: rotateY(15deg) rotateX(-5deg) translateY(-20px); }
+}
+
+/* =========================================
+   PRODUCTS
+========================================= */
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.product-card {
+    background: var(--white);
+    border: 1px solid rgba(6,75,53,.08);
+    border-radius: 22px;
+    overflow: hidden;
+    transition: .35s;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow);
+}
+
+.product-art {
+    min-height: 225px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #eae0ce, #f8f3e9);
+    perspective: 900px;
+}
+
+.product-art .nfc-card {
+    transform: rotateY(-20deg) rotateX(8deg) scale(.65);
+    margin: -30px;
+}
+
+.product-info {
+    padding: 25px;
+}
+
+.product-info h3 {
+    color: var(--green);
+    font-size: 16px;
+    margin-bottom: 9px;
+}
+
+.product-info p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+    margin-bottom: 18px;
+}
+
+.product-info .btn {
+    width: 100%;
+    padding: 12px;
+}
+
+/* =========================================
+   ANALYTICS
+========================================= */
+
+.analytics-section {
+    background: var(--cream-dark);
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 65px;
+}
+
+.analytics-copy h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(35px, 5vw, 48px);
+    color: var(--green-dark);
+    line-height: 1.15;
+    margin: 15px 0 20px;
+}
+
+.analytics-copy p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 25px;
+}
+
+.analytics-mockup {
+    padding: 30px;
+    background: #fffdf8;
+    border-radius: 25px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(6,75,53,.08);
+}
+
+.mockup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.mockup-header strong {
+    color: var(--green);
+    font-size: 14px;
+}
+
+.mockup-header span {
+    background: #edf1e8;
+    color: var(--green);
+    padding: 7px 12px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.mockup-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.mock-stat {
+    padding: 17px;
+    border-radius: 15px;
+    background: #f5f1e8;
+}
+
+.mock-stat small {
+    display: block;
+    color: #899087;
+    font-size: 10px;
+    margin-bottom: 9px;
+}
+
+.mock-stat strong {
+    font-family: "Playfair Display", serif;
+    color: var(--green);
+    font-size: 25px;
+}
+
+.mock-chart {
+    height: 120px;
+    display: flex;
+    align-items: flex-end;
+    gap: 9px;
+    padding: 15px 5px 0;
+    margin-top: 20px;
+    border-bottom: 1px solid #e9e4d9;
+}
+
+.mock-chart span {
+    flex: 1;
+    border-radius: 5px 5px 0 0;
+    background: linear-gradient(to top, var(--green), #9bb9a0);
+    min-height: 15px;
+    animation: chartRise 1.2s ease both;
+}
+
+@keyframes chartRise {
+    from { height: 0; }
+}
+
+/* =========================================
+   PRICING
+========================================= */
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+.price-card {
+    background: var(--white);
+    padding: 34px 27px;
+    border: 1px solid rgba(6,75,53,.1);
+    border-radius: 23px;
+    transition: .3s;
+    position: relative;
+}
+
+.price-card:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--shadow);
+}
+
+.price-card.featured {
+    background: var(--green);
+    color: white;
+    border-color: var(--gold);
+    box-shadow: 0 20px 50px rgba(6,75,53,.2);
+}
+
+.popular-label {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 7px 17px;
+    background: var(--gold);
+    color: var(--green-dark);
+    border-radius: 50px;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.price-card h3 {
+    font-size: 17px;
+    color: var(--green);
+    margin-bottom: 10px;
+}
+
+.price-card.featured h3 {
+    color: white;
+}
+
+.price-card > p {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+    min-height: 42px;
+}
+
+.price-card.featured > p {
+    color: #c2d0c6;
+}
+
+.price-value {
+    font-family: "Playfair Display", serif;
+    font-size: 38px;
+    color: var(--green-dark);
+    margin: 25px 0;
+}
+
+.price-card.featured .price-value {
+    color: var(--gold-light);
+}
+
+.price-value small {
+    font-family: "DM Sans", sans-serif;
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.price-card.featured .price-value small {
+    color: #c2d0c6;
+}
+
+.price-features {
+    list-style: none;
+    margin: 25px 0 30px;
+}
+
+.price-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 14px 0;
+    font-size: 11px;
+    color: #667269;
+}
+
+.price-card.featured .price-features li {
+    color: #e3e9e3;
+}
+
+.price-features i {
+    color: var(--gold);
+    margin-top: 2px;
+}
+
+.price-card .btn {
+    width: 100%;
+}
+
+/* =========================================
+   FAQ
+========================================= */
+
+.faq-section {
+    background: var(--cream-dark);
+}
+
+.faq-list {
+    max-width: 820px;
+    margin: auto;
+}
+
+.faq-item {
+    background: var(--white);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(6,75,53,.06);
+}
+
+.faq-question {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    text-align: left;
+    color: var(--green-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.faq-question i {
+    color: var(--gold);
+    transition: .3s;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s ease;
+}
+
+.faq-answer p {
+    padding: 0 22px 22px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 220px;
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(45deg);
+}
+
+/* =========================================
+   CONTACT
+========================================= */
+
+.contact-section {
+    background: var(--green-dark);
+    color: white;
+    overflow: hidden;
+}
+
+.contact-section .section-heading h2 {
+    color: white;
+}
+
+.contact-section .section-heading p {
+    color: #c2d0c6;
+}
+
+.contact-section .eyebrow {
+    color: var(--gold-light);
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+    gap: 55px;
+    align-items: start;
+}
+
+.contact-copy h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 34px;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 18px;
+}
+
+.contact-copy > p {
+    color: #c2d0c6;
+    line-height: 1.9;
+    font-size: 13px;
+    margin-bottom: 30px;
+}
+
+.contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.contact-detail i {
+    height: 43px;
+    width: 43px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    background: rgba(226,201,140,.12);
+    color: var(--gold-light);
+}
+
+.contact-detail strong {
+    display: block;
+    font-size: 12px;
+    color: white;
+}
+
+.contact-detail span {
+    display: block;
+    font-size: 11px;
+    color: #b4c3b7;
+    margin-top: 4px;
+}
+
+.enquiry-form {
+    padding: 34px;
+    background: #fffdf8;
+    color: var(--text);
+    border-radius: 24px;
+    box-shadow: 0 25px 70px rgba(0,0,0,.15);
+}
+
+.enquiry-form h3 {
+    color: var(--green);
+    font-family: "Playfair Display", serif;
+    font-size: 27px;
+    margin-bottom: 7px;
+}
+
+.enquiry-form > p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 25px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    color: #45564a;
+    font-size: 10px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 13px 14px;
+    background: #f8f5ee;
+    border: 1px solid #e8e0d1;
+    border-radius: 10px;
+    outline: none;
+    color: var(--green-dark);
+    font-size: 12px;
+    transition: .25s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--green-light);
+    box-shadow: 0 0 0 3px rgba(6,75,53,.07);
+}
+
+.form-group textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.form-error {
+    color: #b33a32;
+    font-size: 10px;
+    margin-top: 5px;
+    display: none;
+}
+
+.form-group.invalid .form-error {
+    display: block;
+}
+
+.enquiry-form button {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.form-status {
+    display: none;
+    margin-top: 15px;
+    padding: 13px;
+    border-radius: 10px;
+    background: #edf5e9;
+    color: var(--green);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   CTA
+========================================= */
+
+.final-cta {
+    padding: 85px 0;
+    background: linear-gradient(120deg, #e8dcc8, #f8f3e9);
+    text-align: center;
+}
+
+.final-cta h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(34px, 5vw, 51px);
+    color: var(--green-dark);
+    margin-bottom: 17px;
+}
+
+.final-cta p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 27px;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer {
+    background: #02271c;
+    color: white;
+    padding: 75px 0 25px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 45px;
+    padding-bottom: 55px;
+}
+
+.footer-brand .brand-name {
+    color: white;
+}
+
+.footer-brand > p {
+    color: #a9b9ad;
+    font-size: 12px;
+    line-height: 1.9;
+    margin-top: 20px;
+    max-width: 270px;
+}
+
+.footer-col h4 {
+    color: var(--gold-light);
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 22px;
+}
+
+.footer-col a {
+    display: block;
+    color: #a9b9ad;
+    font-size: 11px;
+    margin-bottom: 15px;
+    transition: .2s;
+}
+
+.footer-col a:hover {
+    color: var(--gold-light);
+    transform: translateX(4px);
+}
+
+.social-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.social-links a {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 50%;
+    color: var(--gold-light);
+    transition: .3s;
+}
+
+.social-links a:hover {
+    background: var(--gold);
+    color: var(--green-dark);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: #81958a;
+    font-size: 10px;
+}
+
+.footer-bottom strong {
+    color: var(--gold-light);
+}
+
+/* =========================================
+   FLOATING BUTTONS
+========================================= */
+
+.back-top {
+    position: fixed;
+    right: 24px;
+    bottom: 25px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--green-dark);
+    z-index: 900;
+    font-size: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: .3s;
+}
+
+.back-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    left: 24px;
+    z-index: 900;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #1e9c5a;
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    transition: .3s;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+    .nav-links {
+        gap: 17px;
+    }
+
+    .nav-links a {
+        font-size: 11px;
+    }
+
+    .hero-inner {
+        gap: 10px;
+    }
+
+    .nfc-card {
+        width: 300px;
+        height: 190px;
+    }
+
+    .stage-phone {
+        width: 125px;
+        height: 240px;
+    }
+}
+
+@media (max-width: 800px) {
+    .section {
+        padding: 80px 0;
+    }
+
+    .menu-toggle {
+        display: grid;
+        place-items: center;
+    }
+
+    .nav-actions .btn {
+        display: none;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 75px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 75px);
+        background: var(--cream);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 35px 7%;
+        gap: 0;
+        transform: translateX(100%);
+        transition: .35s;
+        z-index: 999;
+    }
+
+    .nav-links.active {
+        transform: translateX(0);
+    }
+
+    .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(6,75,53,.1);
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 19px 0;
+        font-size: 15px;
+    }
+
+    .hero {
+        padding-top: 125px;
+    }
+
+    .hero-inner,
+    .about-grid,
+    .experience-grid,
+    .analytics-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-copy {
+        text-align: center;
+    }
+
+    .hero-copy > p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-buttons,
+    .hero-trust {
+        justify-content: center;
+    }
+
+    .hero-stage {
+        min-height: 450px;
+    }
+
+    .stage-phone {
+        right: 7%;
+    }
+
+    .about-grid,
+    .analytics-grid {
+        gap: 35px;
+    }
+
+    .steps-grid,
+    .features-grid,
+    .products-grid,
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .experience-grid {
+        gap: 15px;
+    }
+
+    .experience-copy {
+        text-align: center;
+    }
+
+    .experience-list {
+        display: inline-block;
+        text-align: left;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 540px) {
+    .container {
+        width: 90%;
+    }
+
+    .hero h1 {
+        font-size: 47px;
+    }
+
+    .hero::before {
+        width: 330px;
+        height: 240px;
+    }
+
+    .hero-stage {
+        min-height: 360px;
+        transform: scale(.85);
+        margin: -15px -20px;
+    }
+
+    .nfc-card {
+        width: 285px;
+        height: 180px;
+    }
+
+    .stage-phone {
+        right: 0;
+        bottom: 0;
+        width: 110px;
+        height: 215px;
+    }
+
+    .stage-ring {
+        width: 320px;
+        height: 320px;
+    }
+
+    .about-visual {
+        min-height: 330px;
+    }
+
+    .about-logo .big-v {
+        font-size: 145px;
+    }
+
+    .about-points {
+        grid-template-columns: 1fr;
+    }
+
+    .steps-grid,
+    .features-grid,
+    .products-grid,
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .step-card,
+    .feature-card {
+        padding: 26px;
+    }
+
+    .experience-visual {
+        min-height: 300px;
+        transform: scale(.88);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full {
+        grid-column: auto;
+    }
+
+    .enquiry-form {
+        padding: 24px 19px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px 20px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .final-cta {
+        padding: 65px 0;
+    }
+}
+
+/* =========================================
+   ACCESSIBILITY / REDUCED MOTION
+========================================= */
+
+:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================
+     NAVIGATION
+========================================= -->
+
+<header class="navbar" id="navbar">
+    <div class="container nav-inner">
+
+        <a href="#home" class="brand" aria-label="VELORA TAP Home">
+            <div class="brand-mark">V</div>
+            <div class="brand-name">
+                VELORA TAP
+                <small>TAP · CONNECT · GROW</small>
+            </div>
+        </a>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#contact">Enquiry</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a href="#contact" class="btn btn-primary">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+    </div>
+</header>
+
+
+<!-- =========================================
+     HERO
+========================================= -->
+
+<main>
+
+<section class="hero" id="home">
+
+    <div class="container hero-inner">
+
+        <div class="hero-copy">
+
+            <div class="hero-label">
+                <span></span>
+                Smart Digital Identity
+            </div>
+
+            <h1>
+                One Tap.<br>
+                Endless <em>Connections.</em>
+            </h1>
+
+            <p>
+                Introduce your business with a smarter digital identity.
+                Share your contact details, social links and business
+                information with one simple NFC tap or QR scan.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#products" class="btn btn-primary">
+                    Explore Products
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+                <a href="#how-it-works" class="btn btn-outline">
+                    <i class="fa-solid fa-circle-play"></i>
+                    How It Works
+                </a>
+            </div>
+
+            <div class="hero-trust">
+                <div class="trust-item">
+                    <i class="fa-solid fa-wifi"></i>
+                    NFC Technology
+                </div>
+
+                <div class="trust-item">
+                    <i class="fa-solid fa-qrcode"></i>
+                    QR Enabled
+                </div>
+
+                <div class="trust-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    Smart Analytics
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- 3D NFC CARD STAGE -->
+
+        <div class="hero-stage" id="heroStage">
+
+            <div class="stage-glow"></div>
+            <div class="stage-ring"></div>
+            <div class="tap-ripple"></div>
+
+            <div class="card-float" id="heroCard">
+
+                <div class="nfc-card">
+
+                    <div class="card-top">
+                        <div class="card-logo">VELORA</div>
+                        <div class="card-waves">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-middle">
+                        <h3>YOUR BUSINESS.</h3>
+                        <p>YOUR DIGITAL IDENTITY.</p>
+                    </div>
+
+                    <div class="card-bottom">
+                        <div class="card-chip"></div>
+                        <span>TAP · CONNECT · GROW</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="stage-phone">
+
+                <div class="phone-screen">
+
+                    <div class="phone-avatar">V</div>
+
+                    <h4>YOUR BUSINESS</h4>
+                    <p>Digital Business Profile</p>
+
+                    <div class="phone-link">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </div>
+
+                    <div class="phone-link">
+                        <i class="fa-brands fa-instagram"></i> Instagram
+                    </div>
+
+                    <div class="phone-link">
+                        <i class="fa-solid fa-globe"></i> Website
+                    </div>
+
+                    <div class="phone-link">
+                        <i class="fa-solid fa-star"></i> Google Reviews
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="tap-button" id="tapDemo">
+                <i class="fa-solid fa-wifi"></i>
+                TRY THE NFC TAP
+            </button>
+
+            <div class="tap-message" id="tapMessage">
+                Your digital profile is ready!
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     MARQUEE
+========================================= -->
+
+<div class="marquee">
+    <div class="marquee-track">
+
+        <div class="marquee-item">NFC BUSINESS CARDS <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">SMART QR PROFILES <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">DIGITAL IDENTITY <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">BUSINESS ANALYTICS <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">ONE TAP CONNECTION <i class="fa-solid fa-star"></i></div>
+
+        <div class="marquee-item">NFC BUSINESS CARDS <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">SMART QR PROFILES <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">DIGITAL IDENTITY <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">BUSINESS ANALYTICS <i class="fa-solid fa-star"></i></div>
+        <div class="marquee-item">ONE TAP CONNECTION <i class="fa-solid fa-star"></i></div>
+
+    </div>
+</div>
+
+
+<!-- =========================================
+     ABOUT US
+========================================= -->
+
+<section class="section" id="about">
+
+    <div class="container about-grid">
+
+        <div class="about-visual reveal">
+
+            <div class="about-logo">
+                <div class="big-v">V</div>
+                <p>VELORA TAP</p>
+                <span style="font-size:10px;letter-spacing:4px;display:block;margin-top:12px;">
+                    TAP · CONNECT · GROW
+                </span>
+            </div>
+
+        </div>
+
+        <div class="about-copy reveal">
+
+            <span class="eyebrow">About VELORA TAP</span>
+
+            <h2>
+                Your Business Deserves a
+                <span class="gold-text">Smarter Identity.</span>
+            </h2>
+
+            <p>
+                VELORA TAP is a digital identity platform designed to
+                simplify the way businesses connect with people.
+            </p>
+
+            <p>
+                Through NFC-enabled cards and QR technology, businesses
+                can share their digital profiles, contact information,
+                social media and important links in a convenient way.
+            </p>
+
+            <p>
+                We bring together smart physical products and digital
+                business experiences to help brands build meaningful
+                connections.
+            </p>
+
+            <div class="about-points">
+
+                <div class="about-point">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>Simple Connections</strong>
+                        <span>Share information with a tap or scan.</span>
+                    </div>
+                </div>
+
+                <div class="about-point">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>Modern Identity</strong>
+                        <span>Present your business professionally.</span>
+                    </div>
+                </div>
+
+                <div class="about-point">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>Smart Technology</strong>
+                        <span>NFC and QR-based experiences.</span>
+                    </div>
+                </div>
+
+                <div class="about-point">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <strong>Business Insights</strong>
+                        <span>Understand digital profile activity.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <a href="#contact" class="btn btn-primary">
+                Talk to Our Team
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     HOW IT WORKS
+========================================= -->
+
+<section class="section steps-section" id="how-it-works">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Simple Process</span>
+            <h2>How Does <span class="gold-text">VELORA TAP</span> Work?</h2>
+            <p>
+                Three simple steps to create a smarter digital
+                business experience.
+            </p>
+        </div>
+
+        <div class="steps-grid">
+
+            <div class="step-card reveal">
+                <span class="step-number">01</span>
+                <div class="step-icon">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <h3>Get Your NFC Card</h3>
+                <p>
+                    Choose your preferred NFC card and create your
+                    digital business identity.
+                </p>
+            </div>
+
+            <div class="step-card reveal">
+                <span class="step-number">02</span>
+                <div class="step-icon">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <h3>Tap or Scan</h3>
+                <p>
+                    Let someone tap your NFC card with a compatible
+                    smartphone or scan its QR code.
+                </p>
+            </div>
+
+            <div class="step-card reveal">
+                <span class="step-number">03</span>
+                <div class="step-icon">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+                <h3>Connect Instantly</h3>
+                <p>
+                    Your digital business profile opens, allowing
+                    visitors to access your information and links.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     FEATURES
+========================================= -->
+
+<section class="section" id="features">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Platform Features</span>
+            <h2>Everything You Need to <span class="gold-text">Connect.</span></h2>
+            <p>
+                A smarter collection of tools for your digital
+                business identity.
+            </p>
+        </div>
+
+        <div class="features-grid">
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-wifi"></i>
+                </div>
+                <h3>NFC Technology</h3>
+                <p>
+                    Share your digital business profile through
+                    compatible NFC-enabled devices.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <h3>Smart QR Code</h3>
+                <p>
+                    Provide a convenient QR alternative for visitors
+                    who prefer scanning.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-address-card"></i>
+                </div>
+                <h3>Digital Business Profile</h3>
+                <p>
+                    Present your business details, contact information
+                    and important links in one place.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <h3>WhatsApp Connection</h3>
+                <p>
+                    Allow visitors to connect with your business
+                    through WhatsApp.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-brands fa-google"></i>
+                </div>
+                <h3>Google Reviews</h3>
+                <p>
+                    Direct customers to your Google review page
+                    through a dedicated profile link.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <h3>Digital Analytics</h3>
+                <p>
+                    Track supported profile visits, QR scans,
+                    NFC visits and link clicks.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     3D EXPERIENCE
+========================================= -->
+
+<section class="section experience" id="experience">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">The VELORA Experience</span>
+            <h2>Technology That Makes Every Connection Count.</h2>
+            <p>
+                A physical card meets a digital experience.
+            </p>
+        </div>
+
+        <div class="experience-grid">
+
+            <div class="experience-copy reveal">
+
+                <h3>Not Just a Card.<br>A Digital Experience.</h3>
+
+                <p>
+                    Make introductions easier with a card that
+                    connects your physical presence to your digital
+                    business identity.
+                </p>
+
+                <ul class="experience-list">
+                    <li><i class="fa-solid fa-check"></i> NFC-enabled sharing</li>
+                    <li><i class="fa-solid fa-check"></i> QR code access</li>
+                    <li><i class="fa-solid fa-check"></i> Custom digital profiles</li>
+                    <li><i class="fa-solid fa-check"></i> Easy access to business links</li>
+                </ul>
+
+                <a href="#contact" class="btn btn-gold">
+                    Request Your Card
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+            <div class="experience-visual reveal">
+
+                <div class="nfc-card">
+
+                    <div class="card-top">
+                        <div class="card-logo">VELORA</div>
+                        <div class="card-waves">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-middle">
+                        <h3>CONNECT SMARTER.</h3>
+                        <p>YOUR DIGITAL BUSINESS CARD</p>
+                    </div>
+
+                    <div class="card-bottom">
+                        <div class="card-chip"></div>
+                        <span>TAP · CONNECT · GROW</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     PRODUCTS
+========================================= -->
+
+<section class="section" id="products">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Our Products</span>
+            <h2>Choose Your <span class="gold-text">Digital Identity.</span></h2>
+            <p>
+                Discover smart NFC products designed for modern
+                businesses and professionals.
+            </p>
+        </div>
+
+        <div class="products-grid">
+
+            <div class="product-card reveal">
+
+                <div class="product-art">
+                    <div class="nfc-card">
+                        <div class="card-top">
+                            <div class="card-logo">VELORA</div>
+                            <div class="card-waves"><i class="fa-solid fa-wifi"></i></div>
+                        </div>
+                        <div class="card-middle">
+                            <h3>BUSINESS CARD</h3>
+                            <p>YOUR DIGITAL IDENTITY</p>
+                        </div>
+                        <div class="card-bottom">
+                            <div class="card-chip"></div>
+                            <span>PREMIUM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <h3>NFC Business Card</h3>
+                    <p>
+                        A premium NFC card that helps you share
+                        your digital business profile.
+                    </p>
+                    <button class="btn btn-primary product-select" data-product="NFC Business Card">
+                        Enquire Now <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="product-card reveal">
+
+                <div class="product-art">
+                    <div class="nfc-card" style="background:linear-gradient(140deg,#d9d0bd,#f8f2e6);color:#064b35;border-color:#c49a4b;">
+                        <div class="card-top">
+                            <div class="card-logo" style="color:#064b35;">VELORA</div>
+                            <div class="card-waves" style="color:#064b35;"><i class="fa-solid fa-wifi"></i></div>
+                        </div>
+                        <div class="card-middle">
+                            <h3 style="color:#064b35;">SMART IDENTITY</h3>
+                            <p style="color:#64766a;">TAP TO CONNECT</p>
+                        </div>
+                        <div class="card-bottom" style="color:#064b35;">
+                            <div class="card-chip"></div>
+                            <span>CLASSIC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <h3>Premium NFC Card</h3>
+                    <p>
+                        A refined card design for professionals
+                        who want a distinctive presentation.
+                    </p>
+                    <button class="btn btn-primary product-select" data-product="Premium NFC Card">
+                        Enquire Now <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="product-card reveal">
+
+                <div class="product-art">
+                    <div class="nfc-card" style="width:250px;height:155px;border-radius:15px;padding:17px;">
+                        <div class="card-top">
+                            <div class="card-logo" style="font-size:18px;">VELORA</div>
+                            <div class="card-waves"><i class="fa-solid fa-qrcode"></i></div>
+                        </div>
+                        <div class="card-middle" style="margin-top:23px;">
+                            <h3 style="font-size:15px;">SMART QR</h3>
+                            <p>SCAN TO CONNECT</p>
+                        </div>
+                        <div class="card-bottom" style="left:17px;right:17px;bottom:14px;">
+                            <div class="card-chip"></div>
+                            <span>QR ACCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <h3>QR Digital Profile</h3>
+                    <p>
+                        Share your business profile through a
+                        scannable QR code.
+                    </p>
+                    <button class="btn btn-primary product-select" data-product="QR Digital Profile">
+                        Enquire Now <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     ANALYTICS
+========================================= -->
+
+<section class="section analytics-section" id="analytics">
+
+    <div class="container analytics-grid">
+
+        <div class="analytics-copy reveal">
+
+            <span class="eyebrow">Business Insights</span>
+
+            <h2>Understand Your Digital <span class="gold-text">Connections.</span></h2>
+
+            <p>
+                Your digital business profile can provide useful
+                insights into visitor activity. Understand how
+                people interact with your profile and its links.
+            </p>
+
+            <p>
+                Supported analytics can include profile visits,
+                identifiable NFC and QR visits, and clicks on
+                WhatsApp, website, Instagram and Google Reviews links.
+            </p>
+
+            <a href="#contact" class="btn btn-primary">
+                Learn More
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+        </div>
+
+
+        <div class="analytics-mockup reveal">
+
+            <div class="mockup-header">
+                <strong>Business Overview</strong>
+                <span><i class="fa-solid fa-circle"></i> DEMO PREVIEW</span>
+            </div>
+
+            <div class="mockup-stats">
+
+                <div class="mock-stat">
+                    <small>Profile Visits</small>
+                    <strong>--</strong>
+                </div>
+
+                <div class="mock-stat">
+                    <small>NFC / QR Visits</small>
+                    <strong>--</strong>
+                </div>
+
+                <div class="mock-stat">
+                    <small>Link Clicks</small>
+                    <strong>--</strong>
+                </div>
+
+                <div class="mock-stat">
+                    <small>Engagement</small>
+                    <strong>--</strong>
+                </div>
+
+            </div>
+
+            <div class="mock-chart" aria-label="Illustrative analytics chart">
+                <span style="height:30%"></span>
+                <span style="height:48%"></span>
+                <span style="height:39%"></span>
+                <span style="height:65%"></span>
+                <span style="height:54%"></span>
+                <span style="height:83%"></span>
+                <span style="height:72%"></span>
+                <span style="height:95%"></span>
+            </div>
+
+            <p style="font-size:9px;color:#929b91;margin-top:12px;">
+                Illustrative dashboard preview. Live analytics will be connected to your account.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     PRICING
+========================================= -->
+
+<section class="section" id="pricing">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Our Plans</span>
+            <h2>Find the Right <span class="gold-text">Plan for You.</span></h2>
+            <p>
+                Explore our service options and contact our team
+                for a quotation tailored to your requirements.
+            </p>
+        </div>
+
+        <div class="pricing-grid">
+
+            <div class="price-card reveal">
+
+                <h3>Starter</h3>
+                <p>For individuals and professionals starting their digital journey.</p>
+
+                <div class="price-value">
+                    Custom <small>/ quotation</small>
+                </div>
+
+                <ul class="price-features">
+                    <li><i class="fa-solid fa-check"></i> NFC card option</li>
+                    <li><i class="fa-solid fa-check"></i> Digital business profile</li>
+                    <li><i class="fa-solid fa-check"></i> QR code access</li>
+                    <li><i class="fa-solid fa-check"></i> Contact and social links</li>
+                    <li><i class="fa-solid fa-check"></i> Setup assistance</li>
+                </ul>
+
+                <button class="btn btn-outline plan-select" data-plan="Starter">
+                    Choose Starter
+                </button>
+
+            </div>
+
+
+            <div class="price-card featured reveal">
+
+                <span class="popular-label">POPULAR CHOICE</span>
+
+                <h3>Professional</h3>
+                <p>For growing businesses that need a polished digital identity.</p>
+
+                <div class="price-value">
+                    Custom <small>/ quotation</small>
+                </div>
+
+                <ul class="price-features">
+                    <li><i class="fa-solid fa-check"></i> Premium NFC card option</li>
+                    <li><i class="fa-solid fa-check"></i> Custom digital profile</li>
+                    <li><i class="fa-solid fa-check"></i> QR code access</li>
+                    <li><i class="fa-solid fa-check"></i> Business social links</li>
+                    <li><i class="fa-solid fa-check"></i> Analytics access option</li>
+                    <li><i class="fa-solid fa-check"></i> Client dashboard option</li>
+                </ul>
+
+                <button class="btn btn-gold plan-select" data-plan="Professional">
+                    Choose Professional
+                </button>
+
+            </div>
+
+
+            <div class="price-card reveal">
+
+                <h3>Business</h3>
+                <p>For companies and teams managing multiple business profiles.</p>
+
+                <div class="price-value">
+                    Custom <small>/ quotation</small>
+                </div>
+
+                <ul class="price-features">
+                    <li><i class="fa-solid fa-check"></i> Business NFC solutions</li>
+                    <li><i class="fa-solid fa-check"></i> Multiple profile options</li>
+                    <li><i class="fa-solid fa-check"></i> Branch support option</li>
+                    <li><i class="fa-solid fa-check"></i> Business analytics option</li>
+                    <li><i class="fa-solid fa-check"></i> Team management option</li>
+                    <li><i class="fa-solid fa-check"></i> Priority assistance option</li>
+                </ul>
+
+                <button class="btn btn-outline plan-select" data-plan="Business">
+                    Choose Business
+                </button>
+
+            </div>
+
+        </div>
+
+        <p style="text-align:center;color:var(--muted);font-size:10px;margin-top:25px;">
+            Final pricing, availability and included features will be confirmed in your quotation.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     FAQ
+========================================= -->
+
+<section class="section faq-section" id="faq">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Frequently Asked Questions</span>
+            <h2>Questions? <span class="gold-text">We've Got Answers.</span></h2>
+            <p>
+                Learn more about how VELORA TAP works.
+            </p>
+        </div>
+
+        <div class="faq-list">
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    What is VELORA TAP?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        VELORA TAP is a digital identity platform
+                        that combines NFC cards, QR codes and
+                        digital business profiles.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    How does an NFC card work?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        A compatible smartphone can read the NFC
+                        tag in the card and open the digital profile
+                        URL programmed onto it. Device compatibility
+                        and NFC settings may vary.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Do I need an application?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Visitors generally do not need a special
+                        application to open a web-based profile.
+                        A compatible smartphone and internet
+                        connection are usually sufficient.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Can people use a QR code instead?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Yes. Your QR code can open the same digital
+                        profile, providing an alternative to NFC.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Can I update my business information?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        The planned client dashboard will allow
+                        authorized clients to manage their digital
+                        business information. Availability depends
+                        on account setup.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Can I see how many people visit my profile?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Supported analytics can measure profile
+                        visits and link clicks. A click on a Google
+                        Reviews link does not prove that a review
+                        was submitted.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    How can I order an NFC card?
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>
+                        Submit an enquiry using the form on this
+                        page. Our team can discuss card options,
+                        requirements and pricing.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     CONTACT / ENQUIRY FORM
+========================================= -->
+
+<section class="section contact-section" id="contact">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+            <span class="eyebrow">Let's Connect</span>
+            <h2>Start Your Digital Journey.</h2>
+            <p>
+                Tell us about your business and what you need.
+                Our team will help you explore the right solution.
+            </p>
+        </div>
+
+        <div class="contact-grid">
+
+            <div class="contact-copy reveal">
+
+                <h3>Let's Build Something Smarter Together.</h3>
+
+                <p>
+                    Whether you are an individual professional,
+                    a growing business or a company looking for
+                    digital identity solutions, we'd love to
+                    hear from you.
+                </p>
+
+                <div class="contact-detail">
+                    <i class="fa-solid fa-building"></i>
+                    <div>
+                        <strong>Brand</strong>
+                        <span>VELORA TAP</span>
+                    </div>
+                </div>
+
+                <div class="contact-detail">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <strong>Location</strong>
+                        <span>Mangaluru, Karnataka, India</span>
+                    </div>
+                </div>
+
+                <div class="contact-detail">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <strong>Enquiries</strong>
+                        <span>Submit the enquiry form</span>
+                    </div>
+                </div>
+
+                <div class="contact-detail">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <strong>Business Enquiries</strong>
+                        <span>Submit your requirements anytime</span>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <form class="enquiry-form reveal" id="enquiryForm">
+
+                <h3>Send an Enquiry</h3>
+                <p>Complete the form and tell us what you are looking for.</p>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="customerName">Full Name *</label>
+                        <input type="text" id="customerName" name="name" placeholder="Your full name" required>
+                        <span class="form-error">Please enter your name.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" name="phone" placeholder="Your mobile number" required>
+                        <span class="form-error">Enter a valid phone number.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerEmail">Email Address</label>
+                        <input type="email" id="customerEmail" name="email" placeholder="Your email address">
+                        <span class="form-error">Enter a valid email.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessName">Business Name</label>
+                        <input type="text" id="businessName" name="business" placeholder="Your business name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enquiryType">Enquiry Type *</label>
+                        <select id="enquiryType" name="type" required>
+                            <option value="">Select a service</option>
+                            <option value="NFC Business Card">NFC Business Card</option>
+                            <option value="Premium NFC Card">Premium NFC Card</option>
+                            <option value="QR Digital Profile">QR Digital Profile</option>
+                            <option value="Business Digital Profile">Business Digital Profile</option>
+                            <option value="Multiple Business Accounts">Multiple Business Accounts</option>
+                            <option value="Enterprise Solution">Enterprise Solution</option>
+                            <option value="Other">Other Enquiry</option>
+                        </select>
+                        <span class="form-error">Please select an enquiry type.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessType">Business Category</label>
+                        <select id="businessType" name="category">
+                            <option value="">Select category</option>
+                            <option>Retail</option>
+                            <option>Real Estate</option>
+                            <option>Restaurant</option>
+                            <option>Healthcare</option>
+                            <option>Education</option>
+                            <option>Professional Services</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="customerMessage">Tell Us About Your Requirements *</label>
+                        <textarea id="customerMessage" name="message" placeholder="Write your requirements here..." required></textarea>
+                        <span class="form-error">Please describe your requirements.</span>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Submit Enquiry
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+
+                <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+
+                <p style="font-size:9px;color:#929b91;margin-top:12px;line-height:1.6;">
+                    This first version stores enquiries in this browser only.
+                    Online submission and admin dashboard delivery require backend integration.
+                </p>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     FINAL CTA
+========================================= -->
+
+<section class="final-cta">
+
+    <div class="container reveal">
+
+        <span class="eyebrow">VELORA TAP</span>
+
+        <h2>Make Every Introduction Count.</h2>
+
+        <p>
+            Move beyond traditional business cards.
+            Connect your physical presence with your digital identity.
+        </p>
+
+        <a href="#contact" class="btn btn-primary">
+            Get Started Today
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <div class="footer-brand">
+
+                <a href="#home" class="brand">
+                    <div class="brand-mark">V</div>
+                    <div class="brand-name">
+                        VELORA TAP
+                        <small>TAP · CONNECT · GROW</small>
+                    </div>
+                </a>
+
+                <p>
+                    A smarter digital identity platform
+                    connecting businesses and people through
+                    NFC technology and QR experiences.
+                </p>
+
+                <div class="social-links">
+                    <a href="#contact" aria-label="Instagram enquiry"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#contact" aria-label="Facebook enquiry"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#contact" aria-label="LinkedIn enquiry"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+
+            </div>
+
+
+            <div class="footer-col">
+                <h4>EXPLORE</h4>
+                <a href="#home">Home</a>
+                <a href="#about">About Us</a>
+                <a href="#features">Features</a>
+                <a href="#experience">Experience</a>
+                <a href="#products">Products</a>
+            </div>
+
+
+            <div class="footer-col">
+                <h4>INFORMATION</h4>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#analytics">Analytics</a>
+                <a href="#faq">FAQs</a>
+                <a href="#contact">Enquiry</a>
+            </div>
+
+
+            <div class="footer-col">
+                <h4>GET IN TOUCH</h4>
+                <a href="#contact">Contact Us</a>
+                <a href="#contact">Request a Quotation</a>
+                <a href="#contact">Business Enquiry</a>
+                <a href="#contact">Support</a>
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © <span id="currentYear"></span> <strong>VELORA TAP</strong>. All rights reserved.
+            </span>
+
+            <span>
+                Powered by <strong>VELORA DIGITAL</strong>
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- FLOATING ACTIONS -->
+
+<a href="#contact" class="whatsapp-float" id="whatsappButton" aria-label="WhatsApp enquiry">
+    <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<button class="back-top" id="backTop" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+</button>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<script>
+
+/* =========================================
+   CONFIGURATION
+========================================= */
+
+/*
+   IMPORTANT:
+   Add your official WhatsApp number here later.
+
+   Use country code + number.
+   Example format: 919876543210
+
+   Do not add +, spaces or hyphens.
+*/
+
+const VELORA_CONFIG = {
+    whatsappNumber: "",
+    brandName: "VELORA TAP"
+};
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+const navbar = document.getElementById("navbar");
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+const backTop = document.getElementById("backTop");
+
+window.addEventListener("scroll", () => {
+
+    if (window.scrollY > 40) {
+        navbar.classList.add("scrolled");
+    } else {
+        navbar.classList.remove("scrolled");
+    }
+
+    if (window.scrollY > 400) {
+        backTop.classList.add("visible");
+    } else {
+        backTop.classList.remove("visible");
+    }
+
+});
+
+
+menuToggle.addEventListener("click", () => {
+
+    const isOpen = navLinks.classList.toggle("active");
+
+    document.body.classList.toggle("menu-open", isOpen);
+
+    menuToggle.setAttribute("aria-expanded", isOpen);
+
+    menuToggle.innerHTML = isOpen
+        ? '<i class="fa-solid fa-xmark"></i>'
+        : '<i class="fa-solid fa-bars"></i>';
+
+});
+
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+
+    link.addEventListener("click", () => {
+
+        navLinks.classList.remove("active");
+        document.body.classList.remove("menu-open");
+
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+
+    });
+
+});
+
+
+backTop.addEventListener("click", () => {
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+});
+
+
+/* =========================================
+   HERO 3D CARD MOUSE MOVEMENT
+========================================= */
+
+const heroStage = document.getElementById("heroStage");
+const heroCard = document.getElementById("heroCard");
+
+if (window.matchMedia("(hover: hover)").matches) {
+
+    heroStage.addEventListener("mousemove", (event) => {
+
+        if (heroStage.classList.contains("tapping")) return;
+
+        const rect = heroStage.getBoundingClientRect();
+
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+
+        const rotateY = (x - 0.5) * 22;
+        const rotateX = (0.5 - y) * 18;
+
+        heroCard.style.animation = "none";
+
+        heroCard.style.transform =
+            `rotateY(${rotateY - 12}deg) rotateX(${rotateX + 5}deg)`;
+
+    });
+
+
+    heroStage.addEventListener("mouseleave", () => {
+
+        if (!heroStage.classList.contains("tapping")) {
+
+            heroCard.style.animation = "cardFloat 5s ease-in-out infinite";
+            heroCard.style.transform = "";
+
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   NFC TAP DEMONSTRATION
+========================================= */
+
+const tapDemo = document.getElementById("tapDemo");
+const tapMessage = document.getElementById("tapMessage");
+
+tapDemo.addEventListener("click", () => {
+
+    heroStage.classList.remove("tapping");
+
+    void heroStage.offsetWidth;
+
+    heroStage.classList.add("tapping");
+
+    tapDemo.innerHTML =
+        '<i class="fa-solid fa-check"></i> PROFILE OPENED';
+
+    tapMessage.textContent =
+        "Demo complete! Your digital profile is ready.";
+
+    setTimeout(() => {
+
+        heroStage.classList.remove("tapping");
+
+        tapDemo.innerHTML =
+            '<i class="fa-solid fa-wifi"></i> TRY THE NFC TAP';
+
+    }, 3500);
+
+});
+
+
+/* =========================================
+   PRODUCT ENQUIRY BUTTONS
+========================================= */
+
+document.querySelectorAll(".product-select").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const product = button.dataset.product;
+
+        const enquiryType = document.getElementById("enquiryType");
+
+        enquiryType.value = product;
+
+        document.getElementById("contact").scrollIntoView({
+            behavior: "smooth"
+        });
+
+    });
+
+});
+
+
+/* =========================================
+   PRICING SELECTION
+========================================= */
+
+document.querySelectorAll(".plan-select").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const plan = button.dataset.plan;
+
+        document.getElementById("enquiryType").value =
+            "Business Digital Profile";
+
+        document.getElementById("customerMessage").value =
+            "I am interested in the " + plan +
+            " plan. Please contact me with the pricing and details.";
+
+        document.getElementById("contact").scrollIntoView({
+            behavior: "smooth"
+        });
+
+    });
+
+});
+
+
+/* =========================================
+   FAQ ACCORDION
+========================================= */
+
+document.querySelectorAll(".faq-question").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const current = button.parentElement;
+
+        const wasActive = current.classList.contains("active");
+
+        document.querySelectorAll(".faq-item").forEach(item => {
+            item.classList.remove("active");
+        });
+
+        if (!wasActive) {
+            current.classList.add("active");
+        }
+
+    });
+
+});
+
+
+/* =========================================
+   ENQUIRY FORM
+========================================= */
+
+const enquiryForm = document.getElementById("enquiryForm");
+const formStatus = document.getElementById("formStatus");
+
+
+function validateField(field) {
+
+    const group = field.closest(".form-group");
+
+    let valid = true;
+
+    if (field.hasAttribute("required") && !field.value.trim()) {
+        valid = false;
+    }
+
+    if (field.type === "email" && field.value.trim()) {
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(field.value.trim())) {
+            valid = false;
+        }
+
+    }
+
+    if (field.type === "tel") {
+
+        const digits = field.value.replace(/\D/g, "");
+
+        if (digits.length < 7 || digits.length > 15) {
+            valid = false;
+        }
+
+    }
+
+    if (group) {
+        group.classList.toggle("invalid", !valid);
+    }
+
+    return valid;
+
+}
+
+
+enquiryForm.querySelectorAll("input, select, textarea").forEach(field => {
+
+    field.addEventListener("input", () => {
+        validateField(field);
+    });
+
+    field.addEventListener("change", () => {
+        validateField(field);
+    });
+
+});
+
+
+enquiryForm.addEventListener("submit", (event) => {
+
+    event.preventDefault();
+
+    const fields = Array.from(
+        enquiryForm.querySelectorAll("input, select, textarea")
+    );
+
+    let formIsValid = true;
+
+    fields.forEach(field => {
+
+        if (!validateField(field)) {
+            formIsValid = false;
+        }
+
+    });
+
+    if (!formIsValid) {
+
+        formStatus.style.display = "block";
+        formStatus.style.background = "#fff0ed";
+        formStatus.style.color = "#a33a32";
+        formStatus.textContent =
+            "Please check the required fields and correct the information.";
+
+        return;
+
+    }
+
+
+    const enquiry = {
+
+        name: document.getElementById("customerName").value.trim(),
+
+        phone: document.getElementById("customerPhone").value.trim(),
+
+        email: document.getElementById("customerEmail").value.trim(),
+
+        business: document.getElementById("businessName").value.trim(),
+
+        type: document.getElementById("enquiryType").value,
+
+        category: document.getElementById("businessType").value,
+
+        message: document.getElementById("customerMessage").value.trim(),
+
+        submittedAt: new Date().toISOString()
+
+    };
+
+
+    /*
+       TEMPORARY FRONT-END STORAGE
+
+       This saves the enquiry in this browser only.
+       It does not send the enquiry to your admin dashboard.
+       Supabase integration will replace this later.
+    */
+
+    try {
+
+        const previousEnquiries = JSON.parse(
+            localStorage.getItem("velora_enquiries") || "[]"
+        );
+
+        previousEnquiries.push(enquiry);
+
+        localStorage.setItem(
+            "velora_enquiries",
+            JSON.stringify(previousEnquiries)
+        );
+
+    } catch (error) {
+
+        console.error("Local enquiry storage unavailable:", error);
+
+    }
+
+
+    formStatus.style.display = "block";
+    formStatus.style.background = "#edf5e9";
+    formStatus.style.color = "#064b35";
+
+    formStatus.textContent =
+        "Your enquiry has been saved in this browser. Online delivery to VELORA TAP will be enabled when we connect Supabase.";
+
+    enquiryForm.reset();
+
+    enquiryForm.querySelectorAll(".form-group").forEach(group => {
+        group.classList.remove("invalid");
+    });
+
+});
+
+
+/* =========================================
+   WHATSAPP BUTTON
+========================================= */
+
+const whatsappButton = document.getElementById("whatsappButton");
+
+whatsappButton.addEventListener("click", (event) => {
+
+    event.preventDefault();
+
+    if (!VELORA_CONFIG.whatsappNumber) {
+
+        document.getElementById("contact").scrollIntoView({
+            behavior: "smooth"
+        });
+
+        alert(
+            "VELORA TAP WhatsApp number has not been configured yet. Please use the enquiry form for now."
+        );
+
+        return;
+
+    }
+
+    const message = encodeURIComponent(
+        "Hello VELORA TAP! I would like to know more about your NFC business cards and digital profiles."
+    );
+
+    window.open(
+        "https://wa.me/" +
+        VELORA_CONFIG.whatsappNumber +
+        "?text=" + message,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+});
+
+
+/* =========================================
+   CURRENT YEAR
+========================================= */
+
+document.getElementById("currentYear").textContent =
+    new Date().getFullYear();
+
+
+/* =========================================
+   GSAP SCROLL ANIMATIONS
+========================================= */
+
+if (window.gsap && window.ScrollTrigger &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.from(".hero-copy > *", {
+        opacity: 0,
+        y: 35,
+        duration: 1,
+        stagger: .12,
+        ease: "power3.out",
+        delay: .2
+    });
+
+    gsap.from(".hero-stage", {
+        opacity: 0,
+        x: 70,
+        duration: 1.3,
+        ease: "power3.out",
+        delay: .3
+    });
+
+    gsap.utils.toArray(".reveal").forEach(element => {
+
+        gsap.to(element, {
+
+            opacity: 1,
+            y: 0,
+
+            duration: .85,
+
+            ease: "power3.out",
+
+            scrollTrigger: {
+                trigger: element,
+                start: "top 88%",
+                once: true
+            }
+
+        });
+
+    });
+
+} else {
+
+    document.querySelectorAll(".reveal").forEach(element => {
+        element.style.opacity = "1";
+        element.style.transform = "none";
+    });
+
+}
+
+
+/* =========================================
+   CONSOLE
+========================================= */
+
+console.log(
+    "%cVELORA TAP",
+    "font-size:24px;font-weight:bold;color:#064b35;"
+);
+
+console.log(
+    "Tap. Connect. Grow. | Powered by VELORA DIGITAL"
+);
+
+</script>
+
+</body>
+</html>
