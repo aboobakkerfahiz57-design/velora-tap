@@ -1,9 +1,0 @@
-
-{
-  "rewrites": [
-    {
-      "source": "/:slug",
-      "destination": "/business.html?slug=:slug"
-    }
-  ]
-}
