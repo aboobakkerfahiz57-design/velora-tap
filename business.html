@@ -152,17 +152,26 @@
         content.replaceChildren(paragraph);
       }
 
-      function addLink(container, label, url) {
-        if (!url) return;
+      function addLink(container, label, url, actionKey) {
+  if (!url) return;
 
-        const link = document.createElement("a");
-        link.className = "link-button";
-        link.textContent = label;
-        link.href = url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        container.appendChild(link);
-      }
+  const link = document.createElement("a");
+  link.className = "link-button";
+  link.textContent = label;
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+
+  link.addEventListener("click", () => {
+    window.VeloraAnalytics?.track(
+      businessId,
+      "link_click",
+      actionKey
+    );
+  });
+
+  container.appendChild(link);
+}
 
       if (!db) {
         showMessage("Unable to connect. Please try again later.");
@@ -178,7 +187,7 @@
 
       const { data: business, error } = await db
         .from("businesses")
-        .select("name, description, logo_url, google_review_url, website_url, whatsapp_number, instagram_url")
+        .select("id, name, description, logo_url, google_review_url, website_url, whatsapp_number, instagram_url")
         .eq("slug", slug)
         .eq("status", "active")
         .maybeSingle();
@@ -189,6 +198,12 @@
       }
 
       document.title = business.name + " | VELORA TAP";
+      const businessId = business.id;
+
+window.VeloraAnalytics?.track(
+  businessId,
+  "profile_view"
+);
 
       content.replaceChildren();
 
@@ -215,18 +230,20 @@
       const links = document.createElement("div");
       links.className = "links";
 
-      addLink(links, "★  Google Reviews", business.google_review_url);
-      addLink(links, "⌂  Visit Website", business.website_url);
+      addLink(links, "★ Google Reviews", business.google_review_url, "google_reviews");
 
-      if (business.whatsapp_number) {
-        const number = business.whatsapp_number.replace(/\D/g, "");
-        if (number) {
-          addLink(links, "WhatsApp", "https://wa.me/" + number);
-        }
-      }
+addLink(links, "⌂ Visit Website", business.website_url, "website");
 
-      addLink(links, "◎  Instagram", business.instagram_url);
+addLink(
+  links,
+  "WhatsApp",
+  business.whatsapp_number
+    ? "https://wa.me/" + business.whatsapp_number.replace(/\D/g, "")
+    : null,
+  "whatsapp"
+);
 
+addLink(links, "◎ Instagram", business.instagram_url, "instagram");
       if (!links.children.length) {
         const empty = document.createElement("p");
         empty.className = "empty-message";
