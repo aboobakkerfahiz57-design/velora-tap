@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELORA TAP | Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root{
+ --green:#064b35;
+ --green2:#0c6548;
+ --gold:#c6a15b;
+ --bg:#f4f6f3;
+ --white:#fff;
+ --text:#17251e;
+ --muted:#78847d;
+ --border:#e6ebe6;
+ --red:#c44747;
+ --shadow:0 8px 30px rgba(20,50,35,.07);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#062f23,#0d6246)}
+.login-card{width:100%;max-width:420px;background:white;border-radius:22px;padding:38px;box-shadow:var(--shadow)}
+.logo{font-weight:800;letter-spacing:2px;color:var(--green);font-size:22px}
+.logo small{display:block;color:var(--gold);font-size:9px;letter-spacing:4px;margin-top:5px}
+.login-card h1{font-family:'Playfair Display',serif;font-size:30px;margin:32px 0 8px}
+.muted{color:var(--muted);font-size:13px;line-height:1.7}
+.field{margin-top:17px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+.field input,.field select,.field textarea,.toolbar input,.toolbar select{
+ width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:white;outline:none;color:var(--text)
+}
+.field input:focus,.field textarea:focus,.field select:focus,.toolbar input:focus{border-color:var(--green)}
+.field textarea{min-height:260px;font-family:monospace;font-size:12px}
+.btn{border:0;border-radius:9px;padding:11px 16px;font-weight:700;font-size:12px;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.primary{background:var(--green);color:white}
+.primary:hover{background:var(--green2)}
+.secondary{background:#edf3ef;color:var(--green)}
+.danger{background:#fff0ef;color:var(--red)}
+.gold{background:#f7f0e3;color:#876326}
+.full{width:100%;margin-top:22px}
+.error{color:var(--red);font-size:12px;margin-top:12px}
+.app{min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:#073c2b;color:white;padding:25px 17px;overflow:auto;z-index:5}
+.sidebar .logo{color:white;padding:0 12px 28px}
+.sidebar .logo small{color:#d5b878}
+.nav-label{font-size:9px;color:#94b4a5;letter-spacing:2px;font-weight:800;padding:17px 12px 8px}
+.nav-btn{width:100%;display:flex;gap:12px;align-items:center;border:0;background:transparent;color:#c9d8d0;padding:12px;border-radius:9px;text-align:left;font-size:12px;margin:3px 0}
+.nav-btn i{width:18px;text-align:center}
+.nav-btn:hover,.nav-btn.active{background:#155b43;color:white}
+.main{margin-left:250px;padding:28px;max-width:1800px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:25px}
+.topbar h1{font-family:'Playfair Display',serif;font-size:29px;margin:0}
+.topbar p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.user-area{display:flex;gap:10px;align-items:center}
+.avatar{width:38px;height:38px;border-radius:50%;background:#e7eee8;color:var(--green);display:grid;place-items:center}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}
+.stat,.panel,.table-wrap{background:white;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.stat{padding:19px}
+.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}
+.stat-icon{width:34px;height:34px;border-radius:10px;background:#edf4ef;color:var(--green);display:grid;place-items:center}
+.stat strong{display:block;font-size:27px;margin-top:12px}
+.panel{padding:20px;margin-bottom:18px}
+.panel h2{font-size:15px;margin:0 0 5px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.toolbar input{max-width:300px}
+.toolbar select{max-width:230px}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:700px}
+th,td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--border);font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th{background:#f8faf8;color:#66756b;font-size:10px;text-transform:uppercase;letter-spacing:.7px}
+tr:hover td{background:#fbfdfb}
+.actions{display:flex;gap:6px}
+.icon-btn{width:30px;height:30px;border:0;border-radius:7px;background:#edf3ef;color:var(--green)}
+.icon-btn.delete{background:#fff0ef;color:var(--red)}
+.badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#edf4ef;color:var(--green);font-size:10px}
+.empty{text-align:center;padding:35px;color:var(--muted);font-size:12px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(8,25,17,.55);display:grid;place-items:center;padding:18px;z-index:20}
+.modal{background:white;border-radius:16px;width:100%;max-width:720px;max-height:90vh;overflow:auto;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-head h2{font-size:17px;margin:0}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}
+.notice{padding:12px 14px;background:#f2f6f2;border-radius:9px;font-size:11px;color:#53655a;margin:12px 0}
+.mobile-menu{display:none}
+.status{font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:1000px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .sidebar{width:210px}
+ .main{margin-left:210px;padding:20px}
+}
+@media(max-width:700px){
+ .sidebar{display:none}
+ .main{margin-left:0;padding:16px}
+ .stats{grid-template-columns:repeat(2,1fr);gap:9px}
+ .stat{padding:13px}
+ .stat strong{font-size:22px}
+ .topbar h1{font-size:23px}
+ .mobile-menu{display:inline-flex}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section id="loginScreen" class="login-screen">
+ <div class="login-card">
+  <div class="logo">VELORA TAP<small>TAP · CONNECT · GROW</small></div>
+  <h1>Welcome Back.</h1>
+  <p class="muted">Sign in to manage your VELORA TAP business platform.</p>
+
+  <form id="loginForm">
+   <div class="field">
+    <label>Email Address</label>
+    <input id="loginEmail" type="email" required placeholder="Admin email">
+   </div>
+   <div class="field">
+    <label>Password</label>
+    <input id="loginPassword" type="password" required placeholder="Your password">
+   </div>
+   <button class="btn primary full" type="submit">
+    <i class="fa-solid fa-lock"></i> Sign In
+   </button>
+   <div id="loginError" class="error"></div>
+  </form>
+ </div>
+</section>
+
+<!-- APPLICATION -->
+<div id="app" class="app hidden">
+
+<aside class="sidebar">
+ <div class="logo">VELORA TAP<small>ADMINISTRATION</small></div>
+
+ <div class="nav-label">OVERVIEW</div>
+ <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+ <button class="nav-btn" data-page="businesses"><i class="fa-solid fa-building"></i> Businesses</button>
+ <button class="nav-btn" data-page="clients"><i class="fa-solid fa-users"></i> Clients</button>
+
+ <div class="nav-label">CUSTOMER MANAGEMENT</div>
+ <button class="nav-btn" data-page="inquiries"><i class="fa-solid fa-inbox"></i> Inquiries</button>
+ <button class="nav-btn" data-page="leads"><i class="fa-solid fa-bullseye"></i> Leads</button>
+
+ <div class="nav-label">NFC MANAGEMENT</div>
+ <button class="nav-btn" data-page="nfc_cards"><i class="fa-solid fa-wifi"></i> NFC Cards</button>
+ <button class="nav-btn" data-page="nfc_card_assignments"><i class="fa-solid fa-link"></i> Card Assignments</button>
+ <button class="nav-btn" data-page="business_events"><i class="fa-solid fa-chart-line"></i> Activity & Analytics</button>
+
+ <div class="nav-label">SALES & FINANCE</div>
+ <button class="nav-btn" data-page="orders"><i class="fa-solid fa-cart-shopping"></i> Orders</button>
+ <button class="nav-btn" data-page="invoices"><i class="fa-solid fa-file-invoice"></i> Invoices</button>
+ <button class="nav-btn" data-page="payments"><i class="fa-solid fa-money-bill-transfer"></i> Payments</button>
+
+ <div class="nav-label">TEAM</div>
+ <button class="nav-btn" data-page="staff_profiles"><i class="fa-solid fa-user-tie"></i> Staff</button>
+ <button class="nav-btn" data-page="admin_profiles"><i class="fa-solid fa-user-shield"></i> Admin Accounts</button>
+
+ <div class="nav-label">SYSTEM</div>
+ <button class="nav-btn" data-page="settings"><i class="fa-solid fa-gear"></i> Settings & Tools</button>
+ <button class="nav-btn" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+</aside>
+
+<main class="main">
+ <header class="topbar">
+  <div>
+   <button class="btn secondary mobile-menu" id="mobileMenuButton"><i class="fa-solid fa-bars"></i></button>
+   <h1 id="pageTitle">Dashboard</h1>
+   <p id="pageSubtitle">Your business at a glance.</p>
+  </div>
+  <div class="user-area">
+   <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
+   <div><strong id="adminEmail" style="font-size:11px">Admin</strong><div class="muted">Administrator</div></div>
+  </div>
+ </header>
+
+ <section id="dashboardPage">
+  <div class="stats">
+   <div class="stat"><div class="stat-top">Businesses <span class="stat-icon"><i class="fa-solid fa-building"></i></span></div><strong id="statBusinesses">—</strong></div>
+   <div class="stat"><div class="stat-top">Clients <span class="stat-icon"><i class="fa-solid fa-users"></i></span></div><strong id="statClients">—</strong></div>
+   <div class="stat"><div class="stat-top">Orders <span class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></span></div><strong id="statOrders">—</strong></div>
+   <div class="stat"><div class="stat-top">NFC Cards <span class="stat-icon"><i class="fa-solid fa-wifi"></i></span></div><strong id="statCards">—</strong></div>
+  </div>
+
+  <div class="panel">
+   <h2>Welcome to VELORA TAP</h2>
+   <p class="muted">Manage your business profiles, clients, NFC inventory, sales, payments, staff, and customer activity from one place.</p>
+   <div class="toolbar">
+    <button class="btn primary" id="quickBusiness"><i class="fa-solid fa-plus"></i> Add Business</button>
+    <button class="btn secondary" id="refreshDashboard"><i class="fa-solid fa-rotate"></i> Refresh Dashboard</button>
+   </div>
+  </div>
+
+  <div class="panel">
+   <h2>Recent Business Records</h2>
+   <div id="recentBusinesses" class="status">Loading...</div>
+  </div>
+ </section>
+
+ <section id="recordsPage" class="hidden">
+  <div class="panel">
+   <h2 id="recordsHeading">Manage Records</h2>
+   <p class="muted" id="recordsDescription">Search, create, update and manage database records.</p>
+   <div class="toolbar">
+    <input id="searchRecords" type="search" placeholder="Search records...">
+    <button class="btn primary" id="addRecord"><i class="fa-solid fa-plus"></i> Add Record</button>
+    <button class="btn secondary" id="refreshRecords"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    <button class="btn secondary" id="exportRecords"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+   </div>
+   <div class="table-wrap">
+    <table>
+     <thead id="tableHead"></thead>
+     <tbody id="tableBody"></tbody>
+    </table>
+   </div>
+   <div id="recordStatus" class="status"></div>
+  </div>
+ </section>
+
+ <section id="settingsPage" class="hidden">
+  <div class="panel">
+   <h2>System Settings & Tools</h2>
+   <p class="muted">Upload a business logo, inspect your admin session, or refresh the dashboard.</p>
+
+   <div class="field">
+    <label>Business Logo Upload</label>
+    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
+   </div>
+   <div class="field">
+    <label>Storage File Name (optional)</label>
+    <input id="logoFileName" placeholder="business-logo.png">
+   </div>
+   <button class="btn primary" id="uploadLogo"><i class="fa-solid fa-upload"></i> Upload Logo</button>
+   <div id="uploadResult" class="status"></div>
+
+   <div class="notice">
+    Logos are uploaded to the Supabase Storage bucket named
+    <strong>business-logos</strong>. The bucket and its access policies must exist.
+   </div>
+
+   <hr style="border:0;border-top:1px solid var(--border);margin:22px 0">
+   <h2>Session</h2>
+   <p id="sessionInfo" class="muted">Loading session...</p>
+   <button class="btn secondary" id="refreshSession">Refresh Session</button>
+  </div>
+ </section>
+</main>
+</div>
+
+<!-- RECORD EDITOR -->
+<div id="recordModal" class="modal-backdrop hidden">
+ <div class="modal">
+  <div class="modal-head">
+   <h2 id="modalTitle">Record Editor</h2>
+   <button class="icon-btn" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <p class="muted">Edit the complete database record as JSON. Keep required fields and data types valid.</p>
+  <div class="field">
+   <label>Record JSON</label>
+   <textarea id="recordJson" spellcheck="false"></textarea>
+  </div>
+  <div class="modal-actions">
+   <button class="btn secondary" id="cancelModal">Cancel</button>
+   <button class="btn primary" id="saveRecord"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
+  </div>
+  <div id="modalError" class="error"></div>
+ </div>
+</div>
+
+<script>
+/* =====================================================
+   SUPABASE CONFIGURATION
+===================================================== */
+
+const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
+
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+/* =====================================================
+   APP STATE
+===================================================== */
+
+const TABLES = [
+ "businesses",
+ "clients",
+ "inquiries",
+ "leads",
+ "nfc_cards",
+ "nfc_card_assignments",
+ "business_events",
+ "orders",
+ "invoices",
+ "payments",
+ "staff_profiles",
+ "admin_profiles"
+];
+
+const PRIMARY_KEYS = {
+ businesses:"id",
+ clients:"id",
+ inquiries:"id",
+ leads:"id",
+ nfc_cards:"id",
+ nfc_card_assignments:"id",
+ business_events:"id",
+ orders:"id",
+ invoices:"id",
+ payments:"id",
+ staff_profiles:"id",
+ admin_profiles:"user_id"
+};
+
+let currentUser = null;
+let currentTable = "businesses";
+let currentRows = [];
+let editingRow = null;
+let isCreating = false;
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+const $ = id => document.getElementById(id);
+
+function showError(target,message){
+ target.textContent = message || "Something went wrong.";
+}
+
+function safe(value){
+ if(value === null || value === undefined) return "";
+ if(typeof value === "object") return JSON.stringify(value);
+ return String(value);
+}
+
+function escapeHTML(value){
+ return String(value ?? "").replace(/[&<>"']/g,char=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[char]));
+}
+
+function prettyName(value){
+ return value.replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+function showPage(page){
+ $("dashboardPage").classList.toggle("hidden",page!=="dashboard");
+ $("recordsPage").classList.toggle("hidden",!TABLES.includes(page));
+ $("settingsPage").classList.toggle("hidden",page!=="settings");
+
+ const titles={
+  dashboard:"Dashboard",
+  settings:"Settings & Tools"
+ };
+
+ const title=titles[page] || prettyName(page);
+ $("pageTitle").textContent=title;
+ $("pageSubtitle").textContent=page==="dashboard"
+  ?"Your business at a glance."
+  :page==="settings"
+  ?"Manage system tools and uploads."
+  :"Manage "+title.toLowerCase()+" records.";
+
+ document.querySelectorAll(".nav-btn[data-page]").forEach(button=>{
+  button.classList.toggle("active",button.dataset.page===page);
+ });
+
+ if(TABLES.includes(page)){
+  currentTable=page;
+  $("recordsHeading").textContent=title;
+  loadRecords();
+ }
+}
+
+/* =====================================================
+   AUTHENTICATION
+===================================================== */
+
+$("loginForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ $("loginError").textContent="Signing in...";
+
+ const email=$("loginEmail").value.trim();
+ const password=$("loginPassword").value;
+
+ const {data,error}=await db.auth.signInWithPassword({
+  email,password
+ });
+
+ if(error){
+  showError($("loginError"),error.message);
+  return;
+ }
+
+ currentUser=data.user;
+
+ await verifyAdmin();
+});
+
+async function verifyAdmin(){
+ if(!currentUser){
+  $("loginScreen").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  return;
+ }
+
+ const {data,error}=await db
+  .from("admin_profiles")
+  .select("user_id,is_admin")
+  .eq("user_id",currentUser.id)
+  .maybeSingle();
+
+ if(error || !data || data.is_admin!==true){
+  await db.auth.signOut();
+  currentUser=null;
+  $("loginError").textContent=
+   "This account does not have administrator access. Contact the system owner.";
+  return;
+ }
+
+ $("loginScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("adminEmail").textContent=currentUser.email || "Administrator";
+ $("sessionInfo").textContent="Signed in as "+currentUser.email;
+ await loadDashboard();
+}
+
+async function restoreSession(){
+ const {data,error}=await db.auth.getSession();
+
+ if(error) return;
+
+ if(data.session){
+  currentUser=data.session.user;
+  await verifyAdmin();
+ }
+}
+
+$("logoutButton").addEventListener("click",async()=>{
+ await db.auth.signOut();
+ currentUser=null;
+ $("app").classList.add("hidden");
+ $("loginScreen").classList.remove("hidden");
+ $("loginPassword").value="";
+});
+
+db.auth.onAuthStateChange((_event,session)=>{
+ if(!session){
+  currentUser=null;
+ }
+});
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+document.querySelectorAll(".nav-btn[data-page]").forEach(button=>{
+ button.addEventListener("click",()=>{
+  showPage(button.dataset.page);
+ });
+});
+
+$("mobileMenuButton").addEventListener("click",()=>{
+ const sidebar=document.querySelector(".sidebar");
+ sidebar.style.display=sidebar.style.display==="block"?"none":"block";
+ sidebar.style.position="fixed";
+ sidebar.style.width="250px";
+});
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+async function countRows(table){
+ const {count,error}=await db
+  .from(table)
+  .select("*",{count:"exact",head:true});
+
+ if(error) return "—";
+ return count ?? 0;
+}
+
+async function loadDashboard(){
+ $("recentBusinesses").textContent="Loading dashboard...";
+
+ const [businesses,clients,orders,cards]=await Promise.all([
+  countRows("businesses"),
+  countRows("clients"),
+  countRows("orders"),
+  countRows("nfc_cards")
+ ]);
+
+ $("statBusinesses").textContent=businesses;
+ $("statClients").textContent=clients;
+ $("statOrders").textContent=orders;
+ $("statCards").textContent=cards;
+
+ const {data,error}=await db
+  .from("businesses")
+  .select("*")
+  .order("created_at",{ascending:false})
+  .limit(6);
+
+ if(error){
+  $("recentBusinesses").textContent=error.message;
+  return;
+ }
+
+ if(!data?.length){
+  $("recentBusinesses").textContent="No business records found.";
+  return;
+ }
+
+ $("recentBusinesses").innerHTML=
+  '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Slug</th><th>Status</th></tr></thead><tbody>'+
+  data.map(row=>`<tr>
+   <td>${escapeHTML(row.business_name || row.name || "Unnamed")}</td>
+   <td>${escapeHTML(row.slug || "")}</td>
+   <td><span class="badge">${escapeHTML(row.business_status || row.status || "—")}</span></td>
+  </tr>`).join("")+
+  '</tbody></table></div>';
+}
+
+$("refreshDashboard").addEventListener("click",loadDashboard);
+
+$("quickBusiness").addEventListener("click",()=>{
+ showPage("businesses");
+ setTimeout(()=>openCreateEditor(),300);
+});
+
+/* =====================================================
+   RECORD LIST / SEARCH
+===================================================== */
+
+async function loadRecords(){
+ $("recordStatus").textContent="Loading "+currentTable+"...";
+ $("tableHead").innerHTML="";
+ $("tableBody").innerHTML="";
+
+ const {data,error}=await db
+  .from(currentTable)
+  .select("*")
+  .limit(500);
+
+ if(error){
+  $("recordStatus").textContent=
+   "Unable to load "+currentTable+": "+error.message;
+  return;
+ }
+
+ currentRows=data || [];
+ renderRows(currentRows);
+ $("recordStatus").textContent=
+  currentRows.length+" record(s) loaded.";
+}
+
+function renderRows(rows){
+ if(!rows.length){
+  $("tableHead").innerHTML="";
+  $("tableBody").innerHTML=
+   '<tr><td class="empty" colspan="5">No records found.</td></tr>';
+  return;
+ }
+
+ const keys=Object.keys(rows[0]);
+ const visibleKeys=keys.slice(0,5);
+
+ $("tableHead").innerHTML=
+  "<tr>"+visibleKeys.map(key=>`<th>${escapeHTML(prettyName(key))}</th>`).join("")+
+  "<th>Actions</th></tr>";
+
+ $("tableBody").innerHTML=rows.map((row,index)=>{
+  const cells=visibleKeys.map(key=>
+   `<td title="${escapeHTML(safe(row[key]))}">${escapeHTML(safe(row[key]))}</td>`
+  ).join("");
+
+  return `<tr>
+   ${cells}
+   <td><div class="actions">
+    <button class="icon-btn" data-edit="${index}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+    <button class="icon-btn delete" data-delete="${index}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+   </div></td>
+  </tr>`;
+ }).join("");
+
+ $("tableBody").querySelectorAll("[data-edit]").forEach(button=>{
+  button.addEventListener("click",()=>{
+   openEditEditor(rows[Number(button.dataset.edit)]);
+  });
+ });
+
+ $("tableBody").querySelectorAll("[data-delete]").forEach(button=>{
+  button.addEventListener("click",()=>{
+   deleteRecord(rows[Number(button.dataset.delete)]);
+  });
+ });
+}
+
+$("searchRecords").addEventListener("input",()=>{
+ const query=$("searchRecords").value.toLowerCase().trim();
+
+ if(!query){
+  renderRows(currentRows);
+  return;
+ }
+
+ const filtered=currentRows.filter(row=>
+  Object.values(row).some(value=>
+   safe(value).toLowerCase().includes(query)
+  )
+ );
+
+ renderRows(filtered);
+ $("recordStatus").textContent=
+  filtered.length+" matching record(s).";
+});
+
+$("refreshRecords").addEventListener("click",loadRecords);
+$("addRecord").addEventListener("click",openCreateEditor);
+
+/* =====================================================
+   CREATE / EDIT JSON RECORDS
+===================================================== */
+
+function openCreateEditor(){
+ isCreating=true;
+ editingRow=null;
+ $("modalTitle").textContent="Create "+prettyName(currentTable);
+ $("recordJson").value=JSON.stringify({},null,2);
+ $("modalError").textContent="";
+ $("recordModal").classList.remove("hidden");
+}
+
+function openEditEditor(row){
+ isCreating=false;
+ editingRow=row;
+ $("modalTitle").textContent="Edit "+prettyName(currentTable);
+ $("recordJson").value=JSON.stringify(row,null,2);
+ $("modalError").textContent="";
+ $("recordModal").classList.remove("hidden");
+}
+
+function closeEditor(){
+ $("recordModal").classList.add("hidden");
+ editingRow=null;
+}
+
+$("closeModal").addEventListener("click",closeEditor);
+$("cancelModal").addEventListener("click",closeEditor);
+
+$("saveRecord").addEventListener("click",async()=>{
+ let payload;
+
+ try{
+  payload=JSON.parse($("recordJson").value);
+ }catch(error){
+  showError($("modalError"),"Invalid JSON: "+error.message);
+  return;
+ }
+
+ if(!payload || typeof payload!=="object" || Array.isArray(payload)){
+  showError($("modalError"),"Enter a JSON object.");
+  return;
+ }
+
+ const key=PRIMARY_KEYS[currentTable] || "id";
+ let result;
+
+ $("saveRecord").disabled=true;
+ $("saveRecord").textContent="Saving...";
+
+ try{
+  if(isCreating){
+   delete payload[key];
+   result=await db.from(currentTable).insert(payload);
+  }else{
+   const id=editingRow?.[key];
+
+   if(id===undefined || id===null){
+    throw new Error("Primary key not found for this record.");
+   }
+
+   result=await db
+    .from(currentTable)
+    .update(payload)
+    .eq(key,id);
+  }
+
+  if(result.error) throw result.error;
+
+  closeEditor();
+  await loadRecords();
+
+  if(currentTable==="businesses") await loadDashboard();
+
+ }catch(error){
+  showError($("modalError"),error.message || String(error));
+ }finally{
+  $("saveRecord").disabled=false;
+  $("saveRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Record';
+ }
+});
+
+/* =====================================================
+   DELETE RECORD
+===================================================== */
+
+async function deleteRecord(row){
+ const key=PRIMARY_KEYS[currentTable] || "id";
+ const id=row[key];
+
+ if(id===undefined || id===null){
+  alert("Primary key is missing. Cannot safely delete this record.");
+  return;
+ }
+
+ if(!confirm("Delete this record permanently? This action cannot be undone.")){
+  return;
+ }
+
+ $("recordStatus").textContent="Deleting...";
+
+ const {error}=await db
+  .from(currentTable)
+  .delete()
+  .eq(key,id);
+
+ if(error){
+  $("recordStatus").textContent="Delete failed: "+error.message;
+  return;
+ }
+
+ $("recordStatus").textContent="Record deleted.";
+ await loadRecords();
+
+ if(currentTable==="businesses") await loadDashboard();
+}
+
+/* =====================================================
+   CSV EXPORT
+===================================================== */
+
+$("exportRecords").addEventListener("click",()=>{
+ if(!currentRows.length){
+  alert("There are no records to export.");
+  return;
+ }
+
+ const columns=[...new Set(currentRows.flatMap(row=>Object.keys(row)))];
+
+ const quote=value=>{
+  let text=safe(value).replace(/"/g,'""');
+  return '"'+text+'"';
+ };
+
+ const csv=[
+  columns.map(quote).join(","),
+  ...currentRows.map(row=>
+   columns.map(column=>quote(row[column])).join(",")
+  )
+ ].join("\r\n");
+
+ const blob=new Blob(["\uFEFF"+csv],{
+  type:"text/csv;charset=utf-8;"
+ });
+
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+ link.href=url;
+ link.download=currentTable+"-export.csv";
+ link.click();
+ URL.revokeObjectURL(url);
+});
+
+/* =====================================================
+   STORAGE LOGO UPLOAD
+===================================================== */
+
+$("uploadLogo").addEventListener("click",async()=>{
+ const file=$("logoFile").files[0];
+
+ if(!file){
+  $("uploadResult").textContent="Choose an image first.";
+  return;
+ }
+
+ const allowed=["image/png","image/jpeg","image/webp"];
+
+ if(!allowed.includes(file.type)){
+  $("uploadResult").textContent="Only PNG, JPG and WEBP images are allowed.";
+  return;
+ }
+
+ if(file.size>2*1024*1024){
+  $("uploadResult").textContent="Maximum file size is 2 MB.";
+  return;
+ }
+
+ const extension=file.name.split(".").pop().toLowerCase();
+ const safeName=($("logoFileName").value.trim() ||
+  crypto.randomUUID()+"."+extension).replace(/[^a-zA-Z0-9._-]/g,"-");
+
+ $("uploadResult").textContent="Uploading...";
+
+ const {data,error}=await db.storage
+  .from("business-logos")
+  .upload(safeName,file,{
+   cacheControl:"3600",
+   upsert:true,
+   contentType:file.type
+  });
+
+ if(error){
+  $("uploadResult").textContent="Upload failed: "+error.message;
+  return;
+ }
+
+ const {data:publicData}=db.storage
+  .from("business-logos")
+  .getPublicUrl(data.path);
+
+ $("uploadResult").innerHTML=
+  'Upload successful. <a target="_blank" rel="noopener" href="'+
+  escapeHTML(publicData.publicUrl)+'">Open uploaded logo</a>'+
+  '<br><br>Public URL:<br>'+escapeHTML(publicData.publicUrl);
+});
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+$("refreshSession").addEventListener("click",async()=>{
+ const {data,error}=await db.auth.getSession();
+
+ $("sessionInfo").textContent=error
+  ?error.message
+  :data.session
+   ?"Signed in as "+data.session.user.email
+   :"No active session.";
+});
+
+/* =====================================================
+   STARTUP
+===================================================== */
+
+restoreSession();
+</script>
+</body>
+</html>
