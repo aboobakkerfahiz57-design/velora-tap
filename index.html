@@ -188,6 +188,72 @@ img {
 }
 
 /* =========================================
+   PERMANENT VELORA TAP LOGO
+   Embedded SVG - no external image required
+========================================= */
+
+.brand-mark {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
+    overflow: visible;
+}
+
+.brand-mark::after {
+    content: none;
+}
+
+.brand-mark svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.brand-mark svg .logo-main {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 5.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.brand-mark svg .logo-accent {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+}
+
+.brand-mark svg .logo-card {
+    fill: var(--cream);
+    stroke: var(--green);
+    stroke-width: 2.5;
+}
+
+.brand-mark svg .logo-card-detail {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.footer .brand-mark svg .logo-main {
+    stroke: #e6c98c;
+}
+
+.footer .brand-mark svg .logo-card {
+    fill: #02271c;
+    stroke: #e6c98c;
+}
+
+/* =========================================
    NAVIGATION
 ========================================= */
 
@@ -219,40 +285,6 @@ img {
     display: flex;
     align-items: center;
     gap: 11px;
-}
-
-.brand-mark {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: transparent;
-    box-shadow: none;
-    display: grid;
-    place-items: center;
-}
-
-.brand-mark img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-.brand-mark::after {
-    content: none;
-}
-}
-
-.brand-mark::after {
-    content: ")))";
-    font-family: Arial, sans-serif;
-    font-size: 8px;
-    position: absolute;
-    top: 6px;
-    right: 3px;
-    color: var(--gold-light);
-    transform: rotate(-35deg);
 }
 
 .brand-name {
@@ -850,10 +882,45 @@ img {
 }
 
 .about-logo .big-v {
-    font-family: "Playfair Display", serif;
-    font-size: 190px;
-    line-height: 1;
-    text-shadow: 0 20px 40px rgba(0,0,0,.25);
+    width: 230px;
+    height: 190px;
+    margin: 0 auto 10px;
+    display: grid;
+    place-items: center;
+}
+
+.about-logo .big-v svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.about-logo .big-v .logo-main {
+    fill: none;
+    stroke: var(--gold-light);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.about-logo .big-v .logo-accent {
+    fill: none;
+    stroke: #e6c98c;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.about-logo .big-v .logo-card {
+    fill: #0b563c;
+    stroke: #e6c98c;
+    stroke-width: 3;
+}
+
+.about-logo .big-v .logo-card-detail {
+    fill: none;
+    stroke: #e6c98c;
+    stroke-width: 2.5;
+    stroke-linecap: round;
 }
 
 .about-logo p {
@@ -1915,6 +1982,16 @@ img {
         width: 90%;
     }
 
+    .brand-mark {
+        width: 43px;
+        height: 43px;
+        flex-basis: 43px;
+    }
+
+    .brand-name {
+        font-size: 15px;
+    }
+
     .hero h1 {
         font-size: 47px;
     }
@@ -1952,7 +2029,8 @@ img {
     }
 
     .about-logo .big-v {
-        font-size: 145px;
+        width: 180px;
+        height: 145px;
     }
 
     .about-points {
@@ -2044,9 +2122,18 @@ img {
     <div class="container nav-inner">
 
         <a href="#home" class="brand" aria-label="VELORA TAP Home">
-            <div class="brand-mark">
-    <img src="./velora-logo-.png" alt="VELORA TAP Logo">
-</div>
+
+            <span class="brand-mark" aria-label="VELORA TAP logo">
+                <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                    <path class="logo-main" d="M14 20 L43 77 Q47 85 53 75 L73 42"/>
+                    <path class="logo-accent" d="M56 17 Q72 20 79 34"/>
+                    <path class="logo-accent" d="M62 10 Q83 14 91 34"/>
+                    <rect class="logo-card" x="64" y="56" width="27" height="34" rx="5" transform="rotate(12 77 73)"/>
+                    <path class="logo-card-detail" d="M75 65 Q82 68 83 75"/>
+                    <path class="logo-card-detail" d="M72 69 Q77 72 78 77"/>
+                </svg>
+            </span>
+
             <div class="brand-name">
                 VELORA TAP
                 <small>TAP · CONNECT · GROW</small>
@@ -2072,7 +2159,6 @@ img {
 
     </div>
 </header>
-
 
 <!-- =========================================
      HERO
@@ -2133,7 +2219,6 @@ img {
 
         </div>
 
-
         <!-- 3D NFC CARD STAGE -->
 
         <div class="hero-stage" id="heroStage">
@@ -2166,7 +2251,6 @@ img {
                 </div>
 
             </div>
-
 
             <div class="stage-phone">
 
@@ -2212,7 +2296,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      MARQUEE
 ========================================= -->
@@ -2235,7 +2318,6 @@ img {
     </div>
 </div>
 
-
 <!-- =========================================
      ABOUT US
 ========================================= -->
@@ -2247,8 +2329,20 @@ img {
         <div class="about-visual reveal">
 
             <div class="about-logo">
-                <div class="big-v">V</div>
+
+                <div class="big-v">
+                    <svg viewBox="0 0 100 100" role="img" aria-label="VELORA TAP logo">
+                        <path class="logo-main" d="M14 20 L43 77 Q47 85 53 75 L73 42"/>
+                        <path class="logo-accent" d="M56 17 Q72 20 79 34"/>
+                        <path class="logo-accent" d="M62 10 Q83 14 91 34"/>
+                        <rect class="logo-card" x="64" y="56" width="27" height="34" rx="5" transform="rotate(12 77 73)"/>
+                        <path class="logo-card-detail" d="M75 65 Q82 68 83 75"/>
+                        <path class="logo-card-detail" d="M72 69 Q77 72 78 77"/>
+                    </svg>
+                </div>
+
                 <p>VELORA TAP</p>
+
                 <span style="font-size:10px;letter-spacing:4px;display:block;margin-top:12px;">
                     TAP · CONNECT · GROW
                 </span>
@@ -2329,7 +2423,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      HOW IT WORKS
 ========================================= -->
@@ -2390,7 +2483,6 @@ img {
     </div>
 
 </section>
-
 
 <!-- =========================================
      FEATURES
@@ -2483,7 +2575,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      3D EXPERIENCE
 ========================================= -->
@@ -2557,7 +2648,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      PRODUCTS
 ========================================= -->
@@ -2609,7 +2699,6 @@ img {
 
             </div>
 
-
             <div class="product-card reveal">
 
                 <div class="product-art">
@@ -2641,7 +2730,6 @@ img {
                 </div>
 
             </div>
-
 
             <div class="product-card reveal">
 
@@ -2681,7 +2769,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      ANALYTICS
 ========================================= -->
@@ -2714,7 +2801,6 @@ img {
             </a>
 
         </div>
-
 
         <div class="analytics-mockup reveal">
 
@@ -2768,7 +2854,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      PRICING
 ========================================= -->
@@ -2811,7 +2896,6 @@ img {
 
             </div>
 
-
             <div class="price-card featured reveal">
 
                 <span class="popular-label">POPULAR CHOICE</span>
@@ -2837,7 +2921,6 @@ img {
                 </button>
 
             </div>
-
 
             <div class="price-card reveal">
 
@@ -2872,7 +2955,6 @@ img {
     </div>
 
 </section>
-
 
 <!-- =========================================
      FAQ
@@ -2999,7 +3081,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      CONTACT / ENQUIRY FORM
 ========================================= -->
@@ -3063,7 +3144,6 @@ img {
                 </div>
 
             </div>
-
 
             <form class="enquiry-form reveal" id="enquiryForm">
 
@@ -3152,7 +3232,6 @@ img {
 
 </section>
 
-
 <!-- =========================================
      FINAL CTA
 ========================================= -->
@@ -3181,7 +3260,6 @@ img {
 
 </main>
 
-
 <!-- =========================================
      FOOTER
 ========================================= -->
@@ -3195,9 +3273,18 @@ img {
             <div class="footer-brand">
 
                 <a href="#home" class="brand">
-                    <div class="brand-mark">
-    <img src="./velora-logo-.png" alt="VELORA TAP Logo">
-</div>
+
+                    <span class="brand-mark" aria-label="VELORA TAP logo">
+                        <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+                            <path class="logo-main" d="M14 20 L43 77 Q47 85 53 75 L73 42"/>
+                            <path class="logo-accent" d="M56 17 Q72 20 79 34"/>
+                            <path class="logo-accent" d="M62 10 Q83 14 91 34"/>
+                            <rect class="logo-card" x="64" y="56" width="27" height="34" rx="5" transform="rotate(12 77 73)"/>
+                            <path class="logo-card-detail" d="M75 65 Q82 68 83 75"/>
+                            <path class="logo-card-detail" d="M72 69 Q77 72 78 77"/>
+                        </svg>
+                    </span>
+
                     <div class="brand-name">
                         VELORA TAP
                         <small>TAP · CONNECT · GROW</small>
@@ -3218,7 +3305,6 @@ img {
 
             </div>
 
-
             <div class="footer-col">
                 <h4>EXPLORE</h4>
                 <a href="#home">Home</a>
@@ -3227,7 +3313,6 @@ img {
                 <a href="#experience">Experience</a>
                 <a href="#products">Products</a>
             </div>
-
 
             <div class="footer-col">
                 <h4>INFORMATION</h4>
@@ -3238,7 +3323,6 @@ img {
                 <a href="#contact">Enquiry</a>
             </div>
 
-
             <div class="footer-col">
                 <h4>GET IN TOUCH</h4>
                 <a href="#contact">Contact Us</a>
@@ -3248,7 +3332,6 @@ img {
             </div>
 
         </div>
-
 
         <div class="footer-bottom">
 
@@ -3266,7 +3349,6 @@ img {
 
 </footer>
 
-
 <!-- FLOATING ACTIONS -->
 
 <a href="#contact" class="whatsapp-float" id="whatsappButton" aria-label="WhatsApp enquiry">
@@ -3276,7 +3358,6 @@ img {
 <button class="back-top" id="backTop" aria-label="Back to top">
     <i class="fa-solid fa-arrow-up"></i>
 </button>
-
 
 <!-- =========================================
      JAVASCRIPT
@@ -3303,7 +3384,6 @@ const VELORA_CONFIG = {
     brandName: "VELORA TAP"
 };
 
-
 /* =========================================
    NAVIGATION
 ========================================= */
@@ -3329,7 +3409,6 @@ window.addEventListener("scroll", () => {
 
 });
 
-
 menuToggle.addEventListener("click", () => {
 
     const isOpen = navLinks.classList.toggle("active");
@@ -3343,7 +3422,6 @@ menuToggle.addEventListener("click", () => {
         : '<i class="fa-solid fa-bars"></i>';
 
 });
-
 
 document.querySelectorAll(".nav-links a").forEach(link => {
 
@@ -3359,7 +3437,6 @@ document.querySelectorAll(".nav-links a").forEach(link => {
 
 });
 
-
 backTop.addEventListener("click", () => {
 
     window.scrollTo({
@@ -3368,7 +3445,6 @@ backTop.addEventListener("click", () => {
     });
 
 });
-
 
 /* =========================================
    HERO 3D CARD MOUSE MOVEMENT
@@ -3398,7 +3474,6 @@ if (window.matchMedia("(hover: hover)").matches) {
 
     });
 
-
     heroStage.addEventListener("mouseleave", () => {
 
         if (!heroStage.classList.contains("tapping")) {
@@ -3411,7 +3486,6 @@ if (window.matchMedia("(hover: hover)").matches) {
     });
 
 }
-
 
 /* =========================================
    NFC TAP DEMONSTRATION
@@ -3445,7 +3519,6 @@ tapDemo.addEventListener("click", () => {
 
 });
 
-
 /* =========================================
    PRODUCT ENQUIRY BUTTONS
 ========================================= */
@@ -3467,7 +3540,6 @@ document.querySelectorAll(".product-select").forEach(button => {
     });
 
 });
-
 
 /* =========================================
    PRICING SELECTION
@@ -3494,7 +3566,6 @@ document.querySelectorAll(".plan-select").forEach(button => {
 
 });
 
-
 /* =========================================
    FAQ ACCORDION
 ========================================= */
@@ -3519,14 +3590,12 @@ document.querySelectorAll(".faq-question").forEach(button => {
 
 });
 
-
 /* =========================================
    ENQUIRY FORM
 ========================================= */
 
 const enquiryForm = document.getElementById("enquiryForm");
 const formStatus = document.getElementById("formStatus");
-
 
 function validateField(field) {
 
@@ -3566,7 +3635,6 @@ function validateField(field) {
 
 }
 
-
 enquiryForm.querySelectorAll("input, select, textarea").forEach(field => {
 
     field.addEventListener("input", () => {
@@ -3578,7 +3646,6 @@ enquiryForm.querySelectorAll("input, select, textarea").forEach(field => {
     });
 
 });
-
 
 enquiryForm.addEventListener("submit", (event) => {
 
@@ -3610,7 +3677,6 @@ enquiryForm.addEventListener("submit", (event) => {
 
     }
 
-
     const enquiry = {
 
         name: document.getElementById("customerName").value.trim(),
@@ -3630,7 +3696,6 @@ enquiryForm.addEventListener("submit", (event) => {
         submittedAt: new Date().toISOString()
 
     };
-
 
     /*
        TEMPORARY FRONT-END STORAGE
@@ -3659,7 +3724,6 @@ enquiryForm.addEventListener("submit", (event) => {
 
     }
 
-
     formStatus.style.display = "block";
     formStatus.style.background = "#edf5e9";
     formStatus.style.color = "#064b35";
@@ -3674,7 +3738,6 @@ enquiryForm.addEventListener("submit", (event) => {
     });
 
 });
-
 
 /* =========================================
    WHATSAPP BUTTON
@@ -3714,14 +3777,12 @@ whatsappButton.addEventListener("click", (event) => {
 
 });
 
-
 /* =========================================
    CURRENT YEAR
 ========================================= */
 
 document.getElementById("currentYear").textContent =
     new Date().getFullYear();
-
 
 /* =========================================
    GSAP SCROLL ANIMATIONS
@@ -3778,7 +3839,6 @@ if (window.gsap && window.ScrollTrigger &&
     });
 
 }
-
 
 /* =========================================
    CONSOLE
