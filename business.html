@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Business Profile | VELORA TAP</title>
+  <meta name="description" content="Connect with this business through VELORA TAP.">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 30px 18px;
+      background:
+        radial-gradient(circle at top, #292116 0%, #101010 40%, #080808 100%);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile {
+      width: 100%;
+      max-width: 430px;
+      padding: 38px 25px;
+      text-align: center;
+      background: rgba(20, 20, 20, .94);
+      border: 1px solid rgba(201, 164, 92, .3);
+      border-radius: 18px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, .5);
+    }
+
+    .brand {
+      color: #c9a45c;
+      font-size: 13px;
+      letter-spacing: 4px;
+      font-weight: bold;
+      margin-bottom: 32px;
+    }
+
+    .logo {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      border: 2px solid #c9a45c;
+      object-fit: contain;
+      background: #fff;
+      padding: 5px;
+      margin-bottom: 22px;
+    }
+
+    .business-name {
+      font-size: 27px;
+      margin-bottom: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .description {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0 auto 30px;
+      overflow-wrap: anywhere;
+    }
+
+    .links {
+      display: grid;
+      gap: 13px;
+    }
+
+    .link-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 54px;
+      padding: 15px;
+      border: 1px solid rgba(201, 164, 92, .45);
+      border-radius: 7px;
+      background: #1b1b1b;
+      color: #f1d69c;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: bold;
+      transition: .25s ease;
+    }
+
+    .link-button:hover {
+      background: #c9a45c;
+      color: #080808;
+      transform: translateY(-2px);
+    }
+
+    .empty-message {
+      color: #aaa;
+      line-height: 1.7;
+      padding: 25px 0;
+    }
+
+    .powered {
+      border-top: 1px solid rgba(201, 164, 92, .2);
+      margin-top: 32px;
+      padding-top: 22px;
+      color: #888;
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .powered strong {
+      color: #c9a45c;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="profile">
+
+    <div class="brand">VELORA TAP</div>
+
+    <div id="profile-content">
+      <p class="empty-message">Loading business profile...</p>
+    </div>
+
+    <footer class="powered">
+      POWERED BY <strong>VELORA TAP</strong>
+    </footer>
+
+  </main>
+
+  <script src="config.js"></script>
+
+  <script>
+    (async function () {
+      const db = window.supabaseClient;
+      const content = document.getElementById("profile-content");
+
+      function showMessage(message) {
+        const paragraph = document.createElement("p");
+        paragraph.className = "empty-message";
+        paragraph.textContent = message;
+        content.replaceChildren(paragraph);
+      }
+
+      function addLink(container, label, url) {
+        if (!url) return;
+
+        const link = document.createElement("a");
+        link.className = "link-button";
+        link.textContent = label;
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        container.appendChild(link);
+      }
+
+      if (!db) {
+        showMessage("Unable to connect. Please try again later.");
+        return;
+      }
+
+      const slug = new URLSearchParams(window.location.search).get("slug");
+
+      if (!slug) {
+        showMessage("Business profile not found. Please check your link.");
+        return;
+      }
+
+      const { data: business, error } = await db
+        .from("businesses")
+        .select("name, description, logo_url, google_review_url, website_url, whatsapp_number, instagram_url")
+        .eq("slug", slug)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (error || !business) {
+        showMessage("This business profile is unavailable.");
+        return;
+      }
+
+      document.title = business.name + " | VELORA TAP";
+
+      content.replaceChildren();
+
+      if (business.logo_url) {
+        const logo = document.createElement("img");
+        logo.className = "logo";
+        logo.src = business.logo_url;
+        logo.alt = business.name + " logo";
+        content.appendChild(logo);
+      }
+
+      const heading = document.createElement("h1");
+      heading.className = "business-name";
+      heading.textContent = business.name;
+      content.appendChild(heading);
+
+      if (business.description) {
+        const description = document.createElement("p");
+        description.className = "description";
+        description.textContent = business.description;
+        content.appendChild(description);
+      }
+
+      const links = document.createElement("div");
+      links.className = "links";
+
+      addLink(links, "★  Google Reviews", business.google_review_url);
+      addLink(links, "⌂  Visit Website", business.website_url);
+
+      if (business.whatsapp_number) {
+        const number = business.whatsapp_number.replace(/\D/g, "");
+        if (number) {
+          addLink(links, "WhatsApp", "https://wa.me/" + number);
+        }
+      }
+
+      addLink(links, "◎  Instagram", business.instagram_url);
+
+      if (!links.children.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty-message";
+        empty.textContent = "Business links will be available soon.";
+        content.appendChild(empty);
+      } else {
+        content.appendChild(links);
+      }
+    })();
+  </script>
+
+</body>
+</html>
