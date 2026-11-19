@@ -41,7 +41,8 @@ button{cursor:pointer}
  width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:white;outline:none;color:var(--text)
 }
 .field input:focus,.field textarea:focus,.field select:focus,.toolbar input:focus{border-color:var(--green)}
-.field textarea{min-height:260px;font-family:monospace;font-size:12px}
+.field textarea{min-height:110px}
+.field textarea.json-input{min-height:260px;font-family:monospace;font-size:12px}
 .btn{border:0;border-radius:9px;padding:11px 16px;font-weight:700;font-size:12px;display:inline-flex;gap:8px;align-items:center;justify-content:center}
 .primary{background:var(--green);color:white}
 .primary:hover{background:var(--green2)}
@@ -50,6 +51,7 @@ button{cursor:pointer}
 .gold{background:#f7f0e3;color:#876326}
 .full{width:100%;margin-top:22px}
 .error{color:var(--red);font-size:12px;margin-top:12px}
+.success{color:var(--green);font-size:12px;margin-top:12px}
 .app{min-height:100vh}
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:#073c2b;color:white;padding:25px 17px;overflow:auto;z-index:5}
 .sidebar .logo{color:white;padding:0 12px 28px}
@@ -93,6 +95,11 @@ tr:hover td{background:#fbfdfb}
 .notice{padding:12px 14px;background:#f2f6f2;border-radius:9px;font-size:11px;color:#53655a;margin:12px 0}
 .mobile-menu{display:none}
 .status{font-size:11px;color:var(--muted);margin-top:10px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.form-grid .field{min-width:0}
+.form-grid .wide{grid-column:1/-1}
+.required{color:var(--red)}
+.form-help{font-size:10px;color:var(--muted);margin-top:5px}
 @media(max-width:1000px){
  .stats{grid-template-columns:repeat(2,1fr)}
  .sidebar{width:210px}
@@ -106,6 +113,8 @@ tr:hover td{background:#fbfdfb}
  .stat strong{font-size:22px}
  .topbar h1{font-size:23px}
  .mobile-menu{display:inline-flex}
+ .form-grid{grid-template-columns:1fr}
+ .form-grid .wide{grid-column:auto}
 }
 </style>
 </head>
@@ -118,7 +127,6 @@ tr:hover td{background:#fbfdfb}
   <div class="logo">VELORA TAP<small>TAP · CONNECT · GROW</small></div>
   <h1>Welcome Back.</h1>
   <p class="muted">Sign in to manage your VELORA TAP business platform.</p>
-
   <form id="loginForm">
    <div class="field">
     <label>Email Address</label>
@@ -128,9 +136,7 @@ tr:hover td{background:#fbfdfb}
     <label>Password</label>
     <input id="loginPassword" type="password" required placeholder="Your password">
    </div>
-   <button class="btn primary full" type="submit">
-    <i class="fa-solid fa-lock"></i> Sign In
-   </button>
+   <button class="btn primary full" type="submit"><i class="fa-solid fa-lock"></i> Sign In</button>
    <div id="loginError" class="error"></div>
   </form>
  </div>
@@ -138,141 +144,125 @@ tr:hover td{background:#fbfdfb}
 
 <!-- APPLICATION -->
 <div id="app" class="app hidden">
+ <aside class="sidebar">
+  <div class="logo">VELORA TAP<small>ADMINISTRATION</small></div>
 
-<aside class="sidebar">
- <div class="logo">VELORA TAP<small>ADMINISTRATION</small></div>
+  <div class="nav-label">OVERVIEW</div>
+  <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+  <button class="nav-btn" data-page="businesses"><i class="fa-solid fa-building"></i> Businesses</button>
+  <button class="nav-btn" data-page="clients"><i class="fa-solid fa-users"></i> Clients</button>
 
- <div class="nav-label">OVERVIEW</div>
- <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
- <button class="nav-btn" data-page="businesses"><i class="fa-solid fa-building"></i> Businesses</button>
- <button class="nav-btn" data-page="clients"><i class="fa-solid fa-users"></i> Clients</button>
+  <div class="nav-label">CUSTOMER MANAGEMENT</div>
+  <button class="nav-btn" data-page="inquiries"><i class="fa-solid fa-inbox"></i> Inquiries</button>
+  <button class="nav-btn" data-page="leads"><i class="fa-solid fa-bullseye"></i> Leads</button>
 
- <div class="nav-label">CUSTOMER MANAGEMENT</div>
- <button class="nav-btn" data-page="inquiries"><i class="fa-solid fa-inbox"></i> Inquiries</button>
- <button class="nav-btn" data-page="leads"><i class="fa-solid fa-bullseye"></i> Leads</button>
+  <div class="nav-label">NFC MANAGEMENT</div>
+  <button class="nav-btn" data-page="nfc_cards"><i class="fa-solid fa-wifi"></i> NFC Cards</button>
+  <button class="nav-btn" data-page="nfc_card_assignments"><i class="fa-solid fa-link"></i> Card Assignments</button>
+  <button class="nav-btn" data-page="business_events"><i class="fa-solid fa-chart-line"></i> Activity & Analytics</button>
 
- <div class="nav-label">NFC MANAGEMENT</div>
- <button class="nav-btn" data-page="nfc_cards"><i class="fa-solid fa-wifi"></i> NFC Cards</button>
- <button class="nav-btn" data-page="nfc_card_assignments"><i class="fa-solid fa-link"></i> Card Assignments</button>
- <button class="nav-btn" data-page="business_events"><i class="fa-solid fa-chart-line"></i> Activity & Analytics</button>
+  <div class="nav-label">SALES & FINANCE</div>
+  <button class="nav-btn" data-page="orders"><i class="fa-solid fa-cart-shopping"></i> Orders</button>
+  <button class="nav-btn" data-page="invoices"><i class="fa-solid fa-file-invoice"></i> Invoices</button>
+  <button class="nav-btn" data-page="payments"><i class="fa-solid fa-money-bill-transfer"></i> Payments</button>
 
- <div class="nav-label">SALES & FINANCE</div>
- <button class="nav-btn" data-page="orders"><i class="fa-solid fa-cart-shopping"></i> Orders</button>
- <button class="nav-btn" data-page="invoices"><i class="fa-solid fa-file-invoice"></i> Invoices</button>
- <button class="nav-btn" data-page="payments"><i class="fa-solid fa-money-bill-transfer"></i> Payments</button>
+  <div class="nav-label">TEAM</div>
+  <button class="nav-btn" data-page="staff_profiles"><i class="fa-solid fa-user-tie"></i> Staff</button>
+  <button class="nav-btn" data-page="admin_profiles"><i class="fa-solid fa-user-shield"></i> Admin Accounts</button>
 
- <div class="nav-label">TEAM</div>
- <button class="nav-btn" data-page="staff_profiles"><i class="fa-solid fa-user-tie"></i> Staff</button>
- <button class="nav-btn" data-page="admin_profiles"><i class="fa-solid fa-user-shield"></i> Admin Accounts</button>
+  <div class="nav-label">SYSTEM</div>
+  <button class="nav-btn" data-page="settings"><i class="fa-solid fa-gear"></i> Settings & Tools</button>
+  <button class="nav-btn" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+ </aside>
 
- <div class="nav-label">SYSTEM</div>
- <button class="nav-btn" data-page="settings"><i class="fa-solid fa-gear"></i> Settings & Tools</button>
- <button class="nav-btn" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
-</aside>
-
-<main class="main">
- <header class="topbar">
-  <div>
-   <button class="btn secondary mobile-menu" id="mobileMenuButton"><i class="fa-solid fa-bars"></i></button>
-   <h1 id="pageTitle">Dashboard</h1>
-   <p id="pageSubtitle">Your business at a glance.</p>
-  </div>
-  <div class="user-area">
-   <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
-   <div><strong id="adminEmail" style="font-size:11px">Admin</strong><div class="muted">Administrator</div></div>
-  </div>
- </header>
-
- <section id="dashboardPage">
-  <div class="stats">
-   <div class="stat"><div class="stat-top">Businesses <span class="stat-icon"><i class="fa-solid fa-building"></i></span></div><strong id="statBusinesses">—</strong></div>
-   <div class="stat"><div class="stat-top">Clients <span class="stat-icon"><i class="fa-solid fa-users"></i></span></div><strong id="statClients">—</strong></div>
-   <div class="stat"><div class="stat-top">Orders <span class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></span></div><strong id="statOrders">—</strong></div>
-   <div class="stat"><div class="stat-top">NFC Cards <span class="stat-icon"><i class="fa-solid fa-wifi"></i></span></div><strong id="statCards">—</strong></div>
-  </div>
-
-  <div class="panel">
-   <h2>Welcome to VELORA TAP</h2>
-   <p class="muted">Manage your business profiles, clients, NFC inventory, sales, payments, staff, and customer activity from one place.</p>
-   <div class="toolbar">
-    <button class="btn primary" id="quickBusiness"><i class="fa-solid fa-plus"></i> Add Business</button>
-    <button class="btn secondary" id="refreshDashboard"><i class="fa-solid fa-rotate"></i> Refresh Dashboard</button>
+ <main class="main">
+  <header class="topbar">
+   <div>
+    <button class="btn secondary mobile-menu" id="mobileMenuButton"><i class="fa-solid fa-bars"></i></button>
+    <h1 id="pageTitle">Dashboard</h1>
+    <p id="pageSubtitle">Your business at a glance.</p>
    </div>
-  </div>
-
-  <div class="panel">
-   <h2>Recent Business Records</h2>
-   <div id="recentBusinesses" class="status">Loading...</div>
-  </div>
- </section>
-
- <section id="recordsPage" class="hidden">
-  <div class="panel">
-   <h2 id="recordsHeading">Manage Records</h2>
-   <p class="muted" id="recordsDescription">Search, create, update and manage database records.</p>
-   <div class="toolbar">
-    <input id="searchRecords" type="search" placeholder="Search records...">
-    <button class="btn primary" id="addRecord"><i class="fa-solid fa-plus"></i> Add Record</button>
-    <button class="btn secondary" id="refreshRecords"><i class="fa-solid fa-rotate"></i> Refresh</button>
-    <button class="btn secondary" id="exportRecords"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+   <div class="user-area">
+    <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
+    <div><strong id="adminEmail" style="font-size:11px">Admin</strong><div class="muted">Administrator</div></div>
    </div>
-   <div class="table-wrap">
-    <table>
-     <thead id="tableHead"></thead>
-     <tbody id="tableBody"></tbody>
-    </table>
-   </div>
-   <div id="recordStatus" class="status"></div>
-  </div>
- </section>
+  </header>
 
- <section id="settingsPage" class="hidden">
-  <div class="panel">
-   <h2>System Settings & Tools</h2>
-   <p class="muted">Upload a business logo, inspect your admin session, or refresh the dashboard.</p>
-
-   <div class="field">
-    <label>Business Logo Upload</label>
-    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
+  <section id="dashboardPage">
+   <div class="stats">
+    <div class="stat"><div class="stat-top">Businesses <span class="stat-icon"><i class="fa-solid fa-building"></i></span></div><strong id="statBusinesses">—</strong></div>
+    <div class="stat"><div class="stat-top">Clients <span class="stat-icon"><i class="fa-solid fa-users"></i></span></div><strong id="statClients">—</strong></div>
+    <div class="stat"><div class="stat-top">Orders <span class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></span></div><strong id="statOrders">—</strong></div>
+    <div class="stat"><div class="stat-top">NFC Cards <span class="stat-icon"><i class="fa-solid fa-wifi"></i></span></div><strong id="statCards">—</strong></div>
    </div>
-   <div class="field">
-    <label>Storage File Name (optional)</label>
-    <input id="logoFileName" placeholder="business-logo.png">
+   <div class="panel">
+    <h2>Welcome to VELORA TAP</h2>
+    <p class="muted">Manage your business profiles, clients, NFC inventory, sales, payments, staff, and customer activity from one place.</p>
+    <div class="toolbar">
+     <button class="btn primary" id="quickBusiness"><i class="fa-solid fa-plus"></i> Add Business</button>
+     <button class="btn secondary" id="refreshDashboard"><i class="fa-solid fa-rotate"></i> Refresh Dashboard</button>
+    </div>
    </div>
-   <button class="btn primary" id="uploadLogo"><i class="fa-solid fa-upload"></i> Upload Logo</button>
-   <div id="uploadResult" class="status"></div>
-
-   <div class="notice">
-    Logos are uploaded to the Supabase Storage bucket named
-    <strong>business-logos</strong>. The bucket and its access policies must exist.
+   <div class="panel">
+    <h2>Recent Business Records</h2>
+    <div id="recentBusinesses" class="status">Loading...</div>
    </div>
+  </section>
 
-   <hr style="border:0;border-top:1px solid var(--border);margin:22px 0">
-   <h2>Session</h2>
-   <p id="sessionInfo" class="muted">Loading session...</p>
-   <button class="btn secondary" id="refreshSession">Refresh Session</button>
-  </div>
- </section>
-</main>
+  <section id="recordsPage" class="hidden">
+   <div class="panel">
+    <h2 id="recordsHeading">Manage Records</h2>
+    <p class="muted" id="recordsDescription">Search, create, update and manage database records.</p>
+    <div class="toolbar">
+     <input id="searchRecords" type="search" placeholder="Search records...">
+     <button class="btn primary" id="addRecord"><i class="fa-solid fa-plus"></i> Add Record</button>
+     <button class="btn secondary" id="refreshRecords"><i class="fa-solid fa-rotate"></i> Refresh</button>
+     <button class="btn secondary" id="exportRecords"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+    </div>
+    <div class="table-wrap">
+     <table><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table>
+    </div>
+    <div id="recordStatus" class="status"></div>
+   </div>
+  </section>
+
+  <section id="settingsPage" class="hidden">
+   <div class="panel">
+    <h2>System Settings & Tools</h2>
+    <p class="muted">Upload a business logo, inspect your admin session, or refresh the dashboard.</p>
+    <div class="field">
+     <label>Business Logo Upload</label>
+     <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
+    </div>
+    <div class="field">
+     <label>Storage File Name (optional)</label>
+     <input id="logoFileName" placeholder="business-logo.png">
+    </div>
+    <button class="btn primary" id="uploadLogo"><i class="fa-solid fa-upload"></i> Upload Logo</button>
+    <div id="uploadResult" class="status"></div>
+    <div class="notice">Logos are uploaded to the Supabase Storage bucket named <strong>business-logos</strong>. The bucket and its access policies must exist.</div>
+    <hr style="border:0;border-top:1px solid var(--border);margin:22px 0">
+    <h2>Session</h2>
+    <p id="sessionInfo" class="muted">Loading session...</p>
+    <button class="btn secondary" id="refreshSession">Refresh Session</button>
+   </div>
+  </section>
+ </main>
 </div>
 
-<!-- RECORD EDITOR -->
+<!-- RECORD MODAL -->
 <div id="recordModal" class="modal-backdrop hidden">
  <div class="modal">
   <div class="modal-head">
-   <h2 id="modalTitle">Record Editor</h2>
+   <h2 id="modalTitle">Create Record</h2>
    <button class="icon-btn" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <p class="muted">Edit the complete database record as JSON. Keep required fields and data types valid.</p>
-  <div class="field">
-   <label>Record JSON</label>
-   <textarea id="recordJson" spellcheck="false"></textarea>
-  </div>
+  <div id="modalFormContainer"></div>
+  <div id="modalError" class="error"></div>
   <div class="modal-actions">
    <button class="btn secondary" id="cancelModal">Cancel</button>
    <button class="btn primary" id="saveRecord"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
   </div>
-  <div id="modalError" class="error"></div>
  </div>
 </div>
 
@@ -284,69 +274,45 @@ tr:hover td{background:#fbfdfb}
 const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
 
-const db = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 /* =====================================================
    APP STATE
 ===================================================== */
 
 const TABLES = [
- "businesses",
- "clients",
- "inquiries",
- "leads",
- "nfc_cards",
- "nfc_card_assignments",
- "business_events",
- "orders",
- "invoices",
- "payments",
- "staff_profiles",
- "admin_profiles"
+ "businesses","clients","inquiries","leads","nfc_cards",
+ "nfc_card_assignments","business_events","orders","invoices",
+ "payments","staff_profiles","admin_profiles"
 ];
 
 const PRIMARY_KEYS = {
- businesses:"id",
- clients:"id",
- inquiries:"id",
- leads:"id",
- nfc_cards:"id",
- nfc_card_assignments:"id",
- business_events:"id",
- orders:"id",
- invoices:"id",
- payments:"id",
- staff_profiles:"id",
- admin_profiles:"user_id"
+ businesses:"id",clients:"id",inquiries:"id",leads:"id",
+ nfc_cards:"id",nfc_card_assignments:"id",business_events:"id",
+ orders:"id",invoices:"id",payments:"id",
+ staff_profiles:"id",admin_profiles:"user_id"
 };
 
-let currentUser = null;
-let currentTable = "businesses";
-let currentRows = [];
-let editingRow = null;
-let isCreating = false;
+let currentUser=null;
+let currentTable="businesses";
+let currentRows=[];
+let editingRow=null;
+let isCreating=false;
 
-/* =====================================================
-   HELPERS
-===================================================== */
-
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
 function showError(target,message){
- target.textContent = message || "Something went wrong.";
+ target.textContent=message||"Something went wrong.";
 }
 
 function safe(value){
- if(value === null || value === undefined) return "";
- if(typeof value === "object") return JSON.stringify(value);
+ if(value===null||value===undefined)return "";
+ if(typeof value==="object")return JSON.stringify(value);
  return String(value);
 }
 
 function escapeHTML(value){
- return String(value ?? "").replace(/[&<>"']/g,char=>({
+ return String(value??"").replace(/[&<>"']/g,char=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[char]));
 }
@@ -360,12 +326,9 @@ function showPage(page){
  $("recordsPage").classList.toggle("hidden",!TABLES.includes(page));
  $("settingsPage").classList.toggle("hidden",page!=="settings");
 
- const titles={
-  dashboard:"Dashboard",
-  settings:"Settings & Tools"
- };
+ const titles={dashboard:"Dashboard",settings:"Settings & Tools"};
+ const title=titles[page]||prettyName(page);
 
- const title=titles[page] || prettyName(page);
  $("pageTitle").textContent=title;
  $("pageSubtitle").textContent=page==="dashboard"
   ?"Your business at a glance."
@@ -380,6 +343,7 @@ function showPage(page){
  if(TABLES.includes(page)){
   currentTable=page;
   $("recordsHeading").textContent=title;
+  $("searchRecords").value="";
   loadRecords();
  }
 }
@@ -395,9 +359,7 @@ $("loginForm").addEventListener("submit",async event=>{
  const email=$("loginEmail").value.trim();
  const password=$("loginPassword").value;
 
- const {data,error}=await db.auth.signInWithPassword({
-  email,password
- });
+ const {data,error}=await db.auth.signInWithPassword({email,password});
 
  if(error){
   showError($("loginError"),error.message);
@@ -405,60 +367,55 @@ $("loginForm").addEventListener("submit",async event=>{
  }
 
  currentUser=data.user;
-
  await verifyAdmin();
 });
 
 async function verifyAdmin(){
+ if(!currentUser){
+  $("loginScreen").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  return;
+ }
 
-    if(!currentUser){
-        $("loginScreen").classList.remove("hidden");
-        $("app").classList.add("hidden");
-        return;
-    }
+ const {data,error}=await db
+  .from("admin_profiles")
+  .select("user_id,is_admin")
+  .eq("user_id",currentUser.id)
+  .maybeSingle();
 
-    const {data, error} = await db
-        .from("admin_profiles")
-        .select("user_id,is_admin")
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
+ console.log("ADMIN CHECK:",{
+  loggedInUser:currentUser.id,
+  email:currentUser.email,
+  adminData:data,
+  adminError:error
+ });
 
-    console.log("ADMIN CHECK:", {
-        loggedInUser: currentUser.id,
-        email: currentUser.email,
-        adminData: data,
-        adminError: error
-    });
+ if(error){
+  $("loginError").textContent="Database permission error: "+error.message;
+  return;
+ }
 
-    if(error){
-        $("loginError").textContent =
-            "Database permission error: " + error.message;
-        return;
-    }
+ if(!data){
+  $("loginError").textContent="No admin profile found for: "+currentUser.email;
+  return;
+ }
 
-    if(!data){
-        $("loginError").textContent =
-            "No admin profile found for: " + currentUser.email;
-        return;
-    }
+ if(data.is_admin!==true){
+  $("loginError").textContent="Admin profile found, but is_admin is not true.";
+  return;
+ }
 
-    if(data.is_admin !== true){
-        $("loginError").textContent =
-            "Admin profile found, but is_admin is not true.";
-        return;
-    }
+ $("loginScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("adminEmail").textContent=currentUser.email;
+ $("sessionInfo").textContent="Signed in as "+currentUser.email;
 
-    $("loginScreen").classList.add("hidden");
-    $("app").classList.remove("hidden");
-    $("adminEmail").textContent = currentUser.email;
-    $("sessionInfo").textContent = "Signed in as " + currentUser.email;
-
-    await loadDashboard();
+ await loadDashboard();
 }
+
 async function restoreSession(){
  const {data,error}=await db.auth.getSession();
-
- if(error) return;
+ if(error)return;
 
  if(data.session){
   currentUser=data.session.user;
@@ -475,9 +432,7 @@ $("logoutButton").addEventListener("click",async()=>{
 });
 
 db.auth.onAuthStateChange((_event,session)=>{
- if(!session){
-  currentUser=null;
- }
+ if(!session)currentUser=null;
 });
 
 /* =====================================================
@@ -487,6 +442,9 @@ db.auth.onAuthStateChange((_event,session)=>{
 document.querySelectorAll(".nav-btn[data-page]").forEach(button=>{
  button.addEventListener("click",()=>{
   showPage(button.dataset.page);
+  if(window.innerWidth<=700){
+   document.querySelector(".sidebar").style.display="none";
+  }
  });
 });
 
@@ -502,22 +460,17 @@ $("mobileMenuButton").addEventListener("click",()=>{
 ===================================================== */
 
 async function countRows(table){
- const {count,error}=await db
-  .from(table)
-  .select("*",{count:"exact",head:true});
-
- if(error) return "—";
- return count ?? 0;
+ const {count,error}=await db.from(table).select("*",{count:"exact",head:true});
+ if(error)return "—";
+ return count??0;
 }
 
 async function loadDashboard(){
  $("recentBusinesses").textContent="Loading dashboard...";
 
  const [businesses,clients,orders,cards]=await Promise.all([
-  countRows("businesses"),
-  countRows("clients"),
-  countRows("orders"),
-  countRows("nfc_cards")
+  countRows("businesses"),countRows("clients"),
+  countRows("orders"),countRows("nfc_cards")
  ]);
 
  $("statBusinesses").textContent=businesses;
@@ -525,11 +478,8 @@ async function loadDashboard(){
  $("statOrders").textContent=orders;
  $("statCards").textContent=cards;
 
- const {data,error}=await db
-  .from("businesses")
-  .select("*")
-  .order("created_at",{ascending:false})
-  .limit(6);
+ const {data,error}=await db.from("businesses")
+  .select("*").order("created_at",{ascending:false}).limit(6);
 
  if(error){
   $("recentBusinesses").textContent=error.message;
@@ -544,9 +494,9 @@ async function loadDashboard(){
  $("recentBusinesses").innerHTML=
   '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Slug</th><th>Status</th></tr></thead><tbody>'+
   data.map(row=>`<tr>
-   <td>${escapeHTML(row.business_name || row.name || "Unnamed")}</td>
-   <td>${escapeHTML(row.slug || "")}</td>
-   <td><span class="badge">${escapeHTML(row.business_status || row.status || "—")}</span></td>
+   <td>${escapeHTML(row.business_name||"Unnamed")}</td>
+   <td>${escapeHTML(row.slug||"")}</td>
+   <td><span class="badge">${escapeHTML(row.business_status||"—")}</span></td>
   </tr>`).join("")+
   '</tbody></table></div>';
 }
@@ -567,36 +517,59 @@ async function loadRecords(){
  $("tableHead").innerHTML="";
  $("tableBody").innerHTML="";
 
- const {data,error}=await db
-  .from(currentTable)
-  .select("*")
-  .limit(500);
+ const {data,error}=await db.from(currentTable).select("*").limit(500);
 
  if(error){
-  $("recordStatus").textContent=
-   "Unable to load "+currentTable+": "+error.message;
+  $("recordStatus").textContent="Unable to load "+currentTable+": "+error.message;
   return;
  }
 
- currentRows=data || [];
+ currentRows=data||[];
+
+ if(currentTable==="businesses"){
+  await attachClientNames(currentRows);
+ }
+
  renderRows(currentRows);
- $("recordStatus").textContent=
-  currentRows.length+" record(s) loaded.";
+ $("recordStatus").textContent=currentRows.length+" record(s) loaded.";
+}
+
+async function attachClientNames(rows){
+ const ids=[...new Set(rows.map(row=>row.client_id).filter(Boolean))];
+ if(!ids.length)return;
+
+ const {data,error}=await db.from("clients")
+  .select("id,client_name").in("id",ids);
+
+ if(error){
+  console.warn("Could not load client names:",error.message);
+  return;
+ }
+
+ const names={};
+ (data||[]).forEach(client=>names[client.id]=client.client_name);
+ rows.forEach(row=>row._client_name=names[row.client_id]||"Client not found");
 }
 
 function renderRows(rows){
  if(!rows.length){
   $("tableHead").innerHTML="";
-  $("tableBody").innerHTML=
-   '<tr><td class="empty" colspan="5">No records found.</td></tr>';
+  $("tableBody").innerHTML='<tr><td class="empty" colspan="6">No records found.</td></tr>';
   return;
  }
 
- const keys=Object.keys(rows[0]);
- const visibleKeys=keys.slice(0,5);
+ let visibleKeys;
+
+ if(currentTable==="clients"){
+  visibleKeys=["client_name","email","phone","account_status"];
+ }else if(currentTable==="businesses"){
+  visibleKeys=["business_name","_client_name","business_type","slug","business_status"];
+ }else{
+  visibleKeys=Object.keys(rows[0]).filter(key=>!key.startsWith("_")).slice(0,5);
+ }
 
  $("tableHead").innerHTML=
-  "<tr>"+visibleKeys.map(key=>`<th>${escapeHTML(prettyName(key))}</th>`).join("")+
+  "<tr>"+visibleKeys.map(key=>`<th>${escapeHTML(key==="_client_name"?"Client":prettyName(key))}</th>`).join("")+
   "<th>Actions</th></tr>";
 
  $("tableBody").innerHTML=rows.map((row,index)=>{
@@ -604,13 +577,10 @@ function renderRows(rows){
    `<td title="${escapeHTML(safe(row[key]))}">${escapeHTML(safe(row[key]))}</td>`
   ).join("");
 
-  return `<tr>
-   ${cells}
-   <td><div class="actions">
-    <button class="icon-btn" data-edit="${index}" title="Edit"><i class="fa-solid fa-pen"></i></button>
-    <button class="icon-btn delete" data-delete="${index}" title="Delete"><i class="fa-solid fa-trash"></i></button>
-   </div></td>
-  </tr>`;
+  return `<tr>${cells}<td><div class="actions">
+   <button class="icon-btn" data-edit="${index}" title="Edit"><i class="fa-solid fa-pen"></i></button>
+   <button class="icon-btn delete" data-delete="${index}" title="Delete"><i class="fa-solid fa-trash"></i></button>
+  </div></td></tr>`;
  }).join("");
 
  $("tableBody").querySelectorAll("[data-edit]").forEach(button=>{
@@ -635,39 +605,206 @@ $("searchRecords").addEventListener("input",()=>{
  }
 
  const filtered=currentRows.filter(row=>
-  Object.values(row).some(value=>
-   safe(value).toLowerCase().includes(query)
-  )
+  Object.values(row).some(value=>safe(value).toLowerCase().includes(query))
  );
 
  renderRows(filtered);
- $("recordStatus").textContent=
-  filtered.length+" matching record(s).";
+ $("recordStatus").textContent=filtered.length+" matching record(s).";
 });
 
 $("refreshRecords").addEventListener("click",loadRecords);
 $("addRecord").addEventListener("click",openCreateEditor);
 
 /* =====================================================
-   CREATE / EDIT JSON RECORDS
+   FORM HELPERS
 ===================================================== */
 
-function openCreateEditor(){
+function fieldHTML(name,label,value="",type="text",required=false,wide=false,placeholder=""){
+ return `<div class="field ${wide?"wide":""}">
+  <label for="form_${name}">${label}${required?' <span class="required">*</span>':""}</label>
+  <input id="form_${name}" name="${name}" type="${type}"
+   value="${escapeHTML(value)}" placeholder="${escapeHTML(placeholder)}"
+   ${required?"required":""}>
+ </div>`;
+}
+
+function selectHTML(name,label,value,options,required=false,wide=false){
+ return `<div class="field ${wide?"wide":""}">
+  <label for="form_${name}">${label}${required?' <span class="required">*</span>':""}</label>
+  <select id="form_${name}" name="${name}" ${required?"required":""}>
+   ${options.map(option=>`<option value="${escapeHTML(option.value)}" ${String(value??"")===String(option.value)?"selected":""}>${escapeHTML(option.label)}</option>`).join("")}
+  </select>
+ </div>`;
+}
+
+function textareaHTML(name,label,value="",wide=true){
+ return `<div class="field ${wide?"wide":""}">
+  <label for="form_${name}">${label}</label>
+  <textarea id="form_${name}" name="${name}" placeholder="Enter ${label.toLowerCase()}">${escapeHTML(value)}</textarea>
+ </div>`;
+}
+
+function getFormValue(name){
+ const element=$("form_"+name);
+ return element?element.value.trim():"";
+}
+
+/* =====================================================
+   CLIENT FORM
+===================================================== */
+
+function renderClientForm(row={}){
+ const status=row.account_status||"active";
+
+ $("modalFormContainer").innerHTML=`
+  <p class="muted">Enter the client's contact and account information.</p>
+  <form id="recordForm">
+   <div class="form-grid">
+    ${fieldHTML("client_name","Client Name",row.client_name||"","text",true)}
+    ${fieldHTML("email","Email Address",row.email||"","email",true)}
+    ${fieldHTML("phone","Phone Number",row.phone||"","tel",false)}
+    ${selectHTML("account_status","Account Status",status,[
+     {value:"active",label:"Active"},
+     {value:"inactive",label:"Inactive"},
+     {value:"suspended",label:"Suspended"}
+    ],true)}
+   </div>
+   <p class="form-help">Client ID and timestamps are generated automatically by Supabase.</p>
+  </form>`;
+}
+
+/* =====================================================
+   BUSINESS FORM
+===================================================== */
+
+async function renderBusinessForm(row={}){
+ $("modalFormContainer").innerHTML='<p class="muted">Loading clients...</p>';
+
+ const {data:clients,error}=await db.from("clients")
+  .select("id,client_name,email").order("client_name");
+
+ if(error){
+  $("modalFormContainer").innerHTML=
+   '<div class="notice">Unable to load clients: '+escapeHTML(error.message)+'</div>'+
+   '<p class="muted">Check the clients table permissions and try again.</p>';
+  return;
+ }
+
+ if(!clients?.length){
+  $("modalFormContainer").innerHTML=`
+   <div class="notice">You need to create a client before adding a business.</div>
+   <button type="button" class="btn secondary" id="goCreateClient">Go to Clients</button>`;
+  $("goCreateClient").addEventListener("click",()=>{
+   closeEditor();
+   showPage("clients");
+   setTimeout(openCreateEditor,200);
+  });
+  return;
+ }
+
+ const clientOptions=[
+  {value:"",label:"Select a client"},
+  ...clients.map(client=>({
+   value:client.id,
+   label:client.client_name+" — "+client.email
+  }))
+ ];
+
+ $("modalFormContainer").innerHTML=`
+  <p class="muted">Add the business information and select the client who owns this business.</p>
+  <form id="recordForm">
+   <div class="form-grid">
+    ${selectHTML("client_id","Select Client",row.client_id||"",clientOptions,true,true)}
+    ${fieldHTML("business_name","Business Name",row.business_name||"","text",true)}
+    ${fieldHTML("slug","Business Slug",row.slug||"","text",true)}
+    ${fieldHTML("business_type","Business Type",row.business_type||"")}
+    ${textareaHTML("description","Business Description",row.description||"")}
+    ${fieldHTML("logo_url","Logo URL",row.logo_url||"","url",false,true)}
+    ${fieldHTML("google_review_url","Google Review URL",row.google_review_url||"","url",false,true)}
+    ${fieldHTML("website_url","Website URL",row.website_url||"","url",false,true)}
+    ${fieldHTML("whatsapp_number","WhatsApp Number",row.whatsapp_number||"","tel")}
+    ${fieldHTML("instagram_url","Instagram URL",row.instagram_url||"","url")}
+    ${selectHTML("business_status","Business Status",row.business_status||"draft",[
+     {value:"draft",label:"Draft"},
+     {value:"active",label:"Active"},
+     {value:"inactive",label:"Inactive"},
+     {value:"suspended",label:"Suspended"},
+     {value:"archived",label:"Archived"}
+    ],true)}
+   </div>
+   <p class="form-help">The client ID is linked automatically when you select a client. The slug should be unique.</p>
+  </form>`;
+
+ const businessNameInput=$("form_business_name");
+ const slugInput=$("form_slug");
+
+ businessNameInput.addEventListener("input",()=>{
+  if(!slugInput.dataset.edited){
+   slugInput.value=businessNameInput.value
+    .toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-|-$/g,"");
+  }
+ });
+
+ slugInput.addEventListener("input",()=>{
+  slugInput.dataset.edited="true";
+  slugInput.value=slugInput.value.toLowerCase()
+   .trim().replace(/[^a-z0-9-]/g,"-")
+   .replace(/-+/g,"-").replace(/^-|-$/g,"");
+ });
+}
+
+/* =====================================================
+   CREATE / EDIT RECORD EDITOR
+===================================================== */
+
+async function openCreateEditor(){
  isCreating=true;
  editingRow=null;
  $("modalTitle").textContent="Create "+prettyName(currentTable);
- $("recordJson").value=JSON.stringify({},null,2);
  $("modalError").textContent="";
+ $("saveRecord").disabled=false;
+ $("saveRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Record';
  $("recordModal").classList.remove("hidden");
+
+ if(currentTable==="clients"){
+  renderClientForm();
+ }else if(currentTable==="businesses"){
+  await renderBusinessForm();
+ }else{
+  $("modalFormContainer").innerHTML=`
+   <p class="muted">Enter the complete database record as JSON. Required fields and data types must be valid.</p>
+   <div class="field">
+    <label>Record JSON</label>
+    <textarea id="recordJson" class="json-input" spellcheck="false">{\n  \n}</textarea>
+   </div>`;
+ }
 }
 
-function openEditEditor(row){
+async function openEditEditor(row){
  isCreating=false;
  editingRow=row;
  $("modalTitle").textContent="Edit "+prettyName(currentTable);
- $("recordJson").value=JSON.stringify(row,null,2);
  $("modalError").textContent="";
+ $("saveRecord").disabled=false;
+ $("saveRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Changes';
  $("recordModal").classList.remove("hidden");
+
+ if(currentTable==="clients"){
+  renderClientForm(row);
+ }else if(currentTable==="businesses"){
+  await renderBusinessForm(row);
+ }else{
+  const editable={...row};
+  delete editable._client_name;
+  $("modalFormContainer").innerHTML=`
+   <p class="muted">Edit the complete database record as JSON.</p>
+   <div class="field">
+    <label>Record JSON</label>
+    <textarea id="recordJson" class="json-input" spellcheck="false">${escapeHTML(JSON.stringify(editable,null,2))}</textarea>
+   </div>`;
+ }
 }
 
 function closeEditor(){
@@ -678,53 +815,111 @@ function closeEditor(){
 $("closeModal").addEventListener("click",closeEditor);
 $("cancelModal").addEventListener("click",closeEditor);
 
+/* =====================================================
+   BUILD FORM PAYLOAD
+===================================================== */
+
+function buildClientPayload(){
+ const client_name=getFormValue("client_name");
+ const email=getFormValue("email");
+ const phone=getFormValue("phone");
+ const account_status=getFormValue("account_status");
+
+ if(!client_name||!email||!account_status){
+  throw new Error("Please enter the client name, email and account status.");
+ }
+
+ return {client_name,email,phone:phone||null,account_status};
+}
+
+function buildBusinessPayload(){
+ const client_id=getFormValue("client_id");
+ const business_name=getFormValue("business_name");
+ const slug=getFormValue("slug");
+
+ if(!client_id)throw new Error("Please select a client.");
+ if(!business_name)throw new Error("Please enter the business name.");
+ if(!slug)throw new Error("Please enter the business slug.");
+
+ return {
+  client_id,
+  business_name,
+  slug,
+  business_type:getFormValue("business_type")||null,
+  description:getFormValue("description")||null,
+  logo_url:getFormValue("logo_url")||null,
+  google_review_url:getFormValue("google_review_url")||null,
+  website_url:getFormValue("website_url")||null,
+  whatsapp_number:getFormValue("whatsapp_number")||null,
+  instagram_url:getFormValue("instagram_url")||null,
+  business_status:getFormValue("business_status")||"draft"
+ };
+}
+
+/* =====================================================
+   SAVE RECORD
+===================================================== */
+
 $("saveRecord").addEventListener("click",async()=>{
  let payload;
 
  try{
-  payload=JSON.parse($("recordJson").value);
- }catch(error){
-  showError($("modalError"),"Invalid JSON: "+error.message);
-  return;
- }
+  if(currentTable==="clients"){
+   payload=buildClientPayload();
+  }else if(currentTable==="businesses"){
+   payload=buildBusinessPayload();
+  }else{
+   const jsonElement=$("recordJson");
+   if(!jsonElement)throw new Error("The record editor is not ready.");
 
- if(!payload || typeof payload!=="object" || Array.isArray(payload)){
-  showError($("modalError"),"Enter a JSON object.");
-  return;
- }
+   try{
+    payload=JSON.parse(jsonElement.value);
+   }catch(error){
+    throw new Error("Invalid JSON: "+error.message);
+   }
 
- const key=PRIMARY_KEYS[currentTable] || "id";
- let result;
+   if(!payload||typeof payload!=="object"||Array.isArray(payload)){
+    throw new Error("Enter a JSON object.");
+   }
+  }
 
- $("saveRecord").disabled=true;
- $("saveRecord").textContent="Saving...";
+  const key=PRIMARY_KEYS[currentTable]||"id";
+  let result;
 
- try{
+  $("saveRecord").disabled=true;
+  $("saveRecord").textContent="Saving...";
+
   if(isCreating){
    delete payload[key];
+   delete payload.created_at;
+   delete payload.updated_at;
+
    result=await db.from(currentTable).insert(payload);
   }else{
    const id=editingRow?.[key];
 
-   if(id===undefined || id===null){
+   if(id===undefined||id===null){
     throw new Error("Primary key not found for this record.");
    }
 
-   result=await db
-    .from(currentTable)
-    .update(payload)
-    .eq(key,id);
+   delete payload[key];
+   delete payload.created_at;
+   delete payload.updated_at;
+
+   result=await db.from(currentTable).update(payload).eq(key,id);
   }
 
-  if(result.error) throw result.error;
+  if(result.error)throw result.error;
 
   closeEditor();
   await loadRecords();
 
-  if(currentTable==="businesses") await loadDashboard();
+  if(currentTable==="businesses"||currentTable==="clients"){
+   await loadDashboard();
+  }
 
  }catch(error){
-  showError($("modalError"),error.message || String(error));
+  showError($("modalError"),error.message||String(error));
  }finally{
   $("saveRecord").disabled=false;
   $("saveRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Record';
@@ -736,10 +931,10 @@ $("saveRecord").addEventListener("click",async()=>{
 ===================================================== */
 
 async function deleteRecord(row){
- const key=PRIMARY_KEYS[currentTable] || "id";
+ const key=PRIMARY_KEYS[currentTable]||"id";
  const id=row[key];
 
- if(id===undefined || id===null){
+ if(id===undefined||id===null){
   alert("Primary key is missing. Cannot safely delete this record.");
   return;
  }
@@ -750,10 +945,7 @@ async function deleteRecord(row){
 
  $("recordStatus").textContent="Deleting...";
 
- const {error}=await db
-  .from(currentTable)
-  .delete()
-  .eq(key,id);
+ const {error}=await db.from(currentTable).delete().eq(key,id);
 
  if(error){
   $("recordStatus").textContent="Delete failed: "+error.message;
@@ -763,7 +955,9 @@ async function deleteRecord(row){
  $("recordStatus").textContent="Record deleted.";
  await loadRecords();
 
- if(currentTable==="businesses") await loadDashboard();
+ if(currentTable==="businesses"||currentTable==="clients"){
+  await loadDashboard();
+ }
 }
 
 /* =====================================================
@@ -776,24 +970,21 @@ $("exportRecords").addEventListener("click",()=>{
   return;
  }
 
- const columns=[...new Set(currentRows.flatMap(row=>Object.keys(row)))];
+ const columns=[...new Set(currentRows.flatMap(row=>
+  Object.keys(row).filter(key=>!key.startsWith("_"))
+ ))];
 
  const quote=value=>{
-  let text=safe(value).replace(/"/g,'""');
+  const text=safe(value).replace(/"/g,'""');
   return '"'+text+'"';
  };
 
  const csv=[
   columns.map(quote).join(","),
-  ...currentRows.map(row=>
-   columns.map(column=>quote(row[column])).join(",")
-  )
+  ...currentRows.map(row=>columns.map(column=>quote(row[column])).join(","))
  ].join("\r\n");
 
- const blob=new Blob(["\uFEFF"+csv],{
-  type:"text/csv;charset=utf-8;"
- });
-
+ const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
  const url=URL.createObjectURL(blob);
  const link=document.createElement("a");
  link.href=url;
@@ -827,17 +1018,14 @@ $("uploadLogo").addEventListener("click",async()=>{
  }
 
  const extension=file.name.split(".").pop().toLowerCase();
- const safeName=($("logoFileName").value.trim() ||
+ const safeName=($("logoFileName").value.trim()||
   crypto.randomUUID()+"."+extension).replace(/[^a-zA-Z0-9._-]/g,"-");
 
  $("uploadResult").textContent="Uploading...";
 
- const {data,error}=await db.storage
-  .from("business-logos")
+ const {data,error}=await db.storage.from("business-logos")
   .upload(safeName,file,{
-   cacheControl:"3600",
-   upsert:true,
-   contentType:file.type
+   cacheControl:"3600",upsert:true,contentType:file.type
   });
 
  if(error){
@@ -845,9 +1033,7 @@ $("uploadLogo").addEventListener("click",async()=>{
   return;
  }
 
- const {data:publicData}=db.storage
-  .from("business-logos")
-  .getPublicUrl(data.path);
+ const {data:publicData}=db.storage.from("business-logos").getPublicUrl(data.path);
 
  $("uploadResult").innerHTML=
   'Upload successful. <a target="_blank" rel="noopener" href="'+
