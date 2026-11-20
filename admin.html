@@ -1256,12 +1256,42 @@ $("recordForm").addEventListener("submit",async event=>{
 
  try{
   let result;
-  if(editingRow){
-   const key=PRIMARY_KEYS[currentTable]||"id";
-   result=await db.from(currentTable).update(payload).eq(key,editingRow[key]);
-  }else{
-   result=await db.from(currentTable).insert(payload);
+ 
+if(editingRow){
+  const key=PRIMARY_KEYS[currentTable]||"id";
+  result=await db.from(currentTable).update(payload).eq(key,editingRow[key]);
+}else{
+  if(currentTable==="subscription_payments"){
+    const [
+      { data: userData, error: userError },
+      { data: adminCheck, error: adminError }
+    ] = await Promise.all([
+      db.auth.getUser(),
+      db.rpc("is_velora_admin")
+    ]);
+
+    console.log("PAYMENT INSERT DIAGNOSTICS");
+    console.log("Authenticated user:", userData?.user?.id);
+    console.log("User error:", userError);
+    console.log("Admin check:", adminCheck);
+    console.log("Admin error:", adminError);
+    console.log("Payload fields:", Object.keys(payload));
+
+    if(userError) throw userError;
+    if(adminError) throw adminError;
+
+    if(!userData?.user){
+      throw new Error("No authenticated user found.");
+    }
+
+    if(adminCheck !== true){
+      throw new Error("Database admin authorization returned false.");
+    }
   }
+
+  result=await db.from(currentTable).insert(payload);
+}
+
 
   if(result.error)throw result.error;
 
