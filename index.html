@@ -810,9 +810,8 @@ enquiryForm.addEventListener("submit", async event => {
     try {
         const { data, error } = await supabaseClient
             .from("inquiries")
-            .insert([enquiryRecord])
-            .select("id")
-            .single();
+            .insert([enquiryRecord]);
+            
 
         if (error) throw error;
 
