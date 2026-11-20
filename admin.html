@@ -460,7 +460,7 @@ const FORM_CONFIG = {
  subscription_plans:[
   {name:"plan_name",label:"Plan Name",required:true},
   {name:"plan_description",label:"Description",type:"textarea"},
-  {name:"billing_interval",label:"Billing Interval",required:true},
+  {name:"billing_interval",label:"Billing Interval",type:"select",options:["monthly","yearly","one_time"],required:true,default:"monthly"},
   {name:"price",label:"Price",type:"number",default:"0"},
   {name:"currency",label:"Currency",default:"INR"},
   {name:"max_businesses",label:"Maximum Businesses",type:"number"},
