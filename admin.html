@@ -658,14 +658,6 @@ console.log("Logged-in Admin ID:", currentUser.id);
 console.log("Admin Function Result:", adminCheck);
 console.log("Admin Function Error:", adminCheckError);
  await loadDashboard();
- const { data: adminCheck, error: adminCheckError } =
-    await db.rpc("is_velora_admin");
-
-console.log("Logged-in User ID:", currentUser.id);
-console.log("Admin Function Result:", adminCheck);
-console.log("Admin Function Error:", adminCheckError);
- startLiveInquiries();
-}
 
 async function restoreSession(){
  const {data,error}=await db.auth.getSession();
