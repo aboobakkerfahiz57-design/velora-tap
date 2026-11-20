@@ -651,13 +651,34 @@ async function verifyAdmin(){
  $("app").classList.remove("hidden");
  $("adminEmail").textContent=currentUser.email;
  $("sessionInfo").textContent="Signed in as "+currentUser.email;
- const { data: adminCheck, error: adminCheckError } =
-    await db.rpc("is_velora_admin");
 
-console.log("Logged-in Admin ID:", currentUser.id);
-console.log("Admin Function Result:", adminCheck);
-console.log("Admin Function Error:", adminCheckError);
+ // Confirm that the database-side RLS helper recognizes this authenticated user.
+ const { data: adminCheck, error: adminCheckError } =
+  await db.rpc("is_velora_admin");
+
+ console.info("VELORA TAP admin user:", currentUser.id);
+ console.info("is_velora_admin():", adminCheck);
+ if(adminCheckError){
+  console.error("Admin authorization check failed:", adminCheckError);
+  $("app").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  showError($("loginError"),"Admin authorization check failed: "+adminCheckError.message);
+  await db.auth.signOut();
+  currentUser=null;
+  return;
+ }
+ if(adminCheck !== true){
+  $("app").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  showError($("loginError"),"Your account is listed as an admin, but the database admin check returned false. Check the is_velora_admin() function and admin_profiles record.");
+  await db.auth.signOut();
+  currentUser=null;
+  return;
+ }
+
  await loadDashboard();
+ startLiveInquiries();
+} // End verifyAdmin() before declaring restoreSession()
 
 async function restoreSession(){
  const {data,error}=await db.auth.getSession();
