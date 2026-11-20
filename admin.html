@@ -651,7 +651,12 @@ async function verifyAdmin(){
  $("app").classList.remove("hidden");
  $("adminEmail").textContent=currentUser.email;
  $("sessionInfo").textContent="Signed in as "+currentUser.email;
+ const { data: adminCheck, error: adminCheckError } =
+    await db.rpc("is_velora_admin");
 
+console.log("Logged-in Admin ID:", currentUser.id);
+console.log("Admin Function Result:", adminCheck);
+console.log("Admin Function Error:", adminCheckError);
  await loadDashboard();
  startLiveInquiries();
 }
