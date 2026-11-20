@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VELORA TAP | Client Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --green: #087b55;
+      --green-dark: #07583f;
+      --green-light: #e9f5ef;
+      --gold: #c7a45b;
+      --ink: #17221d;
+      --muted: #77837c;
+      --line: #e8ede9;
+      --surface: #ffffff;
+      --background: #f5f7f5;
+      --red: #c94c4c;
+      --shadow: 0 8px 30px rgba(20, 45, 32, .06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .hidden { display: none !important; }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(199,164,91,.13), transparent 30%),
+        radial-gradient(circle at 90% 90%, rgba(8,123,85,.12), transparent 35%),
+        #f7f9f7;
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-logo {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 15px;
+    }
+
+    .login-card h1 {
+      text-align: center;
+      font: 800 25px Manrope, sans-serif;
+      margin: 0;
+    }
+
+    .login-card > p {
+      text-align: center;
+      color: var(--muted);
+      margin: 8px 0 28px;
+      font-size: 14px;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      background: white;
+      color: var(--ink);
+    }
+
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(8,123,85,.09);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 700;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--green-dark); }
+
+    .btn-light {
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: #fff0f0;
+      color: var(--red);
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .full { width: 100%; }
+
+    .login-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 17px;
+      gap: 10px;
+    }
+
+    .text-button {
+      background: none;
+      border: 0;
+      color: var(--green);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 5px 0;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 11px 13px;
+      border-radius: 9px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .message.show { display: block; }
+    .message.error { background: #fff0f0; color: #a52e2e; }
+    .message.success { background: #eaf7ef; color: #17633e; }
+
+    .app { min-height: 100vh; }
+
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      position: fixed;
+      inset: 0 auto 0 0;
+      padding: 24px 15px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 10px 25px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand img {
+      width: 43px;
+      height: 43px;
+      object-fit: contain;
+    }
+
+    .brand strong {
+      display: block;
+      font: 800 15px Manrope, sans-serif;
+      letter-spacing: .5px;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-label {
+      padding: 22px 11px 8px;
+      color: #9aa49e;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 12px;
+      padding: 11px 12px;
+      border: 0;
+      background: transparent;
+      color: #637168;
+      border-radius: 9px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 2px 0;
+    }
+
+    .nav-btn:hover { background: #f4f8f5; color: var(--green); }
+
+    .nav-btn.active {
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-weight: 800;
+    }
+
+    .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .user-mini {
+      padding: 13px 10px;
+      border-top: 1px solid var(--line);
+      margin-bottom: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .user-mini strong { display: block; font-size: 13px; }
+    .user-mini small { color: var(--muted); font-size: 11px; }
+
+    .main {
+      margin-left: 250px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 75px;
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--line);
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font: 800 18px Manrope, sans-serif;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2aa66b;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .content {
+      max-width: 1450px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    .welcome {
+      margin-bottom: 24px;
+    }
+
+    .welcome h1 {
+      font: 800 25px Manrope, sans-serif;
+      margin: 0 0 7px;
+    }
+
+    .welcome p { color: var(--muted); margin: 0; font-size: 14px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card, .panel, .data-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card { padding: 19px; }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--green-light);
+      font-size: 16px;
+    }
+
+    .stat-number {
+      font: 800 26px Manrope, sans-serif;
+      margin-top: 13px;
+    }
+
+    .stat-note { color: var(--muted); font-size: 11px; margin-top: 4px; }
+
+    .panel { padding: 21px; margin-bottom: 20px; }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font: 800 15px Manrope, sans-serif;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+
+    .section-title {
+      font: 800 23px Manrope, sans-serif;
+      margin: 0 0 7px;
+    }
+
+    .section-description {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 23px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 17px;
+    }
+
+    .detail label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .detail strong {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 600px;
+      font-size: 12px;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f8faf8;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    th, td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    td { overflow-wrap: anywhere; }
+
+    .pill {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      background: #edf3ef;
+      color: #426451;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: capitalize;
+    }
+
+    .pill.green { background: #e6f6ed; color: #167447; }
+    .pill.orange { background: #fff3df; color: #98651b; }
+    .pill.red { background: #ffeded; color: #ad3939; }
+
+    .empty {
+      padding: 35px 15px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .notice {
+      background: #fff8e9;
+      border: 1px solid #f0dfb7;
+      border-radius: 11px;
+      color: #76551c;
+      padding: 13px 15px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 17px;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ticket-item, .notification-item {
+      padding: 15px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ticket-item:last-child, .notification-item:last-child { border: 0; }
+
+    .ticket-item h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+
+    .ticket-item p, .notification-item p {
+      margin: 5px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .notification-item.unread {
+      background: #f4faf6;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-radius: 9px;
+    }
+
+    .qr-area {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    #qrcode {
+      background: white;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      min-width: 154px;
+      min-height: 154px;
+    }
+
+    #qrcode img, #qrcode canvas { display: block; }
+
+    .loading {
+      color: var(--muted);
+      padding: 20px;
+      font-size: 13px;
+    }
+
+    .mobile-menu { display: none; }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100;
+      background: #18392b;
+      color: white;
+      padding: 13px 18px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      max-width: min(420px, calc(100vw - 44px));
+      display: none;
+    }
+
+    .toast.show { display: block; }
+
+    @media(max-width: 1100px) {
+      .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+
+    @media(max-width: 760px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: .25s;
+        box-shadow: var(--shadow);
+      }
+
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .mobile-menu { display: inline-flex; }
+      .topbar { padding: 0 16px; height: 65px; }
+      .content { padding: 20px 15px; }
+      .topbar h2 { font-size: 15px; }
+      .grid { gap: 10px; }
+      .stat-card { padding: 14px; }
+      .stat-number { font-size: 22px; }
+      .two-col, .details-grid { grid-template-columns: 1fr; }
+      .welcome h1 { font-size: 21px; }
+      .login-card { padding: 27px 21px; }
+    }
+
+    @media(max-width: 390px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .stat-number { font-size: 19px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <img class="login-logo" src="./velora-logo.png" alt="VELORA TAP"
+           onerror="this.style.display='none'">
+
+      <h1>Client Portal</h1>
+      <p>Welcome to your VELORA TAP business dashboard.</p>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email address</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="Enter your password" required autocomplete="current-password">
+        </div>
+
+        <button class="btn btn-primary full" id="loginButton" type="submit">
+          Sign in to your account
+        </button>
+      </form>
+
+      <div class="login-links">
+        <button class="text-button" id="forgotPasswordButton" type="button">Forgot password?</button>
+        <button class="text-button" id="clearLoginButton" type="button">Clear fields</button>
+      </div>
+
+      <div id="loginMessage" class="message"></div>
+    </div>
+  </section>
+
+  <!-- APPLICATION -->
+  <div id="app" class="app hidden">
+
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <img src="./velora-logo.png" alt="VELORA TAP"
+             onerror="this.style.display='none'">
+        <div>
+          <strong>VELORA TAP</strong>
+          <small>CLIENT PORTAL</small>
+        </div>
+      </div>
+
+      <div class="nav-label">Workspace</div>
+      <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
+      <button class="nav-btn" data-page="business"><span class="nav-icon">▣</span> My Business</button>
+      <button class="nav-btn" data-page="branches"><span class="nav-icon">⌖</span> Branches</button>
+      <button class="nav-btn" data-page="profile"><span class="nav-icon">✎</span> Digital Profile</button>
+
+      <div class="nav-label">NFC & Insights</div>
+      <button class="nav-btn" data-page="cards"><span class="nav-icon">▤</span> NFC Cards</button>
+      <button class="nav-btn" data-page="qr"><span class="nav-icon">▦</span> QR Generator</button>
+      <button class="nav-btn" data-page="analytics"><span class="nav-icon">◷</span> Analytics</button>
+      <button class="nav-btn" data-page="activity"><span class="nav-icon">↻</span> Activity History</button>
+
+      <div class="nav-label">Account & Services</div>
+      <button class="nav-btn" data-page="orders"><span class="nav-icon">▧</span> Orders</button>
+      <button class="nav-btn" data-page="invoices"><span class="nav-icon">₹</span> Invoices & Payments</button>
+      <button class="nav-btn" data-page="subscriptions"><span class="nav-icon">◇</span> Subscriptions</button>
+      <button class="nav-btn" data-page="support"><span class="nav-icon">✉</span> Support Tickets</button>
+      <button class="nav-btn" data-page="notifications"><span class="nav-icon">♢</span> Notifications</button>
+      <button class="nav-btn" data-page="settings"><span class="nav-icon">⚙</span> Account Settings</button>
+
+      <div class="sidebar-bottom">
+        <div class="user-mini">
+          <strong id="sidebarName">Client</strong>
+          <small id="sidebarEmail">Loading account...</small>
+        </div>
+        <button class="nav-btn" id="logoutButton"><span class="nav-icon">⇥</span> Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-right">
+          <button class="btn btn-light mobile-menu" id="menuButton" type="button">☰</button>
+          <h2 id="pageHeading">Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <span class="small muted"><span class="status-dot"></span>Connected</span>
+          <button class="btn btn-outline" id="refreshButton" type="button">↻ Refresh</button>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <section class="page" id="page-dashboard">
+          <div class="welcome">
+            <h1>Welcome back, <span id="welcomeName">Client</span>!</h1>
+            <p>Here is your VELORA TAP account overview.</p>
+          </div>
+
+          <div class="grid">
+            <div class="stat-card">
+              <div class="stat-top"><span>Businesses</span><span class="stat-icon">▣</span></div>
+              <div class="stat-number" id="statBusinesses">—</div>
+              <div class="stat-note">Your registered businesses</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>NFC Cards</span><span class="stat-icon">▤</span></div>
+              <div class="stat-number" id="statCards">—</div>
+              <div class="stat-note">Cards assigned to your business</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>Total Events</span><span class="stat-icon">◷</span></div>
+              <div class="stat-number" id="statEvents">—</div>
+              <div class="stat-note">Recorded profile and card activity</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>Orders</span><span class="stat-icon">▧</span></div>
+              <div class="stat-number" id="statOrders">—</div>
+              <div class="stat-note">Your recorded orders</div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Business Overview</h3>
+                <button class="btn btn-light" data-goto="business">View</button>
+              </div>
+              <div id="dashboardBusiness" class="loading">Loading business details...</div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Account Information</h3>
+                <button class="btn btn-light" data-goto="settings">Settings</button>
+              </div>
+              <div id="dashboardAccount" class="loading">Loading account...</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recent Activity</h3>
+              <button class="btn btn-light" data-goto="activity">View all</button>
+            </div>
+            <div id="dashboardActivity" class="loading">Loading activity...</div>
+          </div>
+        </section>
+
+        <!-- BUSINESS -->
+        <section class="page hidden" id="page-business">
+          <h1 class="section-title">My Business</h1>
+          <p class="section-description">View the business information registered with VELORA TAP.</p>
+          <div id="businessDetails" class="panel loading">Loading business details...</div>
+        </section>
+
+        <!-- BRANCHES -->
+        <section class="page hidden" id="page-branches">
+          <h1 class="section-title">Branches</h1>
+          <p class="section-description">View the branches connected to your registered business.</p>
+          <div class="panel">
+            <div class="panel-head"><h3>Business Branches</h3></div>
+            <div id="branchesContent" class="loading">Loading branches...</div>
+          </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section class="page hidden" id="page-profile">
+          <h1 class="section-title">Digital Profile</h1>
+          <p class="section-description">Review your public business profile and approval requirements.</p>
+
+          <div class="notice">
+            <strong>Admin approval required.</strong>
+            Your existing database does not yet contain the profile-submission and review tables or client submission permissions. Profile editing is therefore not enabled in this version. This prevents changes from bypassing your admin approval process.
+          </div>
+
+          <div id="profileDetails" class="panel loading">Loading profile...</div>
+        </section>
+
+        <!-- NFC CARDS -->
+        <section class="page hidden" id="page-cards">
+          <h1 class="section-title">NFC Cards</h1>
+          <p class="section-description">View your assigned VELORA TAP NFC cards and their current status.</p>
+          <div class="panel">
+            <div class="panel-head"><h3>Assigned Cards</h3></div>
+            <div id="cardsContent" class="loading">Loading cards...</div>
+          </div>
+        </section>
+
+        <!-- QR -->
+        <section class="page hidden" id="page-qr">
+          <h1 class="section-title">QR Generator</h1>
+          <p class="section-description">Create a QR code for a business profile URL or another link you control.</p>
+
+          <div class="panel">
+            <div class="field">
+              <label for="qrUrl">Enter your public business profile URL</label>
+              <input id="qrUrl" type="url" placeholder="https://example.com/your-business">
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="generateQrButton" type="button">Generate QR Code</button>
+              <button class="btn btn-outline" id="downloadQrButton" type="button" disabled>Download PNG</button>
+            </div>
+
+            <div class="qr-area" style="margin-top:25px">
+              <div id="qrcode"></div>
+              <div>
+                <strong>Share your business link</strong>
+                <p class="small muted">Scan this QR code to open the URL entered above. Make sure the URL is correct before printing or sharing.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section class="page hidden" id="page-analytics">
+          <h1 class="section-title">Analytics</h1>
+          <p class="section-description">Your recorded NFC taps, QR scans, profile views and link clicks.</p>
+
+          <div class="grid">
+            <div class="stat-card">
+              <div class="stat-top"><span>NFC Taps</span><span class="stat-icon">▤</span></div>
+              <div class="stat-number" id="analyticsNfc">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>QR Scans</span><span class="stat-icon">▦</span></div>
+              <div class="stat-number" id="analyticsQr">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>Profile Views</span><span class="stat-icon">◉</span></div>
+              <div class="stat-number" id="analyticsViews">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top"><span>Link Clicks</span><span class="stat-icon">↗</span></div>
+              <div class="stat-number" id="analyticsClicks">—</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Event Breakdown</h3></div>
+            <div id="analyticsContent" class="loading">Loading analytics...</div>
+          </div>
+        </section>
+
+        <!-- ACTIVITY -->
+        <section class="page hidden" id="page-activity">
+          <h1 class="section-title">Activity History</h1>
+          <p class="section-description">Recorded events associated with your business.</p>
+          <div class="panel">
+            <div id="activityContent" class="loading">Loading activity...</div>
+          </div>
+        </section>
+
+        <!-- ORDERS -->
+        <section class="page hidden" id="page-orders">
+          <h1 class="section-title">Orders</h1>
+          <p class="section-description">View your VELORA TAP orders and their current status.</p>
+          <div class="panel">
+            <div id="ordersContent" class="loading">Loading orders...</div>
+          </div>
+        </section>
+
+        <!-- INVOICES -->
+        <section class="page hidden" id="page-invoices">
+          <h1 class="section-title">Invoices & Payments</h1>
+          <p class="section-description">View invoices and payment records associated with your account.</p>
+          <div class="panel">
+            <div class="panel-head"><h3>Invoices</h3></div>
+            <div id="invoicesContent" class="loading">Loading invoices...</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Payments</h3></div>
+            <div id="paymentsContent" class="loading">Loading payments...</div>
+          </div>
+        </section>
+
+        <!-- SUBSCRIPTIONS -->
+        <section class="page hidden" id="page-subscriptions">
+          <h1 class="section-title">Subscriptions</h1>
+          <p class="section-description">View your current subscription and available plans.</p>
+          <div class="panel">
+            <div class="panel-head"><h3>My Subscription</h3></div>
+            <div id="subscriptionsContent" class="loading">Loading subscription...</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Available Plans</h3></div>
+            <div id="plansContent" class="loading">Loading plans...</div>
+          </div>
+        </section>
+
+        <!-- SUPPORT -->
+        <section class="page hidden" id="page-support">
+          <h1 class="section-title">Support Tickets</h1>
+          <p class="section-description">Create a support request and view your submitted tickets.</p>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Create a Support Ticket</h3></div>
+            <form id="ticketForm">
+              <div class="field">
+                <label for="ticketSubject">Subject</label>
+                <input id="ticketSubject" maxlength="180" required placeholder="What do you need help with?">
+              </div>
+
+              <div class="two-col">
+                <div class="field">
+                  <label for="ticketCategory">Category</label>
+                  <select id="ticketCategory">
+                    <option value="general">General</option>
+                    <option value="technical">Technical</option>
+                    <option value="nfc">NFC Card</option>
+                    <option value="billing">Billing</option>
+                    <option value="profile">Digital Profile</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="ticketPriority">Priority</label>
+                  <select id="ticketPriority">
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="ticketDescription">Description</label>
+                <textarea id="ticketDescription" rows="4" required placeholder="Explain your issue..."></textarea>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="createTicketButton">Submit Ticket</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>My Support Tickets</h3></div>
+            <div id="ticketsContent" class="loading">Loading tickets...</div>
+          </div>
+        </section>
+
+        <!-- NOTIFICATIONS -->
+        <section class="page hidden" id="page-notifications">
+          <h1 class="section-title">Notifications</h1>
+          <p class="section-description">Updates and messages linked to your client account.</p>
+          <div class="panel">
+            <div id="notificationsContent" class="loading">Loading notifications...</div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page hidden" id="page-settings">
+          <h1 class="section-title">Account Settings</h1>
+          <p class="section-description">View your account information and manage your login security.</p>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Personal Information</h3></div>
+            <div id="settingsDetails" class="details-grid">Loading account...</div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Security</h3></div>
+            <p class="small muted">You can request a password reset email for your account.</p>
+            <button class="btn btn-primary" id="settingsResetButton" type="button">Send Password Reset Email</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Session</h3></div>
+            <p class="small muted">Sign out of your current VELORA TAP client session.</p>
+            <button class="btn btn-danger" id="settingsLogoutButton" type="button">Sign Out</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ============================================================
+    // VELORA TAP CLIENT PORTAL
+    // Supabase configuration
+    // ============================================================
+
+    const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    // ============================================================
+    // APPLICATION STATE
+    // ============================================================
+
+    let currentUser = null;
+    let clientRecord = null;
+    let businesses = [];
+    let branches = [];
+    let cards = [];
+    let orders = [];
+    let invoices = [];
+    let payments = [];
+    let subscriptions = [];
+    let plans = [];
+    let events = [];
+    let tickets = [];
+    let notifications = [];
+    let selectedPage = "dashboard";
+    let qrInstance = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    const PAGE_TITLES = {
+      dashboard: "Dashboard",
+      business: "My Business",
+      branches: "Branches",
+      profile: "Digital Profile",
+      cards: "NFC Cards",
+      qr: "QR Generator",
+      analytics: "Analytics",
+      activity: "Activity History",
+      orders: "Orders",
+      invoices: "Invoices & Payments",
+      subscriptions: "Subscriptions",
+      support: "Support Tickets",
+      notifications: "Notifications",
+      settings: "Account Settings"
+    };
+
+    // ============================================================
+    // BASIC HELPERS
+    // ============================================================
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function formatDate(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+      return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+      return date.toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function money(value, currency = "INR") {
+      const amount = Number(value || 0);
+      try {
+        return new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency
+        }).format(amount);
+      } catch {
+        return "₹" + amount.toFixed(2);
+      }
+    }
+
+    function statusPill(value) {
+      const status = String(value || "unknown").toLowerCase();
+      let color = "";
+
+      if (["active", "paid", "completed", "delivered", "confirmed", "resolved", "approved"].includes(status)) {
+        color = "green";
+      } else if (["pending", "draft", "submitted", "processing", "partially_paid"].includes(status)) {
+        color = "orange";
+      } else if (["cancelled", "failed", "suspended", "overdue", "rejected"].includes(status)) {
+        color = "red";
+      }
+
+      return `<span class="pill ${color}">${escapeHTML(status.replaceAll("_", " "))}</span>`;
+    }
+
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 3500);
+    }
+
+    function showLoginMessage(message, type = "error") {
+      const box = $("loginMessage");
+      box.textContent = message;
+      box.className = "message show " + type;
+    }
+
+    function showEmpty(title, description = "No records found.") {
+      return `<div class="empty"><strong>${escapeHTML(title)}</strong>${escapeHTML(description)}</div>`;
+    }
+
+    function setButtonLoading(button, loading, label = "Please wait...") {
+      if (!button) return;
+      if (loading) {
+        button.dataset.originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = label;
+      } else {
+        button.disabled = false;
+        button.textContent = button.dataset.originalText || button.textContent;
+      }
+    }
+
+    async function getRows(table, queryBuilder) {
+      let query = supabaseClient.from(table).select("*");
+      if (queryBuilder) query = queryBuilder(query);
+      const { data, error } = await query;
+      if (error) {
+        console.error("Supabase query error:", table, error);
+        throw error;
+      }
+      return data || [];
+    }
+
+    function setHTML(id, html) {
+      const element = $(id);
+      if (element) element.innerHTML = html;
+    }
+
+    function displayError(id, error) {
+      console.error(error);
+      setHTML(id, `<div class="empty"><strong>Unable to load this section</strong>${escapeHTML(error.message || "Please refresh and try again.")}</div>`);
+    }
+
+    // ============================================================
+    // AUTHENTICATION
+    // ============================================================
+
+    async function signIn(email, password) {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      currentUser = data.user;
+      await loadClientApplication();
+    }
+
+    async function signOut() {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        showToast(error.message);
+        return;
+      }
+
+      currentUser = null;
+      clientRecord = null;
+      $("app").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+      $("loginForm").reset();
+      showToast("You have signed out.");
+    }
+
+    async function sendPasswordReset(email) {
+      if (!email) {
+        showToast("Enter your account email address first.");
+        $("loginEmail").focus();
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href
+      });
+
+      if (error) throw error;
+      showToast("Password reset email sent. Check your inbox.");
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const button = $("loginButton");
+      setButtonLoading(button, true, "Signing in...");
+
+      try {
+        await signIn(
+          $("loginEmail").value.trim(),
+          $("loginPassword").value
+        );
+      } catch (error) {
+        showLoginMessage(error.message || "Unable to sign in.");
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    $("forgotPasswordButton").addEventListener("click", async () => {
+      try {
+        await sendPasswordReset($("loginEmail").value.trim());
+      } catch (error) {
+        showLoginMessage(error.message || "Could not send password reset email.");
+      }
+    });
+
+    $("clearLoginButton").addEventListener("click", () => {
+      $("loginForm").reset();
+      $("loginMessage").className = "message";
+    });
+
+    $("logoutButton").addEventListener("click", signOut);
+    $("settingsLogoutButton").addEventListener("click", signOut);
+
+    $("settingsResetButton").addEventListener("click", async () => {
+      try {
+        await sendPasswordReset(currentUser?.email);
+      } catch (error) {
+        showToast(error.message || "Password reset failed.");
+      }
+    });
+
+    // ============================================================
+    // LOAD CLIENT ACCOUNT
+    // ============================================================
+
+    async function loadClientApplication() {
+      if (!currentUser) return;
+
+      $("loginScreen").classList.add("hidden");
+      $("app").classList.remove("hidden");
+
+      try {
+        const { data, error } = await supabaseClient
+          .from("clients")
+          .select("*")
+          .eq("auth_user_id", currentUser.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          await supabaseClient.auth.signOut();
+          $("app").classList.add("hidden");
+          $("loginScreen").classList.remove("hidden");
+          showLoginMessage(
+            "No client account is linked to this login. Ask VELORA TAP admin to connect your Auth user to the clients table."
+          );
+          return;
+        }
+
+        clientRecord = data;
+
+        if (clientRecord.account_status !== "active") {
+          await supabaseClient.auth.signOut();
+          $("app").classList.add("hidden");
+          $("loginScreen").classList.remove("hidden");
+          showLoginMessage("Your client account is not active. Please contact VELORA TAP support.");
+          return;
+        }
+
+        $("sidebarName").textContent = clientRecord.client_name || "Client";
+        $("sidebarEmail").textContent = clientRecord.email || currentUser.email || "";
+        $("welcomeName").textContent = (clientRecord.client_name || "Client").split(" ")[0];
+
+        await loadAllData();
+        navigateTo("dashboard");
+
+      } catch (error) {
+        console.error(error);
+        showToast("Account loading failed: " + (error.message || "Unknown error"));
+      }
+    }
+
+    // ============================================================
+    // LOAD ALL CLIENT DATA
+    // ============================================================
+
+    async function loadAllData() {
+      if (!clientRecord) return;
+
+      const clientId = clientRecord.id;
+
+      const tasks = await Promise.allSettled([
+        getRows("businesses", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
+        getRows("orders", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
+        getRows("invoices", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
+        getRows("payments", q => q.eq("client_id", clientId).order("payment_date", { ascending: false })),
+        getRows("client_subscriptions", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
+        getRows("notifications", q => q.eq("user_id", currentUser.id).order("created_at", { ascending: false })),
+        getRows("support_tickets", q => q.eq("client_id", clientId).order("created_at", { ascending: false }))
+      ]);
+
+      businesses = tasks[0].status === "fulfilled" ? tasks[0].value : [];
+      orders = tasks[1].status === "fulfilled" ? tasks[1].value : [];
+      invoices = tasks[2].status === "fulfilled" ? tasks[2].value : [];
+      payments = tasks[3].status === "fulfilled" ? tasks[3].value : [];
+      subscriptions = tasks[4].status === "fulfilled" ? tasks[4].value : [];
+      notifications = tasks[5].status === "fulfilled" ? tasks[5].value : [];
+      tickets = tasks[6].status === "fulfilled" ? tasks[6].value : [];
+
+      const businessIds = businesses.map(b => b.id);
+
+      if (businessIds.length) {
+        const secondary = await Promise.allSettled([
+          getRows("business_branches", q => q.in("business_id", businessIds).order("created_at", { ascending: false })),
+          getRows("nfc_cards", q => q.in("business_id", businessIds).order("created_at", { ascending: false })),
+          getRows("business_events", q => q.in("business_id", businessIds).order("created_at", { ascending: false }).limit(500))
+        ]);
+
+        branches = secondary[0].status === "fulfilled" ? secondary[0].value : [];
+        cards = secondary[1].status === "fulfilled" ? secondary[1].value : [];
+        events = secondary[2].status === "fulfilled" ? secondary[2].value : [];
+      } else {
+        branches = [];
+        cards = [];
+        events = [];
+      }
+
+      const plansResult = await Promise.allSettled([
+        getRows("subscription_plans", q => q.eq("is_active", true).order("price", { ascending: true }))
+      ]);
+
+      plans = plansResult[0].status === "fulfilled" ? plansResult[0].value : [];
+
+      renderAll();
+    }
+
+    async function refreshAll() {
+      const button = $("refreshButton");
+      setButtonLoading(button, true, "Refreshing...");
+      try {
+        await loadAllData();
+        showToast("Dashboard refreshed.");
+      } catch (error) {
+        showToast(error.message || "Refresh failed.");
+      } finally {
+        setButtonLoading(button, false);
+      }
+    }
+
+    $("refreshButton").addEventListener("click", refreshAll);
+
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
+
+    function navigateTo(page) {
+      if (!PAGE_TITLES[page]) return;
+
+      selectedPage = page;
+
+      document.querySelectorAll(".page").forEach(section => {
+        section.classList.add("hidden");
+      });
+
+      const target = $("page-" + page);
+      if (target) target.classList.remove("hidden");
+
+      document.querySelectorAll(".nav-btn[data-page]").forEach(button => {
+        button.classList.toggle("active", button.dataset.page === page);
+      });
+
+      $("pageHeading").textContent = PAGE_TITLES[page];
+      $("sidebar").classList.remove("open");
+
+      // Re-render the current page using the latest loaded data.
+      renderPage(page);
+    }
+
+    document.querySelectorAll(".nav-btn[data-page]").forEach(button => {
+      button.addEventListener("click", () => navigateTo(button.dataset.page));
+    });
+
+    document.querySelectorAll("[data-goto]").forEach(button => {
+      button.addEventListener("click", () => navigateTo(button.dataset.goto));
+    });
+
+    $("menuButton").addEventListener("click", () => {
+      $("sidebar").classList.toggle("open");
+    });
+
+    // ============================================================
+    // RENDER FUNCTIONS
+    // ============================================================
+
+    function renderAll() {
+      renderDashboard();
+      renderBusiness();
+      renderBranches();
+      renderProfile();
+      renderCards();
+      renderAnalytics();
+      renderActivity();
+      renderOrders();
+      renderInvoices();
+      renderSubscriptions();
+      renderSupport();
+      renderNotifications();
+      renderSettings();
+    }
+
+    function renderPage(page) {
+      const renderers = {
+        dashboard: renderDashboard,
+        business: renderBusiness,
+        branches: renderBranches,
+        profile: renderProfile,
+        cards: renderCards,
+        analytics: renderAnalytics,
+        activity: renderActivity,
+        orders: renderOrders,
+        invoices: renderInvoices,
+        subscriptions: renderSubscriptions,
+        support: renderSupport,
+        notifications: renderNotifications,
+        settings: renderSettings
+      };
+
+      if (renderers[page]) renderers[page]();
+    }
+
+    function renderDashboard() {
+      $("statBusinesses").textContent = businesses.length;
+      $("statCards").textContent = cards.length;
+      $("statEvents").textContent = events.length;
+      $("statOrders").textContent = orders.length;
+
+      const business = businesses[0];
+
+      setHTML("dashboardBusiness", business ? `
+        <div class="details-grid">
+          <div class="detail"><label>Business Name</label><strong>${escapeHTML(business.business_name)}</strong></div>
+          <div class="detail"><label>Business Type</label><strong>${escapeHTML(business.business_type || "—")}</strong></div>
+          <div class="detail"><label>Profile Slug</label><strong>${escapeHTML(business.slug)}</strong></div>
+          <div class="detail"><label>Status</label><strong>${statusPill(business.business_status)}</strong></div>
+        </div>
+      ` : showEmpty("No business linked", "Contact VELORA TAP to link your business to this account."));
+
+      setHTML("dashboardAccount", `
+        <div class="details-grid">
+          <div class="detail"><label>Client Name</label><strong>${escapeHTML(clientRecord.client_name)}</strong></div>
+          <div class="detail"><label>Email</label><strong>${escapeHTML(clientRecord.email)}</strong></div>
+          <div class="detail"><label>Phone</label><strong>${escapeHTML(clientRecord.phone || "—")}</strong></div>
+          <div class="detail"><label>Account Status</label><strong>${statusPill(clientRecord.account_status)}</strong></div>
+        </div>
+      `);
+
+      const recent = events.slice(0, 6);
+      setHTML("dashboardActivity", recent.length ? renderEventsTable(recent) :
+        showEmpty("No activity yet", "Your business events will appear here when recorded."));
+    }
+
+    function renderBusiness() {
+      setHTML("businessDetails", businesses.length ? businesses.map(business => `
+        <div style="padding:4px 0 22px">
+          <div class="panel-head">
+            <h3>${escapeHTML(business.business_name)}</h3>
+            ${statusPill(business.business_status)}
+          </div>
+
+          <div class="details-grid">
+            <div class="detail"><label>Business Name</label><strong>${escapeHTML(business.business_name)}</strong></div>
+            <div class="detail"><label>Business Type</label><strong>${escapeHTML(business.business_type || "—")}</strong></div>
+            <div class="detail"><label>Public Slug</label><strong>${escapeHTML(business.slug)}</strong></div>
+            <div class="detail"><label>Created</label><strong>${formatDate(business.created_at)}</strong></div>
+            <div class="detail"><label>Website</label><strong>${business.website_url ? `<a href="${escapeHTML(business.website_url)}" target="_blank" rel="noopener">Open website ↗</a>` : "—"}</strong></div>
+            <div class="detail"><label>WhatsApp</label><strong>${escapeHTML(business.whatsapp_number || "—")}</strong></div>
+            <div class="detail"><label>Google Review URL</label><strong>${business.google_review_url ? `<a href="${escapeHTML(business.google_review_url)}" target="_blank" rel="noopener">Open review link ↗</a>` : "—"}</strong></div>
+            <div class="detail"><label>Instagram</label><strong>${business.instagram_url ? `<a href="${escapeHTML(business.instagram_url)}" target="_blank" rel="noopener">Open Instagram ↗</a>` : "—"}</strong></div>
+          </div>
+
+          <div class="detail" style="margin-top:18px">
+            <label>Description</label>
+            <strong>${escapeHTML(business.description || "No description added.")}</strong>
+          </div>
+        </div>
+      `).join('<hr style="border:0;border-top:1px solid var(--line);margin:15px 0">') :
+        showEmpty("No business found", "Your client account does not currently have a linked business."));
+    }
+
+    function renderBranches() {
+      if (!branches.length) {
+        setHTML("branchesContent", showEmpty("No branches found", "No branches are linked to your business yet."));
+        return;
+      }
+
+      setHTML("branchesContent", `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Branch</th><th>Code</th><th>City</th><th>Phone</th><th>Status</th><th>Primary</th>
+            </tr></thead>
+            <tbody>
+              ${branches.map(branch => `
+                <tr>
+                  <td><strong>${escapeHTML(branch.branch_name)}</strong></td>
+                  <td>${escapeHTML(branch.branch_code || "—")}</td>
+                  <td>${escapeHTML(branch.city || "—")}</td>
+                  <td>${escapeHTML(branch.phone || "—")}</td>
+                  <td>${statusPill(branch.branch_status)}</td>
+                  <td>${branch.is_primary ? "Yes" : "No"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `);
+    }
+
+    function renderProfile() {
+      const business = businesses[0];
+
+      setHTML("profileDetails", business ? `
+        <div class="panel-head">
+          <h3>Current Public Profile Information</h3>
+          ${statusPill(business.business_status)}
+        </div>
+        <div class="details-grid">
+          <div class="detail"><label>Business Name</label><strong>${escapeHTML(business.business_name)}</strong></div>
+          <div class="detail"><label>Business Type</label><strong>${escapeHTML(business.business_type || "—")}</strong></div>
+          <div class="detail"><label>Website</label><strong>${escapeHTML(business.website_url || "—")}</strong></div>
+          <div class="detail"><label>WhatsApp</label><strong>${escapeHTML(business.whatsapp_number || "—")}</strong></div>
+          <div class="detail"><label>Google Review URL</label><strong>${escapeHTML(business.google_review_url || "—")}</strong></div>
+          <div class="detail"><label>Instagram</label><strong>${escapeHTML(business.instagram_url || "—")}</strong></div>
+        </div>
+        <p class="small muted" style="margin-top:18px">To request changes, submit a support ticket under the Digital Profile category until the admin-approved profile submission workflow is installed.</p>
+        <button class="btn btn-primary" type="button" data-goto="support">Request a Profile Change</button>
+      ` : showEmpty("No business profile", "A business must be linked to your account first."));
+
+      const profileButton = $("profileDetails").querySelector("[data-goto]");
+      if (profileButton) profileButton.addEventListener("click", () => navigateTo("support"));
+    }
+
+    function renderCards() {
+      if (!cards.length) {
+        setHTML("cardsContent", showEmpty("No NFC cards assigned", "Your assigned NFC cards will appear here."));
+        return;
+      }
+
+      setHTML("cardsContent", `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Card Code</th><th>Card Type</th><th>Status</th><th>Assigned At</th><th>Created</th>
+            </tr></thead>
+            <tbody>
+              ${cards.map(card => `
+                <tr>
+                  <td><strong>${escapeHTML(card.card_code)}</strong></td>
+                  <td>${escapeHTML(card.card_type || "Standard")}</td>
+                  <td>${statusPill(card.card_status)}</td>
+                  <td>${formatDate(card.assigned_at)}</td>
+                  <td>${formatDate(card.created_at)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `);
+    }
+
+    function renderAnalytics() {
+      const count = type => events.filter(event => event.event_type === type).length;
+
+      const nfc = count("nfc_tap");
+      const qr = count("qr_scan");
+      const views = count("profile_view");
+      const clicks = events.filter(event =>
+        ["google_review_click", "whatsapp_click", "website_click", "instagram_click"].includes(event.event_type)
+      ).length;
+
+      $("analyticsNfc").textContent = nfc;
+      $("analyticsQr").textContent = qr;
+      $("analyticsViews").textContent = views;
+      $("analyticsClicks").textContent = clicks;
+
+      const counts = {};
+      events.forEach(event => {
+        counts[event.event_type] = (counts[event.event_type] || 0) + 1;
+      });
+
+      const rows = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+
+      setHTML("analyticsContent", rows.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Event Type</th><th>Total Events</th></tr></thead>
+            <tbody>
+              ${rows.map(([type,total]) => `
+                <tr><td>${escapeHTML(type.replaceAll("_", " "))}</td><td><strong>${total}</strong></td></tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted" style="margin-top:12px">Showing up to the latest 500 events permitted by your account's data access.</p>
+      ` : showEmpty("No analytics available", "Events will appear here when your NFC cards and QR links are used."));
+    }
+
+    function renderEventsTable(list) {
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Event</th><th>Source</th><th>Date</th></tr></thead>
+            <tbody>
+              ${list.map(event => `
+                <tr>
+                  <td><strong>${escapeHTML((event.event_type || "").replaceAll("_", " "))}</strong></td>
+                  <td>${escapeHTML(event.source || "—")}</td>
+                  <td>${formatDateTime(event.created_at)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderActivity() {
+      setHTML("activityContent", events.length ?
+        renderEventsTable(events) :
+        showEmpty("No activity recorded", "Your business activity will appear here."));
+    }
+
+    function renderOrders() {
+      setHTML("ordersContent", orders.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Order Number</th><th>Description</th><th>Quantity</th><th>Total</th><th>Status</th><th>Date</th>
+            </tr></thead>
+            <tbody>
+              ${orders.map(order => `
+                <tr>
+                  <td><strong>${escapeHTML(order.order_number)}</strong></td>
+                  <td>${escapeHTML(order.description || "—")}</td>
+                  <td>${escapeHTML(order.quantity)}</td>
+                  <td>${money(order.total_amount)}</td>
+                  <td>${statusPill(order.order_status)}</td>
+                  <td>${formatDate(order.created_at)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : showEmpty("No orders found", "Your VELORA TAP orders will appear here."));
+    }
+
+    function renderInvoices() {
+      setHTML("invoicesContent", invoices.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Invoice</th><th>Customer</th><th>Date</th><th>Due Date</th><th>Total</th><th>Payment</th><th>Print</th>
+            </tr></thead>
+            <tbody>
+              ${invoices.map(invoice => `
+                <tr>
+                  <td><strong>${escapeHTML(invoice.invoice_number)}</strong></td>
+                  <td>${escapeHTML(invoice.customer_name)}</td>
+                  <td>${formatDate(invoice.invoice_date)}</td>
+                  <td>${formatDate(invoice.due_date)}</td>
+                  <td>${money(invoice.total_amount)}</td>
+                  <td>${statusPill(invoice.payment_status)}</td>
+                  <td><button class="btn btn-light print-invoice" data-id="${escapeHTML(invoice.id)}">Print</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : showEmpty("No invoices found", "Invoices issued to your account will appear here."));
+
+      document.querySelectorAll(".print-invoice").forEach(button => {
+        button.addEventListener("click", () => {
+          const invoice = invoices.find(item => item.id === button.dataset.id);
+          if (invoice) printInvoice(invoice);
+        });
+      });
+
+      setHTML("paymentsContent", payments.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Payment Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+              ${payments.map(payment => `
+                <tr>
+                  <td>${formatDateTime(payment.payment_date)}</td>
+                  <td><strong>${money(payment.amount)}</strong></td>
+                  <td>${escapeHTML(payment.payment_method)}</td>
+                  <td>${escapeHTML(payment.payment_reference || "—")}</td>
+                  <td>${statusPill(payment.payment_status)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : showEmpty("No payments found", "Your recorded payments will appear here."));
+    }
+
+    function printInvoice(invoice) {
+      const popup = window.open("", "_blank", "width=850,height=750");
+
+      if (!popup) {
+        showToast("Please allow pop-ups to print invoices.");
+        return;
+      }
+
+      popup.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Invoice ${escapeHTML(invoice.invoice_number)}</title>
+          <style>
+            body{font-family:Arial,sans-serif;padding:40px;color:#17221d}
+            h1{color:#087b55}
+            .line{border-top:1px solid #ddd;margin:25px 0}
+            .row{display:flex;justify-content:space-between;margin:12px 0}
+            .total{font-size:22px;font-weight:bold}
+            @media print{button{display:none}}
+          </style>
+        </head>
+        <body>
+          <h1>VELORA TAP</h1>
+          <p>Invoice</p>
+          <div class="line"></div>
+          <div class="row"><strong>Invoice Number</strong><span>${escapeHTML(invoice.invoice_number)}</span></div>
+          <div class="row"><strong>Customer</strong><span>${escapeHTML(invoice.customer_name)}</span></div>
+          <div class="row"><strong>Email</strong><span>${escapeHTML(invoice.customer_email || "—")}</span></div>
+          <div class="row"><strong>Phone</strong><span>${escapeHTML(invoice.customer_phone || "—")}</span></div>
+          <div class="row"><strong>Invoice Date</strong><span>${formatDate(invoice.invoice_date)}</span></div>
+          <div class="row"><strong>Due Date</strong><span>${formatDate(invoice.due_date)}</span></div>
+          <div class="line"></div>
+          <div class="row"><span>Subtotal</span><span>${money(invoice.subtotal)}</span></div>
+          <div class="row"><span>Discount</span><span>${money(invoice.discount)}</span></div>
+          <div class="row"><span>Tax</span><span>${money(invoice.tax_amount)}</span></div>
+          <div class="line"></div>
+          <div class="row total"><span>Total</span><span>${money(invoice.total_amount)}</span></div>
+          <div class="row"><strong>Payment Status</strong><span>${escapeHTML(invoice.payment_status)}</span></div>
+          <p>${escapeHTML(invoice.notes || "")}</p>
+          <button onclick="window.print()">Print Invoice</button>
+        </body>
+        </html>
+      `);
+
+      popup.document.close();
+      popup.focus();
+      setTimeout(() => popup.print(), 350);
+    }
+
+    function renderSubscriptions() {
+      setHTML("subscriptionsContent", subscriptions.length ? `
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Plan ID</th><th>Status</th><th>Amount</th><th>Start</th><th>End</th><th>Auto Renew</th>
+            </tr></thead>
+            <tbody>
+              ${subscriptions.map(subscription => `
+                <tr>
+                  <td>${escapeHTML(subscription.plan_id)}</td>
+                  <td>${statusPill(subscription.subscription_status)}</td>
+                  <td>${money(subscription.amount, subscription.currency || "INR")}</td>
+                  <td>${formatDate(subscription.start_date)}</td>
+                  <td>${formatDate(subscription.end_date)}</td>
+                  <td>${subscription.auto_renew ? "Yes" : "No"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : showEmpty("No subscription found", "Your active subscription will appear here when assigned."));
+
+      setHTML("plansContent", plans.length ? `
+        <div class="grid">
+          ${plans.map(plan => `
+            <div class="data-card" style="padding:18px">
+              <h3 style="margin:0 0 8px;font:800 16px Manrope">${escapeHTML(plan.plan_name)}</h3>
+              <div style="font:800 24px Manrope;color:var(--green)">${money(plan.price, plan.currency || "INR")}</div>
+              <p class="small muted">${escapeHTML(plan.plan_description || "")}</p>
+              <p class="small">Billing: ${escapeHTML(plan.billing_interval)}</p>
+              <p class="small">Businesses: ${escapeHTML(plan.max_businesses ?? "—")}</p>
+              <p class="small">Branches: ${escapeHTML(plan.max_branches ?? "—")}</p>
+              <p class="small">NFC Cards: ${escapeHTML(plan.max_nfc_cards ?? "—")}</p>
+              <span class="pill green">Available plan</span>
+            </div>
+          `).join("")}
+        </div>
+        <p class="small muted">To purchase or change a plan, contact VELORA TAP support. Plan changes are not automatically charged by this portal.</p>
+      ` : showEmpty("No active plans", "There are currently no published subscription plans."));
+    }
+
+    function renderSupport() {
+      setHTML("ticketsContent", tickets.length ? tickets.map(ticket => `
+        <div class="ticket-item">
+          <div class="panel-head">
+            <h4>${escapeHTML(ticket.subject)}</h4>
+            ${statusPill(ticket.ticket_status)}
+          </div>
+          <p>${escapeHTML(ticket.description)}</p>
+          <p>
+            <strong>Ticket:</strong> ${escapeHTML(ticket.ticket_number)}
+            &nbsp; · &nbsp; <strong>Priority:</strong> ${escapeHTML(ticket.priority)}
+            &nbsp; · &nbsp; <strong>Category:</strong> ${escapeHTML(ticket.category)}
+          </p>
+          <p>Created: ${formatDateTime(ticket.created_at)}</p>
+        </div>
+      `).join("") : showEmpty("No support tickets", "Use the form above to submit your first support request."));
+    }
+
+    function renderNotifications() {
+      setHTML("notificationsContent", notifications.length ? notifications.map(notification => `
+        <div class="notification-item ${notification.is_read ? "" : "unread"}">
+          <div class="panel-head">
+            <strong>${escapeHTML(notification.title)}</strong>
+            ${notification.is_read ? '<span class="pill">Read</span>' : '<span class="pill green">New</span>'}
+          </div>
+          <p>${escapeHTML(notification.message)}</p>
+          <p>${formatDateTime(notification.created_at)}</p>
+          <div class="form-actions">
+            ${!notification.is_read ? `<button class="btn btn-light mark-read" data-id="${escapeHTML(notification.id)}">Mark as read</button>` : ""}
+            ${notification.action_url ? `<a class="btn btn-outline" href="${escapeHTML(notification.action_url)}" target="_blank" rel="noopener">Open link</a>` : ""}
+          </div>
+        </div>
+      `).join("") : showEmpty("No notifications", "You are all caught up."));
+
+      document.querySelectorAll(".mark-read").forEach(button => {
+        button.addEventListener("click", async () => {
+          await markNotificationRead(button.dataset.id);
+        });
+      });
+    }
+
+    function renderSettings() {
+      setHTML("settingsDetails", `
+        <div class="detail"><label>Full Name</label><strong>${escapeHTML(clientRecord.client_name)}</strong></div>
+        <div class="detail"><label>Email</label><strong>${escapeHTML(clientRecord.email)}</strong></div>
+        <div class="detail"><label>Phone</label><strong>${escapeHTML(clientRecord.phone || "—")}</strong></div>
+        <div class="detail"><label>Account Status</label><strong>${statusPill(clientRecord.account_status)}</strong></div>
+        <div class="detail"><label>Account Created</label><strong>${formatDate(clientRecord.created_at)}</strong></div>
+        <div class="detail"><label>Login Email</label><strong>${escapeHTML(currentUser?.email || "—")}</strong></div>
+      `);
+    }
+
+    // ============================================================
+    // SUPPORT TICKET CREATION
+    // ============================================================
+
+    $("ticketForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!currentUser || !clientRecord) {
+        showToast("Please sign in again.");
+        return;
+      }
+
+      const button = $("createTicketButton");
+      setButtonLoading(button, true, "Submitting...");
+
+      try {
+        const ticketNumber = "VT-" + Date.now().toString().slice(-10);
+
+        const ticketRecord = {
+          ticket_number: ticketNumber,
+          client_id: clientRecord.id,
+          created_by: currentUser.id,
+          subject: $("ticketSubject").value.trim(),
+          description: $("ticketDescription").value.trim(),
+          category: $("ticketCategory").value,
+          priority: $("ticketPriority").value,
+          ticket_status: "submitted",
+          assigned_to: null
+        };
+
+        const { error } = await supabaseClient
+          .from("support_tickets")
+          .insert(ticketRecord);
+
+        if (error) throw error;
+
+        $("ticketForm").reset();
+        await loadAllData();
+        navigateTo("support");
+        showToast("Support ticket submitted successfully.");
+
+      } catch (error) {
+        console.error(error);
+        showToast("Ticket could not be submitted: " + (error.message || "Please check database permissions."));
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    // ============================================================
+    // NOTIFICATION ACTION
+    // ============================================================
+
+    async function markNotificationRead(notificationId) {
+      try {
+        const { error } = await supabaseClient
+          .from("notifications")
+          .update({
+            is_read: true,
+            read_at: new Date().toISOString()
+          })
+          .eq("id", notificationId)
+          .eq("user_id", currentUser.id);
+
+        if (error) throw error;
+
+        notifications = notifications.map(item =>
+          item.id === notificationId
+            ? { ...item, is_read: true }
+            : item
+        );
+
+        renderNotifications();
+        showToast("Notification marked as read.");
+
+      } catch (error) {
+        showToast("Could not update notification: " + error.message);
+      }
+    }
+
+    // ============================================================
+    // QR CODE GENERATOR
+    // ============================================================
+
+    $("generateQrButton").addEventListener("click", () => {
+      const url = $("qrUrl").value.trim();
+
+      if (!url) {
+        showToast("Enter a URL first.");
+        $("qrUrl").focus();
+        return;
+      }
+
+      try {
+        const parsed = new URL(url);
+
+        if (!["http:", "https:"].includes(parsed.protocol)) {
+          throw new Error("Only HTTP or HTTPS URLs are supported.");
+        }
+
+        $("qrcode").innerHTML = "";
+
+        qrInstance = new QRCode($("qrcode"), {
+          text: parsed.href,
+          width: 180,
+          height: 180,
+          colorDark: "#07583f",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        $("downloadQrButton").disabled = false;
+        showToast("QR code generated successfully.");
+
+      } catch (error) {
+        showToast(error.message || "Enter a valid URL.");
+      }
+    });
+
+    $("downloadQrButton").addEventListener("click", () => {
+      const container = $("qrcode");
+      const canvas = container.querySelector("canvas");
+      const image = container.querySelector("img");
+
+      let dataUrl = "";
+
+      if (canvas) {
+        dataUrl = canvas.toDataURL("image/png");
+      } else if (image) {
+        dataUrl = image.src;
+      }
+
+      if (!dataUrl) {
+        showToast("Generate a QR code first.");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "velora-tap-qr.png";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    // ============================================================
+    // AUTH SESSION RESTORE
+    // ============================================================
+
+    async function initializeApplication() {
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+
+        if (data.session?.user) {
+          currentUser = data.session.user;
+          await loadClientApplication();
+        }
+      } catch (error) {
+        console.error("Session initialization error:", error);
+        showLoginMessage(error.message || "Could not restore your login session.");
+      }
+    }
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        currentUser = null;
+        clientRecord = null;
+        $("app").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+      }
+    });
+
+    // Start the portal.
+    initializeApplication();
+  </script>
+</body>
+</html>
