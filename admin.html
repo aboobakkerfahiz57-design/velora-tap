@@ -5,8 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VELORA TAP | Admin Dashboard</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -35,7 +36,7 @@ button{cursor:pointer}
  border-radius:9px;background:white;outline:none;color:var(--text)
 }
 .field input:focus,.field textarea:focus,.field select:focus,.toolbar input:focus{border-color:var(--green)}
-.field textarea{min-height:100px;resize:vertical}
+.field textarea{min-height:85px;resize:vertical}
 .btn{border:0;border-radius:9px;padding:11px 16px;font-weight:700;font-size:12px;display:inline-flex;gap:8px;align-items:center;justify-content:center}
 .primary{background:var(--green);color:white}
 .primary:hover{background:var(--green2)}
@@ -80,7 +81,7 @@ tr:hover td{background:#fbfdfb}
 .badge{display:inline-block;padding:5px 8px;border-radius:20px;background:#edf4ef;color:var(--green);font-size:10px}
 .empty{text-align:center;padding:35px;color:var(--muted);font-size:12px}
 .modal-backdrop{position:fixed;inset:0;background:rgba(8,25,17,.55);display:grid;place-items:center;padding:18px;z-index:30}
-.modal{background:white;border-radius:16px;width:100%;max-width:760px;max-height:92vh;overflow:auto;padding:22px}
+.modal{background:white;border-radius:16px;width:100%;max-width:850px;max-height:92vh;overflow:auto;padding:22px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
 .modal-head h2{font-size:17px;margin:0}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
@@ -90,6 +91,17 @@ tr:hover td{background:#fbfdfb}
 .mobile-menu{display:none}
 .status{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6}
 .toolbar .grow{flex:1;min-width:180px}
+.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.profile-stat{background:#f5f8f5;border-radius:10px;padding:15px}
+.profile-stat span{display:block;color:var(--muted);font-size:10px}
+.profile-stat strong{display:block;margin-top:7px;font-size:20px}
+.profile-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}
+.profile-tab{border:0;background:#edf3ef;color:var(--green);padding:9px 12px;border-radius:8px;font-size:11px;font-weight:700}
+.profile-tab.active{background:var(--green);color:white}
+.invoice-preview{background:white;border:1px solid var(--border);padding:28px;border-radius:12px}
+.invoice-brand{font-weight:800;color:var(--green);font-size:21px;letter-spacing:2px}
+.invoice-total{font-size:22px;font-weight:800;color:var(--green)}
+.small{font-size:10px;color:var(--muted)}
 @media(max-width:1000px){
  .stats{grid-template-columns:repeat(2,1fr)}
  .sidebar{width:210px}.main{margin-left:210px;padding:20px}
@@ -103,6 +115,7 @@ tr:hover td{background:#fbfdfb}
  .form-grid{grid-template-columns:1fr}
  .form-grid .wide{grid-column:auto}
  .user-area{font-size:10px}
+ .profile-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -135,12 +148,14 @@ tr:hover td{background:#fbfdfb}
 
  <div class="nav-label">OVERVIEW</div>
  <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
- <button class="nav-btn" data-page="businesses"><i class="fa-solid fa-building"></i> Businesses</button>
  <button class="nav-btn" data-page="clients"><i class="fa-solid fa-users"></i> Clients</button>
+ <button class="nav-btn" data-page="businesses"><i class="fa-solid fa-building"></i> Businesses</button>
+ <button class="nav-btn" data-page="business_branches"><i class="fa-solid fa-code-branch"></i> Branches</button>
 
  <div class="nav-label">CUSTOMER MANAGEMENT</div>
  <button class="nav-btn" data-page="inquiries"><i class="fa-solid fa-inbox"></i> Inquiries</button>
  <button class="nav-btn" data-page="leads"><i class="fa-solid fa-bullseye"></i> Leads</button>
+ <button class="nav-btn" data-page="support_tickets"><i class="fa-solid fa-headset"></i> Support Tickets</button>
 
  <div class="nav-label">NFC MANAGEMENT</div>
  <button class="nav-btn" data-page="nfc_cards"><i class="fa-solid fa-wifi"></i> NFC Cards</button>
@@ -151,13 +166,18 @@ tr:hover td{background:#fbfdfb}
  <button class="nav-btn" data-page="orders"><i class="fa-solid fa-cart-shopping"></i> Orders</button>
  <button class="nav-btn" data-page="invoices"><i class="fa-solid fa-file-invoice"></i> Invoices</button>
  <button class="nav-btn" data-page="payments"><i class="fa-solid fa-money-bill-transfer"></i> Payments</button>
+ <button class="nav-btn" data-page="subscription_plans"><i class="fa-solid fa-list-check"></i> Subscription Plans</button>
+ <button class="nav-btn" data-page="client_subscriptions"><i class="fa-solid fa-calendar-check"></i> Subscriptions</button>
+ <button class="nav-btn" data-page="subscription_payments"><i class="fa-solid fa-wallet"></i> Subscription Payments</button>
 
  <div class="nav-label">TEAM</div>
  <button class="nav-btn" data-page="staff_profiles"><i class="fa-solid fa-user-tie"></i> Staff</button>
+ <button class="nav-btn" data-page="staff_permissions"><i class="fa-solid fa-key"></i> Staff Permissions</button>
  <button class="nav-btn" data-page="admin_profiles"><i class="fa-solid fa-user-shield"></i> Admin Accounts</button>
  <button class="nav-btn" data-page="audit_logs"><i class="fa-solid fa-clipboard-list"></i> Audit Logs</button>
 
  <div class="nav-label">SYSTEM</div>
+ <button class="nav-btn" data-page="notifications"><i class="fa-solid fa-bell"></i> Notifications</button>
  <button class="nav-btn" data-page="settings"><i class="fa-solid fa-gear"></i> Settings & Tools</button>
  <button class="nav-btn" id="logoutButton"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
 </aside>
@@ -184,14 +204,19 @@ tr:hover td{background:#fbfdfb}
   </div>
   <div class="panel">
    <h2>Welcome to VELORA TAP</h2>
-   <p class="muted">Manage business profiles, clients, NFC inventory, sales, payments, staff, and customer activity.</p>
+   <p class="muted">Manage clients, businesses, NFC inventory, sales, payments, subscriptions and customer activity.</p>
    <div class="toolbar">
-    <button class="btn primary" id="quickBusiness"><i class="fa-solid fa-plus"></i> Add Business</button>
-    <button class="btn secondary" id="refreshDashboard"><i class="fa-solid fa-rotate"></i> Refresh Dashboard</button>
+    <button class="btn primary" id="quickClient"><i class="fa-solid fa-plus"></i> Add Client</button>
+    <button class="btn secondary" id="quickBusiness"><i class="fa-solid fa-plus"></i> Add Business</button>
+    <button class="btn secondary" id="refreshDashboard"><i class="fa-solid fa-rotate"></i> Refresh</button>
    </div>
   </div>
   <div class="panel">
-   <h2>Recent Business Records</h2>
+   <h2>Recent Website Inquiries</h2>
+   <div id="recentInquiries" class="status">Loading...</div>
+  </div>
+  <div class="panel">
+   <h2>Recent Businesses</h2>
    <div id="recentBusinesses" class="status">Loading...</div>
   </div>
  </section>
@@ -216,7 +241,7 @@ tr:hover td{background:#fbfdfb}
  <section id="settingsPage" class="hidden">
   <div class="panel">
    <h2>System Settings & Tools</h2>
-   <p class="muted">Upload a business logo, inspect your admin session, or refresh the dashboard.</p>
+   <p class="muted">Upload a business logo and inspect your admin session.</p>
    <div class="field">
     <label>Business Logo Upload</label>
     <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp">
@@ -227,7 +252,7 @@ tr:hover td{background:#fbfdfb}
    </div>
    <button class="btn primary" id="uploadLogo"><i class="fa-solid fa-upload"></i> Upload Logo</button>
    <div id="uploadResult" class="status"></div>
-   <div class="notice">Logos are uploaded to the Supabase Storage bucket named <strong>business-logos</strong>. The bucket and its access policies must exist.</div>
+   <div class="notice">Uses the Supabase Storage bucket named <strong>business-logos</strong>. The bucket and its access policies must exist.</div>
    <hr style="border:0;border-top:1px solid var(--border);margin:22px 0">
    <h2>Session</h2>
    <p id="sessionInfo" class="muted">Loading session...</p>
@@ -255,6 +280,32 @@ tr:hover td{background:#fbfdfb}
  </div>
 </div>
 
+<div id="profileModal" class="modal-backdrop hidden">
+ <div class="modal">
+  <div class="modal-head">
+   <h2 id="profileTitle">Client Profile</h2>
+   <button class="icon-btn" id="closeProfile"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div id="profileContent"></div>
+ </div>
+</div>
+
+<div id="invoiceModal" class="modal-backdrop hidden">
+ <div class="modal">
+  <div class="modal-head">
+   <h2>Invoice Preview</h2>
+   <button class="icon-btn" id="closeInvoice"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="toolbar">
+   <button class="btn primary" id="downloadInvoice"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+   <button class="btn secondary" id="printInvoice"><i class="fa-solid fa-print"></i> Print</button>
+   <button class="btn secondary" id="whatsappInvoice"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+  </div>
+  <div id="invoicePreview" class="invoice-preview"></div>
+  <p class="small">WhatsApp opens a prepared message. Attach the downloaded PDF in WhatsApp before sending.</p>
+ </div>
+</div>
+
 <script>
 /* =====================================================
    SUPABASE CONFIGURATION
@@ -262,36 +313,32 @@ tr:hover td{background:#fbfdfb}
 
 const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
-
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 /* =====================================================
-   TABLES AND PRIMARY KEYS
+   DATABASE TABLES
 ===================================================== */
 
 const TABLES = [
- "businesses","clients","inquiries","leads","nfc_cards",
- "nfc_card_assignments","business_events","orders","invoices",
- "payments","staff_profiles","admin_profiles","audit_logs"
+ "clients","businesses","business_branches","inquiries","leads",
+ "nfc_cards","nfc_card_assignments","business_events","orders",
+ "invoices","payments","client_subscriptions","subscription_plans",
+ "subscription_payments","support_tickets","staff_profiles",
+ "staff_permissions","notifications","admin_profiles","audit_logs"
 ];
 
 const PRIMARY_KEYS = {
- businesses:"id",clients:"id",inquiries:"id",leads:"id",
- nfc_cards:"id",nfc_card_assignments:"id",business_events:"id",
- orders:"id",invoices:"id",payments:"id",staff_profiles:"id",
- admin_profiles:"user_id",audit_logs:"id"
+ admin_profiles:"user_id",
+ audit_logs:"id"
 };
 
-/*
-  The field names below are based on the database constraints
-  available for this project. Fields not confirmed in that export
-  are deliberately not guessed.
-*/
+const READ_ONLY = ["admin_profiles","audit_logs","business_events"];
 
 const FORM_CONFIG = {
  clients:[
   {name:"client_name",label:"Client Name",required:true},
   {name:"email",label:"Email Address",type:"email",required:true},
+  {name:"phone",label:"Phone Number"},
   {name:"account_status",label:"Account Status",type:"select",options:["active","inactive","suspended","archived"],default:"active"}
  ],
 
@@ -299,105 +346,211 @@ const FORM_CONFIG = {
   {name:"client_id",label:"Client",type:"relation",table:"clients",required:true},
   {name:"business_name",label:"Business Name",required:true},
   {name:"slug",label:"Business Slug",required:true},
+  {name:"business_type",label:"Business Type"},
+  {name:"description",label:"Description",type:"textarea"},
+  {name:"logo_url",label:"Logo URL"},
+  {name:"google_review_url",label:"Google Review URL"},
+  {name:"website_url",label:"Website URL"},
+  {name:"whatsapp_number",label:"WhatsApp Number"},
+  {name:"instagram_url",label:"Instagram URL"},
   {name:"business_status",label:"Business Status",type:"select",options:["draft","active","inactive","suspended","archived"],default:"draft"}
+ ],
+
+ business_branches:[
+  {name:"business_id",label:"Business",type:"relation",table:"businesses",required:true},
+  {name:"branch_name",label:"Branch Name",required:true},
+  {name:"branch_code",label:"Branch Code"},
+  {name:"address",label:"Address",type:"textarea"},
+  {name:"city",label:"City"},
+  {name:"state",label:"State"},
+  {name:"postal_code",label:"Postal Code"},
+  {name:"country",label:"Country",default:"India"},
+  {name:"phone",label:"Phone"},
+  {name:"whatsapp_number",label:"WhatsApp"},
+  {name:"email",label:"Email",type:"email"},
+  {name:"branch_status",label:"Status",type:"select",options:["active","inactive"],default:"active"},
+  {name:"is_primary",label:"Primary Branch",type:"select",options:["false","true"],default:"false"}
  ],
 
  inquiries:[
   {name:"customer_name",label:"Customer Name",required:true},
+  {name:"email",label:"Email",type:"email"},
   {name:"phone",label:"Phone Number",required:true},
-  {name:"inquiry_source",label:"Inquiry Source",required:true},
-  {name:"inquiry_status",label:"Inquiry Status",type:"select",options:["new","contacted","qualified","converted","closed"],default:"new"}
+  {name:"business_name",label:"Business Name"},
+  {name:"business_type",label:"Business Type"},
+  {name:"message",label:"Message",type:"textarea"},
+  {name:"inquiry_source",label:"Inquiry Source",default:"website"},
+  {name:"inquiry_status",label:"Inquiry Status",type:"select",options:["new","contacted","qualified","converted","closed"],default:"new"},
+  {name:"client_id",label:"Linked Existing Client",type:"relation",table:"clients"}
  ],
 
  leads:[
+  {name:"client_id",label:"Existing Client",type:"relation",table:"clients"},
+  {name:"inquiry_id",label:"Related Inquiry",type:"relation",table:"inquiries"},
   {name:"customer_name",label:"Customer Name",required:true},
+  {name:"business_name",label:"Business Name"},
+  {name:"email",label:"Email",type:"email"},
   {name:"phone",label:"Phone Number",required:true},
   {name:"lead_status",label:"Lead Status",type:"select",options:["new","contacted","meeting","quotation_sent","converted","lost"],default:"new"},
-  {name:"inquiry_id",label:"Related Inquiry",type:"relation",table:"inquiries"},
-  {name:"assigned_to",label:"Assigned Staff",type:"relation",table:"staff_profiles",valueField:"user_id",labelField:"full_name"}
+  {name:"follow_up_date",label:"Follow-up Date",type:"datetime-local"},
+  {name:"notes",label:"Notes",type:"textarea"},
+  {name:"assigned_to",label:"Assigned Staff User ID"}
  ],
 
  nfc_cards:[
   {name:"card_code",label:"Card Code",required:true},
   {name:"card_uid",label:"Card UID"},
-  {name:"card_status",label:"Card Status",type:"select",options:["available","assigned","lost","damaged","retired"],default:"available"}
+  {name:"business_id",label:"Business",type:"relation",table:"businesses"},
+  {name:"branch_id",label:"Branch",type:"relation",table:"business_branches"},
+  {name:"card_status",label:"Card Status",type:"select",options:["available","assigned","lost","damaged","retired"],default:"available"},
+  {name:"card_type",label:"Card Type",default:"standard"},
+  {name:"notes",label:"Notes",type:"textarea"}
  ],
 
  nfc_card_assignments:[
   {name:"card_id",label:"NFC Card",type:"relation",table:"nfc_cards",labelField:"card_code",required:true},
   {name:"business_id",label:"Business",type:"relation",table:"businesses",labelField:"business_name",required:true},
-  {name:"assignment_status",label:"Assignment Status",type:"select",options:["active","returned","replaced","lost"],default:"active"}
- ],
-
- business_events:[
-  {name:"business_id",label:"Business",type:"relation",table:"businesses",labelField:"business_name",required:true},
-  {name:"event_type",label:"Event Type",type:"select",options:["nfc_tap","qr_scan","profile_view","google_review_click","whatsapp_click","website_click","instagram_click"],required:true},
-  {name:"source",label:"Source",type:"select",options:["nfc","qr","direct","other"],required:true},
-  {name:"nfc_card_id",label:"NFC Card",type:"relation",table:"nfc_cards",labelField:"card_code"}
+  {name:"assignment_status",label:"Assignment Status",type:"select",options:["active","returned","replaced","lost"],default:"active"},
+  {name:"notes",label:"Notes",type:"textarea"}
  ],
 
  orders:[
   {name:"order_number",label:"Order Number",required:true},
-  {name:"client_id",label:"Client",type:"relation",table:"clients",required:true},
+  {name:"client_id",label:"Client",type:"relation",table:"clients"},
   {name:"business_id",label:"Business",type:"relation",table:"businesses",labelField:"business_name"},
+  {name:"branch_id",label:"Branch",type:"relation",table:"business_branches",labelField:"branch_name"},
   {name:"quantity",label:"Quantity",type:"number",required:true,default:"1"},
-  {name:"total_amount",label:"Total Amount",type:"number",required:true},
-  {name:"order_status",label:"Order Status",type:"select",options:["pending","confirmed","processing","delivered","cancelled"],default:"pending"}
+  {name:"description",label:"Description",type:"textarea"},
+  {name:"order_status",label:"Order Status",type:"select",options:["pending","confirmed","processing","delivered","cancelled"],default:"pending"},
+  {name:"total_amount",label:"Total Amount",type:"number",required:true,default:"0"}
  ],
 
  invoices:[
   {name:"invoice_number",label:"Invoice Number",required:true},
-  {name:"customer_name",label:"Customer Name",required:true},
   {name:"client_id",label:"Client",type:"relation",table:"clients"},
   {name:"business_id",label:"Business",type:"relation",table:"businesses",labelField:"business_name"},
+  {name:"branch_id",label:"Branch",type:"relation",table:"business_branches",labelField:"branch_name"},
   {name:"order_id",label:"Order",type:"relation",table:"orders",labelField:"order_number"},
-  {name:"subtotal",label:"Subtotal",type:"number",required:true,default:"0"},
+  {name:"customer_name",label:"Customer Name",required:true},
+  {name:"customer_email",label:"Customer Email",type:"email"},
+  {name:"customer_phone",label:"Customer Phone"},
+  {name:"billing_address",label:"Billing Address",type:"textarea"},
+  {name:"subtotal",label:"Subtotal",type:"number",default:"0",required:true},
   {name:"discount",label:"Discount",type:"number",default:"0"},
   {name:"tax_amount",label:"Tax Amount",type:"number",default:"0"},
-  {name:"total_amount",label:"Total Amount",type:"number",required:true},
+  {name:"total_amount",label:"Total Amount",type:"number",default:"0",required:true},
   {name:"invoice_date",label:"Invoice Date",type:"date",required:true},
+  {name:"due_date",label:"Due Date",type:"date"},
   {name:"invoice_status",label:"Invoice Status",type:"select",options:["draft","issued","cancelled"],default:"draft"},
-  {name:"payment_status",label:"Payment Status",type:"select",options:["unpaid","partially_paid","paid","overdue","cancelled"],default:"unpaid"}
+  {name:"payment_status",label:"Payment Status",type:"select",options:["unpaid","partially_paid","paid","overdue","cancelled"],default:"unpaid"},
+  {name:"notes",label:"Notes",type:"textarea"}
  ],
 
  payments:[
   {name:"invoice_id",label:"Invoice",type:"relation",table:"invoices",labelField:"invoice_number",required:true},
   {name:"client_id",label:"Client",type:"relation",table:"clients"},
   {name:"amount",label:"Amount",type:"number",required:true},
-  {name:"payment_method",label:"Payment Method",type:"select",options:["cash","upi","bank_transfer","card","other"],required:true},
+  {name:"payment_method",label:"Payment Method",type:"select",options:["cash","upi","bank_transfer","card","other"],default:"bank_transfer"},
+  {name:"payment_reference",label:"Payment Reference"},
+  {name:"payment_status",label:"Payment Status",type:"select",options:["pending","completed","failed","refunded"],default:"completed"},
+  {name:"payment_date",label:"Payment Date",type:"datetime-local",defaultNow:true},
+  {name:"notes",label:"Notes",type:"textarea"}
+ ],
+
+ subscription_plans:[
+  {name:"plan_name",label:"Plan Name",required:true},
+  {name:"plan_description",label:"Description",type:"textarea"},
+  {name:"billing_interval",label:"Billing Interval",required:true},
+  {name:"price",label:"Price",type:"number",default:"0"},
+  {name:"currency",label:"Currency",default:"INR"},
+  {name:"max_businesses",label:"Maximum Businesses",type:"number"},
+  {name:"max_branches",label:"Maximum Branches",type:"number"},
+  {name:"max_nfc_cards",label:"Maximum NFC Cards",type:"number"},
+  {name:"is_active",label:"Active",type:"select",options:["true","false"],default:"true"}
+ ],
+
+ client_subscriptions:[
+  {name:"client_id",label:"Client",type:"relation",table:"clients",required:true},
+  {name:"plan_id",label:"Plan",type:"relation",table:"subscription_plans",labelField:"plan_name",required:true},
+  {name:"subscription_status",label:"Status",type:"select",options:["pending","active","cancelled","expired","suspended"],default:"pending"},
+  {name:"start_date",label:"Start Date",type:"date"},
+  {name:"end_date",label:"End Date",type:"date"},
+  {name:"auto_renew",label:"Auto Renew",type:"select",options:["true","false"],default:"false"},
+  {name:"amount",label:"Amount",type:"number",default:"0"},
+  {name:"currency",label:"Currency",default:"INR"},
+  {name:"notes",label:"Notes",type:"textarea"}
+ ],
+
+ subscription_payments:[
+  {name:"subscription_id",label:"Subscription",type:"relation",table:"client_subscriptions",required:true},
+  {name:"amount",label:"Amount",type:"number",required:true},
+  {name:"payment_method",label:"Payment Method",type:"select",options:["cash","upi","bank_transfer","card","other"],default:"other"},
+  {name:"payment_reference",label:"Reference"},
   {name:"payment_status",label:"Payment Status",type:"select",options:["pending","completed","failed","refunded"],default:"pending"},
-  {name:"payment_date",label:"Payment Date",type:"date",required:true}
+  {name:"paid_at",label:"Paid At",type:"datetime-local"},
+  {name:"notes",label:"Notes",type:"textarea"}
+ ],
+
+ support_tickets:[
+  {name:"ticket_number",label:"Ticket Number",required:true},
+  {name:"client_id",label:"Client",type:"relation",table:"clients",required:true},
+  {name:"business_id",label:"Business",type:"relation",table:"businesses"},
+  {name:"branch_id",label:"Branch",type:"relation",table:"business_branches"},
+  {name:"subject",label:"Subject",required:true},
+  {name:"description",label:"Description",type:"textarea",required:true},
+  {name:"category",label:"Category",default:"general"},
+  {name:"priority",label:"Priority",type:"select",options:["low","normal","high","urgent"],default:"normal"},
+  {name:"ticket_status",label:"Status",type:"select",options:["submitted","open","in_progress","resolved","closed"],default:"submitted"}
  ],
 
  staff_profiles:[
+  {name:"user_id",label:"Existing Supabase Auth User UUID",required:true},
   {name:"full_name",label:"Full Name",required:true},
-  {name:"email",label:"Email Address",type:"email",required:true},
-  {name:"staff_role",label:"Staff Role",type:"select",options:["sales_manager","operations","finance","support"],required:true},
-  {name:"staff_status",label:"Staff Status",type:"select",options:["active","inactive","suspended"],default:"active"}
+  {name:"email",label:"Email",type:"email",required:true},
+  {name:"phone",label:"Phone"},
+  {name:"staff_role",label:"Role",type:"select",options:["sales_manager","operations","finance","support"],default:"support"},
+  {name:"staff_status",label:"Status",type:"select",options:["active","inactive","suspended"],default:"active"}
+ ],
+
+ staff_permissions:[
+  {name:"staff_role",label:"Staff Role",required:true},
+  {name:"permission_key",label:"Permission Key",required:true},
+  {name:"allowed",label:"Allowed",type:"select",options:["true","false"],default:"true"}
+ ],
+
+ notifications:[
+  {name:"user_id",label:"Recipient User UUID",required:true},
+  {name:"notification_type",label:"Notification Type",default:"general"},
+  {name:"title",label:"Title",required:true},
+  {name:"message",label:"Message",type:"textarea",required:true},
+  {name:"action_url",label:"Action URL"}
  ]
 };
 
-let currentUser = null;
-let currentTable = "businesses";
-let currentRows = [];
-let editingRow = null;
-let relationCache = {};
+let currentUser=null;
+let currentTable="clients";
+let currentRows=[];
+let editingRow=null;
+let relationCache={};
+let selectedInvoice=null;
+let profileClient=null;
+let profileData={};
 
 /* =====================================================
    HELPERS
 ===================================================== */
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
 function escapeHTML(value){
- return String(value ?? "").replace(/[&<>"']/g,char=>({
+ return String(value??"").replace(/[&<>"']/g,char=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[char]));
 }
 
 function safe(value){
- if(value === null || value === undefined) return "";
- if(typeof value === "object") return JSON.stringify(value);
+ if(value===null||value===undefined)return "";
+ if(typeof value==="object")return JSON.stringify(value);
  return String(value);
 }
 
@@ -406,11 +559,51 @@ function prettyName(value){
 }
 
 function showError(target,message){
- target.textContent = message || "Something went wrong.";
+ target.textContent=message||"Something went wrong.";
 }
 
 function makeId(){
  return crypto.randomUUID();
+}
+
+function money(value){
+ return "₹"+Number(value||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function localDateTime(value){
+ if(!value)return "";
+ const d=new Date(value);
+ if(Number.isNaN(d.getTime()))return value;
+ const pad=n=>String(n).padStart(2,"0");
+ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function dateOnly(value){
+ if(!value)return "";
+ return String(value).slice(0,10);
+}
+
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+ link.href=url;
+ link.download=name;
+ document.body.appendChild(link);
+ link.click();
+ link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+function relationName(table,row){
+ if(!row)return "";
+ const map={
+  clients:"client_name",businesses:"business_name",
+  inquiries:"customer_name",nfc_cards:"card_code",
+  orders:"order_number",invoices:"invoice_number",
+  staff_profiles:"full_name",business_branches:"branch_name",
+  subscription_plans:"plan_name"
+ };
+ return row[map[table]]||row.id||"";
 }
 
 /* =====================================================
@@ -436,14 +629,9 @@ $("loginForm").addEventListener("submit",async event=>{
 });
 
 async function verifyAdmin(){
- if(!currentUser){
-  $("loginScreen").classList.remove("hidden");
-  $("app").classList.add("hidden");
-  return;
- }
+ if(!currentUser)return;
 
- const {data,error}=await db
-  .from("admin_profiles")
+ const {data,error}=await db.from("admin_profiles")
   .select("user_id,is_admin")
   .eq("user_id",currentUser.id)
   .maybeSingle();
@@ -453,8 +641,9 @@ async function verifyAdmin(){
   return;
  }
 
- if(!data || data.is_admin !== true){
+ if(!data||data.is_admin!==true){
   showError($("loginError"),"This account does not have administrator access.");
+  await db.auth.signOut();
   return;
  }
 
@@ -464,11 +653,12 @@ async function verifyAdmin(){
  $("sessionInfo").textContent="Signed in as "+currentUser.email;
 
  await loadDashboard();
+ startLiveInquiries();
 }
 
 async function restoreSession(){
  const {data,error}=await db.auth.getSession();
- if(error) return;
+ if(error)return;
  if(data.session){
   currentUser=data.session.user;
   await verifyAdmin();
@@ -476,6 +666,7 @@ async function restoreSession(){
 }
 
 $("logoutButton").addEventListener("click",async()=>{
+ if(inquiryChannel)db.removeChannel(inquiryChannel);
  await db.auth.signOut();
  currentUser=null;
  $("app").classList.add("hidden");
@@ -484,7 +675,7 @@ $("logoutButton").addEventListener("click",async()=>{
 });
 
 db.auth.onAuthStateChange((_event,session)=>{
- if(!session) currentUser=null;
+ if(!session)currentUser=null;
 });
 
 /* =====================================================
@@ -513,11 +704,11 @@ function showPage(page){
   currentTable=page;
   $("recordsHeading").textContent=title;
   $("searchRecords").value="";
-  $("addRecord").classList.toggle("hidden",page==="admin_profiles" || page==="audit_logs" || page==="business_events");
+  $("addRecord").classList.toggle("hidden",READ_ONLY.includes(page));
   loadRecords();
  }
 
- if(window.innerWidth<=700 && page!=="dashboard"){
+ if(window.innerWidth<=700&&page!=="dashboard"){
   $("sidebar").style.display="none";
  }
 }
@@ -537,12 +728,13 @@ $("mobileMenuButton").addEventListener("click",()=>{
 
 async function countRows(table){
  const {count,error}=await db.from(table).select("*",{count:"exact",head:true});
- if(error) return "—";
- return count ?? 0;
+ if(error)return "—";
+ return count??0;
 }
 
 async function loadDashboard(){
- $("recentBusinesses").textContent="Loading dashboard...";
+ $("recentBusinesses").textContent="Loading...";
+ $("recentInquiries").textContent="Loading...";
 
  const [businesses,clients,orders,cards]=await Promise.all([
   countRows("businesses"),countRows("clients"),
@@ -554,35 +746,73 @@ async function loadDashboard(){
  $("statOrders").textContent=orders;
  $("statCards").textContent=cards;
 
- const {data,error}=await db.from("businesses")
-  .select("*").order("created_at",{ascending:false}).limit(6);
+ const {data:b,error:be}=await db.from("businesses")
+  .select("id,business_name,slug,business_status,created_at")
+  .order("created_at",{ascending:false}).limit(6);
 
- if(error){
-  $("recentBusinesses").textContent=error.message;
-  return;
- }
+ if(be)$("recentBusinesses").textContent=be.message;
+ else $("recentBusinesses").innerHTML=miniTable(b||[],["business_name","slug","business_status"]);
 
- if(!data?.length){
-  $("recentBusinesses").textContent="No business records found.";
-  return;
- }
+ const {data:i,error:ie}=await db.from("inquiries")
+  .select("id,customer_name,phone,inquiry_status,created_at")
+  .order("created_at",{ascending:false}).limit(6);
 
- $("recentBusinesses").innerHTML=
-  '<div class="table-wrap"><table><thead><tr><th>Business</th><th>Slug</th><th>Status</th></tr></thead><tbody>'+
-  data.map(row=>`<tr>
-   <td>${escapeHTML(row.business_name)}</td>
-   <td>${escapeHTML(row.slug)}</td>
-   <td><span class="badge">${escapeHTML(row.business_status)}</span></td>
-  </tr>`).join("")+
-  '</tbody></table></div>';
+ if(ie)$("recentInquiries").textContent=ie.message;
+ else $("recentInquiries").innerHTML=miniTable(i||[],["customer_name","phone","inquiry_status"]);
+}
+
+function miniTable(rows,columns){
+ if(!rows.length)return "No records found.";
+ return '<div class="table-wrap"><table><thead><tr>'+
+ columns.map(c=>`<th>${escapeHTML(prettyName(c))}</th>`).join("")+
+ '</tr></thead><tbody>'+
+ rows.map(row=>'<tr>'+columns.map(c=>`<td>${escapeHTML(safe(row[c]))}</td>`).join("")+'</tr>').join("")+
+ '</tbody></table></div>';
 }
 
 $("refreshDashboard").addEventListener("click",loadDashboard);
 
-$("quickBusiness").addEventListener("click",async()=>{
- showPage("businesses");
- await openCreateEditor();
+$("quickClient").addEventListener("click",()=>{
+ showPage("clients");
+ openCreateEditor();
 });
+
+$("quickBusiness").addEventListener("click",()=>{
+ showPage("businesses");
+ openCreateEditor();
+});
+
+/* =====================================================
+   LIVE WEBSITE INQUIRIES
+===================================================== */
+
+let inquiryChannel=null;
+
+function startLiveInquiries(){
+ if(inquiryChannel)return;
+
+ inquiryChannel=db.channel("admin-inquiry-updates")
+  .on("postgres_changes",{
+   event:"INSERT",schema:"public",table:"inquiries"
+  },payload=>{
+   loadDashboard();
+   showBrowserNotice("New website inquiry",payload.new?.customer_name||"A new inquiry arrived.");
+  })
+  .subscribe();
+}
+
+function showBrowserNotice(title,message){
+ if("Notification" in window&&Notification.permission==="granted"){
+  new Notification(title,{body:message});
+ }
+}
+
+if("Notification" in window&&Notification.permission==="default"){
+ // Browser notification permission is requested only after a user action.
+ document.addEventListener("click",()=>{
+  if(Notification.permission==="default")Notification.requestPermission();
+ },{once:true});
+}
 
 /* =====================================================
    RECORD LIST
@@ -600,7 +830,7 @@ async function loadRecords(){
   return;
  }
 
- currentRows=data || [];
+ currentRows=data||[];
  renderRows(currentRows);
  $("recordStatus").textContent=currentRows.length+" record(s) loaded.";
 }
@@ -613,19 +843,41 @@ function renderRows(rows){
  }
 
  const keys=Object.keys(rows[0]);
- const visibleKeys=keys.slice(0,6);
- const readOnly=["admin_profiles","audit_logs","business_events"].includes(currentTable);
+ const preferred={
+  clients:["client_name","email","phone","account_status","created_at"],
+  businesses:["business_name","client_id","slug","business_status"],
+  invoices:["invoice_number","customer_name","total_amount","payment_status","invoice_status","invoice_date"],
+  inquiries:["customer_name","phone","email","inquiry_status","created_at"],
+  leads:["customer_name","phone","lead_status","client_id","created_at"],
+  orders:["order_number","client_id","total_amount","order_status"],
+  payments:["invoice_id","client_id","amount","payment_method","payment_status","payment_date"],
+  nfc_cards:["card_code","business_id","card_status","card_type"],
+  business_branches:["branch_name","business_id","city","branch_status"],
+  staff_profiles:["full_name","email","staff_role","staff_status"]
+ };
+
+ const visibleKeys=(preferred[currentTable]||keys).filter(k=>keys.includes(k)).slice(0,7);
 
  $("tableHead").innerHTML="<tr>"+
   visibleKeys.map(key=>`<th>${escapeHTML(prettyName(key))}</th>`).join("")+
   "<th>Actions</th></tr>";
 
  $("tableBody").innerHTML=rows.map((row,index)=>{
-  const cells=visibleKeys.map(key=>
-   `<td title="${escapeHTML(safe(row[key]))}">${escapeHTML(safe(row[key]))}</td>`
-  ).join("");
+  const cells=visibleKeys.map(key=>{
+   let value=row[key];
+   if(key==="total_amount"||key==="amount")value=money(value);
+   if(key==="client_id"&&currentTable!=="clients")value=clientNameFromCache(value)||value;
+   return `<td title="${escapeHTML(safe(value))}">${escapeHTML(safe(value))}</td>`;
+  }).join("");
+
+  const readOnly=READ_ONLY.includes(currentTable);
+  const profileAction=currentTable==="clients"
+   ?`<button class="icon-btn" data-profile="${index}" title="Client Profile"><i class="fa-solid fa-address-card"></i></button>`:"";
+  const invoiceAction=currentTable==="invoices"
+   ?`<button class="icon-btn" data-invoice="${index}" title="Invoice PDF / Print"><i class="fa-solid fa-file-invoice"></i></button>`:"";
 
   return `<tr>${cells}<td><div class="actions">
+   ${profileAction}${invoiceAction}
    <button class="icon-btn" data-view="${index}" title="View"><i class="fa-solid fa-eye"></i></button>
    ${readOnly?"":`<button class="icon-btn" data-edit="${index}" title="Edit"><i class="fa-solid fa-pen"></i></button>
    <button class="icon-btn delete" data-delete="${index}" title="Delete"><i class="fa-solid fa-trash"></i></button>`}
@@ -635,14 +887,23 @@ function renderRows(rows){
  $("tableBody").querySelectorAll("[data-view]").forEach(button=>{
   button.addEventListener("click",()=>viewRecord(rows[Number(button.dataset.view)]));
  });
-
  $("tableBody").querySelectorAll("[data-edit]").forEach(button=>{
   button.addEventListener("click",()=>openEditEditor(rows[Number(button.dataset.edit)]));
  });
-
  $("tableBody").querySelectorAll("[data-delete]").forEach(button=>{
   button.addEventListener("click",()=>deleteRecord(rows[Number(button.dataset.delete)]));
  });
+ $("tableBody").querySelectorAll("[data-profile]").forEach(button=>{
+  button.addEventListener("click",()=>openClientProfile(rows[Number(button.dataset.profile)]));
+ });
+ $("tableBody").querySelectorAll("[data-invoice]").forEach(button=>{
+  button.addEventListener("click",()=>openInvoice(rows[Number(button.dataset.invoice)]));
+ });
+}
+
+function clientNameFromCache(id){
+ const row=relationCache.clients?.find(x=>x.id===id);
+ return row?.client_name||"";
 }
 
 $("searchRecords").addEventListener("input",()=>{
@@ -658,29 +919,29 @@ $("refreshRecords").addEventListener("click",loadRecords);
 $("addRecord").addEventListener("click",openCreateEditor);
 
 /* =====================================================
-   FORM BUILDER
+   RELATION SELECTORS
 ===================================================== */
 
 async function getRelationOptions(table){
- if(relationCache[table]) return relationCache[table];
+ if(relationCache[table])return relationCache[table];
 
  const {data,error}=await db.from(table).select("*").limit(500);
- if(error) throw new Error("Could not load "+table+": "+error.message);
+ if(error)throw new Error("Could not load "+table+": "+error.message);
 
- relationCache[table]=data || [];
+ relationCache[table]=data||[];
  return relationCache[table];
 }
 
-function getLabelField(field,rows){
- if(field.labelField) return field.labelField;
- if(field.table==="clients") return "client_name";
- if(field.table==="businesses") return "business_name";
- if(field.table==="inquiries") return "customer_name";
- if(field.table==="nfc_cards") return "card_code";
- if(field.table==="orders") return "order_number";
- if(field.table==="invoices") return "invoice_number";
- if(field.table==="staff_profiles") return "full_name";
- return Object.keys(rows[0] || {}).find(k=>k!=="id") || "id";
+function relationLabelField(field){
+ if(field.labelField)return field.labelField;
+ const map={
+  clients:"client_name",businesses:"business_name",
+  inquiries:"customer_name",nfc_cards:"card_code",
+  orders:"order_number",invoices:"invoice_number",
+  staff_profiles:"full_name",business_branches:"branch_name",
+  subscription_plans:"plan_name",client_subscriptions:"id"
+ };
+ return map[field.table]||"id";
 }
 
 async function buildField(field,value){
@@ -689,7 +950,6 @@ async function buildField(field,value){
 
  const label=document.createElement("label");
  label.textContent=field.label+(field.required?" *":"");
- label.htmlFor="field_"+field.name;
  wrapper.appendChild(label);
 
  let input;
@@ -702,46 +962,104 @@ async function buildField(field,value){
   input.appendChild(empty);
 
   const rows=await getRelationOptions(field.table);
-  const valueField=field.valueField || "id";
-  const labelField=getLabelField(field,rows);
-
   rows.forEach(row=>{
    const option=document.createElement("option");
-   option.value=row[valueField] ?? "";
-   option.textContent=(row[labelField] || row[valueField] || "Unnamed")+"";
+   option.value=row.id;
+   option.textContent=relationName(field.table,row);
    input.appendChild(option);
   });
 
  }else if(field.type==="select"){
   input=document.createElement("select");
-  field.options.forEach(optionValue=>{
+  field.options.forEach(v=>{
    const option=document.createElement("option");
-   option.value=optionValue;
-   option.textContent=prettyName(optionValue);
+   option.value=v;
+   option.textContent=prettyName(v);
    input.appendChild(option);
   });
 
  }else if(field.type==="textarea"){
   input=document.createElement("textarea");
-
  }else{
   input=document.createElement("input");
-  input.type=field.type || "text";
+  input.type=field.type||"text";
  }
 
  input.id="field_"+field.name;
  input.name=field.name;
  input.required=!!field.required;
- input.value=value ?? field.default ?? "";
- if(field.type==="number") input.step="any";
 
+ if(value!==undefined&&value!==null){
+  input.value=field.type==="datetime-local"?localDateTime(value):
+   field.type==="date"?dateOnly(value):String(value);
+ }else if(field.defaultNow){
+  input.value=localDateTime(new Date());
+ }else{
+  input.value=field.default??"";
+ }
+
+ if(field.type==="number")input.step="any";
  wrapper.appendChild(input);
+
+ if(field.name==="client_id"&&["invoices","leads","inquiries","orders","client_subscriptions"].includes(currentTable)){
+  input.addEventListener("change",()=>fillClientDetails(input.value));
+ }
+
+ if(field.name==="invoice_id"&&currentTable==="payments"){
+  input.addEventListener("change",()=>fillPaymentClient(input.value));
+ }
+
  return wrapper;
 }
 
+async function fillClientDetails(clientId){
+ if(!clientId)return;
+ const rows=await getRelationOptions("clients");
+ const client=rows.find(x=>x.id===clientId);
+ if(!client)return;
+
+ const fields={
+  customer_name:client.client_name,
+  customer_email:client.email,
+  customer_phone:client.phone,
+  email:client.email,
+  phone:client.phone
+ };
+
+ Object.entries(fields).forEach(([name,value])=>{
+  const input=$("field_"+name);
+  if(input&&value&&!input.value)input.value=value;
+ });
+
+ const businessField=$("field_business_id");
+ if(businessField){
+  const businesses=await getRelationOptions("businesses");
+  const own=businesses.filter(x=>x.client_id===clientId);
+  if(own.length===1)businessField.value=own[0].id;
+  else if(own.length>1)businessField.innerHTML=
+   '<option value="">Choose business</option>'+
+   own.map(x=>`<option value="${escapeHTML(x.id)}">${escapeHTML(x.business_name)}</option>`).join("");
+ }
+}
+
+async function fillPaymentClient(invoiceId){
+ if(!invoiceId)return;
+ const rows=await getRelationOptions("invoices");
+ const invoice=rows.find(x=>x.id===invoiceId);
+ if(!invoice)return;
+ const clientField=$("field_client_id");
+ if(clientField&&invoice.client_id){
+  clientField.value=invoice.client_id;
+ }
+}
+
+/* =====================================================
+   FORM EDITOR
+===================================================== */
+
 async function openCreateEditor(){
- if(["admin_profiles","audit_logs","business_events"].includes(currentTable)){
-  alert("This section is read-only in this dashboard.");
+ if(READ_ONLY.includes(currentTable)){
+  alert("This section is read-only.");
   return;
  }
 
@@ -753,16 +1071,19 @@ async function openCreateEditor(){
  $("recordModal").classList.remove("hidden");
 
  const config=FORM_CONFIG[currentTable];
-
  if(!config){
-  $("modalError").textContent="A dedicated form has not been configured for this table.";
+  $("modalError").textContent="No create form has been configured for this table.";
   return;
  }
 
  try{
   for(const field of config){
-   const element=await buildField(field,"");
-   $("formFields").appendChild(element);
+   $("formFields").appendChild(await buildField(field,null));
+  }
+  if(currentTable==="invoices"){
+   const today=new Date().toISOString().slice(0,10);
+   const date=$("field_invoice_date");
+   if(date&&!date.value)date.value=today;
   }
  }catch(error){
   $("modalError").textContent=error.message;
@@ -770,7 +1091,7 @@ async function openCreateEditor(){
 }
 
 async function openEditEditor(row){
- if(["admin_profiles","audit_logs","business_events"].includes(currentTable)){
+ if(READ_ONLY.includes(currentTable)){
   viewRecord(row);
   return;
  }
@@ -783,16 +1104,14 @@ async function openEditEditor(row){
  $("recordModal").classList.remove("hidden");
 
  const config=FORM_CONFIG[currentTable];
-
  if(!config){
-  $("modalError").textContent="A dedicated form has not been configured for this table.";
+  $("modalError").textContent="No edit form has been configured for this table.";
   return;
  }
 
  try{
   for(const field of config){
-   const element=await buildField(field,row[field.name]);
-   $("formFields").appendChild(element);
+   $("formFields").appendChild(await buildField(field,row[field.name]));
   }
  }catch(error){
   $("modalError").textContent=error.message;
@@ -840,25 +1159,25 @@ $("recordForm").addEventListener("submit",async event=>{
  event.preventDefault();
 
  const config=FORM_CONFIG[currentTable];
- if(!config) return;
+ if(!config)return;
 
  const payload={};
 
  for(const field of config){
   const input=$("field_"+field.name);
-  if(!input) continue;
+  if(!input)continue;
 
   let value=input.value.trim();
 
-  if(field.required && !value){
+  if(field.required&&!value){
    showError($("modalError"),field.label+" is required.");
    input.focus();
    return;
   }
 
-  if(value==="") value=null;
+  if(value==="")value=null;
 
-  if(field.type==="number" && value!==null){
+  if(field.type==="number"&&value!==null){
    value=Number(value);
    if(!Number.isFinite(value)){
     showError($("modalError"),field.label+" must be a valid number.");
@@ -866,11 +1185,45 @@ $("recordForm").addEventListener("submit",async event=>{
    }
   }
 
+  if(field.type==="datetime-local"&&value){
+   value=new Date(value).toISOString();
+  }
+
+  if(["true","false"].includes(value)&&["is_primary","auto_renew","is_active","allowed"].includes(field.name)){
+   value=value==="true";
+  }
+
   payload[field.name]=value;
  }
 
- if(currentTable==="businesses" && !editingRow){
-  // The database may generate timestamps and IDs automatically.
+ if(currentTable==="leads"&&payload.client_id){
+  const clients=await getRelationOptions("clients");
+  const c=clients.find(x=>x.id===payload.client_id);
+  if(c){
+   payload.customer_name=c.client_name;
+   payload.phone=payload.phone||c.phone;
+   payload.email=payload.email||c.email;
+  }
+ }
+
+ if(currentTable==="inquiries"&&payload.client_id){
+  const clients=await getRelationOptions("clients");
+  const c=clients.find(x=>x.id===payload.client_id);
+  if(c){
+   payload.customer_name=c.client_name;
+   payload.phone=payload.phone||c.phone;
+   payload.email=payload.email||c.email;
+  }
+ }
+
+ if(currentTable==="invoices"&&payload.client_id){
+  const clients=await getRelationOptions("clients");
+  const c=clients.find(x=>x.id===payload.client_id);
+  if(c){
+   payload.customer_name=c.client_name;
+   payload.customer_email=payload.customer_email||c.email;
+   payload.customer_phone=payload.customer_phone||c.phone;
+  }
  }
 
  $("saveRecord").disabled=true;
@@ -879,26 +1232,34 @@ $("recordForm").addEventListener("submit",async event=>{
 
  try{
   let result;
-
   if(editingRow){
-   const key=PRIMARY_KEYS[currentTable];
-   result=await db.from(currentTable)
-    .update(payload)
-    .eq(key,editingRow[key]);
+   const key=PRIMARY_KEYS[currentTable]||"id";
+   result=await db.from(currentTable).update(payload).eq(key,editingRow[key]);
   }else{
    result=await db.from(currentTable).insert(payload);
   }
 
-  if(result.error) throw result.error;
+  if(result.error)throw result.error;
+
+  // Keep the NFC card and assignment records consistent.
+  if(currentTable==="nfc_card_assignments"&&payload.card_id){
+   if(payload.assignment_status==="active"){
+    const cardUpdate=await db.from("nfc_cards").update({
+     business_id:payload.business_id,
+     card_status:"assigned",
+     assigned_at:new Date().toISOString()
+    }).eq("id",payload.card_id);
+    if(cardUpdate.error)throw cardUpdate.error;
+   }
+  }
 
   closeEditor();
   relationCache={};
   await loadRecords();
-
-  if(currentTable==="businesses" || currentTable==="clients") await loadDashboard();
+  await loadDashboard();
 
  }catch(error){
-  showError($("modalError"),error.message || String(error));
+  showError($("modalError"),error.message||String(error));
  }finally{
   $("saveRecord").disabled=false;
   $("saveRecord").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Record';
@@ -910,18 +1271,17 @@ $("recordForm").addEventListener("submit",async event=>{
 ===================================================== */
 
 async function deleteRecord(row){
- const key=PRIMARY_KEYS[currentTable];
+ const key=PRIMARY_KEYS[currentTable]||"id";
  const id=row[key];
 
- if(id===undefined || id===null){
-  alert("Primary key is missing. Cannot safely delete this record.");
+ if(id===undefined||id===null){
+  alert("Primary key is missing.");
   return;
  }
 
- if(!confirm("Delete this record permanently? This action cannot be undone.")) return;
+ if(!confirm("Delete this record permanently? This cannot be undone."))return;
 
  $("recordStatus").textContent="Deleting...";
-
  const {error}=await db.from(currentTable).delete().eq(key,id);
 
  if(error){
@@ -929,11 +1289,323 @@ async function deleteRecord(row){
   return;
  }
 
- $("recordStatus").textContent="Record deleted.";
  relationCache={};
  await loadRecords();
  await loadDashboard();
 }
+
+/* =====================================================
+   CLIENT MASTER PROFILE
+===================================================== */
+
+async function openClientProfile(client){
+ profileClient=client;
+ $("profileModal").classList.remove("hidden");
+ $("profileTitle").textContent=client.client_name+" — Client Profile";
+ $("profileContent").innerHTML="Loading client information...";
+
+ const tables=[
+  ["Businesses","businesses","client_id"],
+  ["Orders","orders","client_id"],
+  ["Invoices","invoices","client_id"],
+  ["Payments","payments","client_id"],
+  ["Subscriptions","client_subscriptions","client_id"],
+  ["Support Tickets","support_tickets","client_id"],
+  ["Leads","leads","client_id"],
+  ["Inquiries","inquiries","client_id"]
+ ];
+
+ const results=await Promise.all(tables.map(async item=>{
+  const {data,error}=await db.from(item[1]).select("*").eq(item[2],client.id).limit(100);
+  return {title:item[0],table:item[1],rows:data||[],error};
+ }));
+
+ profileData={};
+ results.forEach(r=>profileData[r.table]=r.rows);
+
+ const businesses=profileData.businesses||[];
+ const invoices=profileData.invoices||[];
+ const payments=profileData.payments||[];
+ const orders=profileData.orders||[];
+ const paid=payments.filter(p=>p.payment_status==="completed").reduce((s,p)=>s+Number(p.amount||0),0);
+ const billed=invoices.reduce((s,i)=>s+Number(i.total_amount||0),0);
+
+ $("profileContent").innerHTML=`
+  <div class="panel">
+   <h2>${escapeHTML(client.client_name)}</h2>
+   <p class="muted">${escapeHTML(client.email)} · ${escapeHTML(client.phone||"No phone number")}</p>
+   <span class="badge">${escapeHTML(client.account_status)}</span>
+   <p class="small">Client ID: ${escapeHTML(client.id)}</p>
+  </div>
+  <div class="profile-grid">
+   <div class="profile-stat"><span>Businesses</span><strong>${businesses.length}</strong></div>
+   <div class="profile-stat"><span>Orders</span><strong>${orders.length}</strong></div>
+   <div class="profile-stat"><span>Total Invoiced</span><strong>${money(billed)}</strong></div>
+   <div class="profile-stat"><span>Payments Received</span><strong>${money(paid)}</strong></div>
+  </div>
+  <div class="profile-tabs" id="profileTabs">
+   ${results.map((r,i)=>`<button class="profile-tab ${i===0?"active":""}" data-tab="${r.table}">${r.title} (${r.rows.length})</button>`).join("")}
+  </div>
+  <div id="profileTable"></div>
+ `;
+
+ results.forEach((r,i)=>{
+  if(r.error){
+   $("profileTable").innerHTML="Unable to load "+r.title+": "+escapeHTML(r.error.message);
+   return;
+  }
+  if(i===0)renderProfileTable(r.table);
+ });
+
+ $("profileTabs").querySelectorAll("[data-tab]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+   document.querySelectorAll(".profile-tab").forEach(x=>x.classList.remove("active"));
+   btn.classList.add("active");
+   renderProfileTable(btn.dataset.tab);
+  });
+ });
+}
+
+function renderProfileTable(table){
+ const rows=profileData[table]||[];
+ if(!rows.length){
+  $("profileTable").innerHTML='<div class="empty">No linked records found.</div>';
+  return;
+ }
+
+ const keys=Object.keys(rows[0]).filter(k=>!["id","client_id"].includes(k)).slice(0,5);
+ $("profileTable").innerHTML=miniTable(rows,keys);
+}
+
+$("closeProfile").addEventListener("click",()=>{
+ $("profileModal").classList.add("hidden");
+});
+
+/* =====================================================
+   INVOICE PDF, PRINT AND WHATSAPP
+===================================================== */
+
+async function openInvoice(invoice){
+ selectedInvoice=invoice;
+ $("invoiceModal").classList.remove("hidden");
+
+ let client=null,business=null,branch=null;
+
+ if(invoice.client_id){
+  const {data}=await db.from("clients").select("*").eq("id",invoice.client_id).maybeSingle();
+  client=data;
+ }
+ if(invoice.business_id){
+  const {data}=await db.from("businesses").select("*").eq("id",invoice.business_id).maybeSingle();
+  business=data;
+ }
+ if(invoice.branch_id){
+  const {data}=await db.from("business_branches").select("*").eq("id",invoice.branch_id).maybeSingle();
+  branch=data;
+ }
+
+ selectedInvoice={...invoice,_client:client,_business:business,_branch:branch};
+ renderInvoicePreview(selectedInvoice);
+}
+
+function renderInvoicePreview(inv){
+ const client=inv._client||{};
+ const business=inv._business||{};
+ const branch=inv._branch||{};
+
+ $("invoicePreview").innerHTML=`
+  <div class="invoice-brand">VELORA TAP</div>
+  <div class="small">TAP · CONNECT · GROW</div>
+  <hr style="border:0;border-top:2px solid #c6a15b;margin:18px 0">
+  <div style="display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap">
+   <div>
+    <h2 style="margin:0">INVOICE</h2>
+    <p class="small">Invoice Number: ${escapeHTML(inv.invoice_number)}</p>
+    <p class="small">Invoice Date: ${escapeHTML(inv.invoice_date||"")}</p>
+    <p class="small">Due Date: ${escapeHTML(inv.due_date||"Not specified")}</p>
+   </div>
+   <div style="text-align:right">
+    <span class="badge">${escapeHTML(inv.invoice_status||"")}</span>
+    <p class="small">Payment: ${escapeHTML(inv.payment_status||"")}</p>
+   </div>
+  </div>
+  <div style="margin-top:25px">
+   <strong>Bill To</strong>
+   <p style="margin:6px 0">${escapeHTML(inv.customer_name)}</p>
+   <p class="small">${escapeHTML(inv.customer_email||client.email||"")}</p>
+   <p class="small">${escapeHTML(inv.customer_phone||client.phone||"")}</p>
+   <p class="small">${escapeHTML(inv.billing_address||"")}</p>
+  </div>
+  ${business.business_name?`<div style="margin-top:18px"><strong>Business</strong><p>${escapeHTML(business.business_name)}</p>${branch.branch_name?`<p class="small">${escapeHTML(branch.branch_name)}</p>`:""}</div>`:""}
+  <table style="min-width:0;margin-top:25px">
+   <thead><tr><th>Description</th><th>Amount</th></tr></thead>
+   <tbody><tr><td>Services / Products</td><td>${money(inv.subtotal)}</td></tr>
+   <tr><td>Discount</td><td>-${money(inv.discount)}</td></tr>
+   <tr><td>Tax</td><td>${money(inv.tax_amount)}</td></tr></tbody>
+  </table>
+  <div style="display:flex;justify-content:flex-end;margin-top:20px">
+   <div><div class="small">TOTAL AMOUNT</div><div class="invoice-total">${money(inv.total_amount)}</div></div>
+  </div>
+  ${inv.notes?`<div style="margin-top:25px"><strong>Notes</strong><p class="small">${escapeHTML(inv.notes)}</p></div>`:""}
+  <hr style="border:0;border-top:1px solid #e6ebe6;margin:25px 0">
+  <p class="small">Thank you for choosing VELORA TAP.</p>
+ `;
+}
+
+function invoiceFilename(inv){
+ return "VELORA-TAP-"+String(inv.invoice_number||"invoice").replace(/[^a-z0-9_-]/gi,"-")+".pdf";
+}
+
+function createInvoicePDF(inv){
+ if(!window.jspdf?.jsPDF)throw new Error("PDF library did not load. Check your internet connection and refresh the page.");
+
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF();
+ const green=[6,75,53];
+ const gold=[198,161,91];
+
+ doc.setTextColor(...green);
+ doc.setFont("helvetica","bold");
+ doc.setFontSize(22);
+ doc.text("VELORA TAP",20,22);
+
+ doc.setTextColor(100,100,100);
+ doc.setFont("helvetica","normal");
+ doc.setFontSize(9);
+ doc.text("TAP - CONNECT - GROW",20,29);
+
+ doc.setDrawColor(...gold);
+ doc.setLineWidth(1);
+ doc.line(20,35,190,35);
+
+ doc.setTextColor(30,30,30);
+ doc.setFont("helvetica","bold");
+ doc.setFontSize(19);
+ doc.text("INVOICE",20,48);
+
+ doc.setFont("helvetica","normal");
+ doc.setFontSize(10);
+ doc.text("Invoice Number: "+(inv.invoice_number||""),20,59);
+ doc.text("Invoice Date: "+(inv.invoice_date||""),20,66);
+ doc.text("Due Date: "+(inv.due_date||"Not specified"),20,73);
+ doc.text("Invoice Status: "+(inv.invoice_status||""),120,59);
+ doc.text("Payment Status: "+(inv.payment_status||""),120,66);
+
+ doc.setFont("helvetica","bold");
+ doc.text("BILL TO",20,88);
+ doc.setFont("helvetica","normal");
+ doc.text(String(inv.customer_name||""),20,96);
+ doc.text(String(inv.customer_email||inv._client?.email||""),20,103);
+ doc.text(String(inv.customer_phone||inv._client?.phone||""),20,110);
+
+ const address=doc.splitTextToSize(String(inv.billing_address||""),160);
+ doc.text(address,20,117);
+
+ let y=145;
+ if(inv._business?.business_name){
+  doc.setFont("helvetica","bold");
+  doc.text("Business: "+inv._business.business_name,20,y);
+  y+=8;
+ }
+ if(inv._branch?.branch_name){
+  doc.setFont("helvetica","normal");
+  doc.text("Branch: "+inv._branch.branch_name,20,y);
+  y+=8;
+ }
+
+ y+=8;
+ doc.setFillColor(...green);
+ doc.rect(20,y,170,10,"F");
+ doc.setTextColor(255,255,255);
+ doc.setFont("helvetica","bold");
+ doc.text("Description",25,y+7);
+ doc.text("Amount",160,y+7);
+
+ y+=19;
+ doc.setTextColor(30,30,30);
+ doc.setFont("helvetica","normal");
+ doc.text("Products / Services",25,y);
+ doc.text(money(inv.subtotal),160,y);
+ y+=10;
+ doc.text("Discount",25,y);
+ doc.text("-"+money(inv.discount),160,y);
+ y+=10;
+ doc.text("Tax",25,y);
+ doc.text(money(inv.tax_amount),160,y);
+ y+=12;
+
+ doc.setDrawColor(...gold);
+ doc.line(20,y,190,y);
+ y+=12;
+
+ doc.setFont("helvetica","bold");
+ doc.setFontSize(14);
+ doc.setTextColor(...green);
+ doc.text("TOTAL",25,y);
+ doc.text(money(inv.total_amount),160,y);
+
+ y+=18;
+ if(inv.notes){
+  doc.setFontSize(9);
+  doc.setTextColor(70,70,70);
+  doc.text("Notes: "+String(inv.notes),20,y,{maxWidth:165});
+  y+=12;
+ }
+
+ doc.setFontSize(9);
+ doc.setTextColor(100,100,100);
+ doc.text("Thank you for choosing VELORA TAP.",20,280);
+
+ return doc;
+}
+
+$("downloadInvoice").addEventListener("click",()=>{
+ if(!selectedInvoice)return;
+ try{
+  createInvoicePDF(selectedInvoice).save(invoiceFilename(selectedInvoice));
+ }catch(error){alert(error.message);}
+});
+
+$("printInvoice").addEventListener("click",()=>{
+ if(!selectedInvoice)return;
+ const content=$("invoicePreview").innerHTML;
+ const win=window.open("","_blank");
+ if(!win){alert("Please allow pop-ups to print the invoice.");return;}
+ win.document.write(`
+  <!DOCTYPE html><html><head><title>Invoice</title>
+  <style>
+   body{font-family:Arial,sans-serif;padding:30px;color:#17251e}
+   .invoice-brand{font-size:24px;font-weight:bold;color:#064b35}
+   .small{font-size:11px;color:#777}
+   table{width:100%;border-collapse:collapse;margin-top:20px}
+   td,th{border-bottom:1px solid #ddd;padding:12px;text-align:left}
+   th{background:#064b35;color:white}
+   .invoice-total{font-size:24px;font-weight:bold;color:#064b35}
+   .badge{padding:5px 9px;background:#edf4ef;border-radius:20px}
+   @media print{body{padding:0}}
+  </style></head><body>${content}
+  <script>window.onload=function(){window.print()}<\/script>
+  </body></html>
+ `);
+ win.document.close();
+});
+
+$("whatsappInvoice").addEventListener("click",()=>{
+ if(!selectedInvoice)return;
+ const phone=String(selectedInvoice.customer_phone||selectedInvoice._client?.phone||"").replace(/\D/g,"");
+ const message=
+  "Hello "+(selectedInvoice.customer_name||"Customer")+
+  ", your VELORA TAP invoice "+selectedInvoice.invoice_number+
+  " for "+money(selectedInvoice.total_amount)+
+  " is ready. Payment status: "+selectedInvoice.payment_status+
+  ". Please find the invoice PDF attached.";
+ const url="https://wa.me/"+phone+"?text="+encodeURIComponent(message);
+ window.open(url,"_blank","noopener");
+});
+
+$("closeInvoice").addEventListener("click",()=>{
+ $("invoiceModal").classList.add("hidden");
+});
 
 /* =====================================================
    CSV EXPORT
@@ -946,21 +1618,13 @@ $("exportRecords").addEventListener("click",()=>{
  }
 
  const columns=[...new Set(currentRows.flatMap(row=>Object.keys(row)))];
-
  const quote=value=>'"'+safe(value).replace(/"/g,'""')+'"';
-
  const csv=[
   columns.map(quote).join(","),
-  ...currentRows.map(row=>columns.map(column=>quote(row[column])).join(","))
+  ...currentRows.map(row=>columns.map(c=>quote(row[c])).join(","))
  ].join("\r\n");
 
- const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
- const url=URL.createObjectURL(blob);
- const link=document.createElement("a");
- link.href=url;
- link.download=currentTable+"-export.csv";
- link.click();
- URL.revokeObjectURL(url);
+ downloadBlob(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"}),currentTable+"-export.csv");
 });
 
 /* =====================================================
@@ -969,26 +1633,23 @@ $("exportRecords").addEventListener("click",()=>{
 
 $("uploadLogo").addEventListener("click",async()=>{
  const file=$("logoFile").files[0];
-
  if(!file){
   $("uploadResult").textContent="Choose an image first.";
   return;
  }
 
  const allowed=["image/png","image/jpeg","image/webp"];
-
  if(!allowed.includes(file.type)){
   $("uploadResult").textContent="Only PNG, JPG and WEBP images are allowed.";
   return;
  }
-
  if(file.size>2*1024*1024){
   $("uploadResult").textContent="Maximum file size is 2 MB.";
   return;
  }
 
  const extension=file.name.split(".").pop().toLowerCase();
- const safeName=($("logoFileName").value.trim() || makeId()+"."+extension)
+ const safeName=($("logoFileName").value.trim()||makeId()+"."+extension)
   .replace(/[^a-zA-Z0-9._-]/g,"-");
 
  $("uploadResult").textContent="Uploading...";
@@ -1003,7 +1664,6 @@ $("uploadLogo").addEventListener("click",async()=>{
  }
 
  const {data:publicData}=db.storage.from("business-logos").getPublicUrl(data.path);
-
  $("uploadResult").innerHTML=
   'Upload successful. <a target="_blank" rel="noopener" href="'+
   escapeHTML(publicData.publicUrl)+'">Open uploaded logo</a>'+
@@ -1016,10 +1676,8 @@ $("uploadLogo").addEventListener("click",async()=>{
 
 $("refreshSession").addEventListener("click",async()=>{
  const {data,error}=await db.auth.getSession();
-
- $("sessionInfo").textContent=error
-  ?error.message
-  :data.session?"Signed in as "+data.session.user.email:"No active session.";
+ $("sessionInfo").textContent=error?error.message:
+  data.session?"Signed in as "+data.session.user.email:"No active session.";
 });
 
 /* =====================================================
