@@ -1991,23 +1991,23 @@ function setVisitFormValues(visit){
  });
 }
 
-function clearVisitForm(){
- const form=getVisitField("shopVisitForm","visitForm");
 
- if(form)form.reset();
+function clearVisitForm() {
+    const form = getVisitField("shopVisitForm", "visitForm");
 
- const message=getVisitField("visitMessage","visitThankYouMessage");
+    if (form) {
+        form.reset();
+    }
 
- if(message){
-  message.value=
-   "Hello [Contact Person],\n\n"+
-   "Thank you for taking the time to speak with us today.\n\n"+
-   "It was a pleasure introducing VELORA TAP and our NFC Google Review cards and smart QR solutions.\n"+
-   "We appreciate your time and consideration. If you need any further information or would like a demonstration, please feel free to contact us.\n\n"+
-   "Thank you!\n"+
-   "Team VELORA TAP\n"+
-   "+91 80885 90273";
- }
+    const recordId = getVisitField("visitRecordId");
+    if (recordId) {
+        recordId.value = "";
+    }
+
+    const message = getVisitField("visitMessage", "visitThankYouMessage");
+    if (message) {
+        message.value = "";
+    }
 }
 
 function defaultVisitMessage(visit){
