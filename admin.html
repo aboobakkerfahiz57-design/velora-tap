@@ -2141,15 +2141,6 @@ function openWhatsAppFromForm(){
 }
 
 
-
- const message=visit.message||defaultVisitMessage(visit);
-
- window.open(
-  "https://wa.me/"+phone+"?text="+encodeURIComponent(message),
-  "_blank"
- );
-}
-
 function visitStatusClass(status){
  if(status==="Interested")return "status-interested";
  if(status==="Follow-up Required")return "status-followup";
