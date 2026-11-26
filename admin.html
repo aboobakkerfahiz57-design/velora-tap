@@ -2097,6 +2097,7 @@ function deleteShopVisit(id){
  renderShopVisits();
 }
 
+
 function openVisitWhatsApp(id){
  const visit=shopVisits.find(x=>x.id===id);
  if(!visit)return;
@@ -2107,6 +2108,39 @@ function openVisitWhatsApp(id){
   alert("Please add the shop's WhatsApp number first.");
   return;
  }
+
+ const message=visit.message||defaultVisitMessage(visit);
+
+ const url="https://wa.me/"+phone+
+  "?text="+encodeURIComponent(message);
+
+ window.open(url,"_blank");
+}
+
+function openWhatsAppFromForm(){
+ const visit=getVisitFormValues();
+
+ if(!visit.whatsapp){
+  alert("Please enter a WhatsApp number.");
+  return;
+ }
+
+ const phone=String(visit.whatsapp).replace(/\D/g,"");
+
+ if(!phone){
+  alert("Please enter a valid WhatsApp number.");
+  return;
+ }
+
+ const message=visit.message||defaultVisitMessage(visit);
+
+ const url="https://wa.me/"+phone+
+  "?text="+encodeURIComponent(message);
+
+ window.open(url,"_blank");
+}
+
+
 
  const message=visit.message||defaultVisitMessage(visit);
 
@@ -2240,6 +2274,18 @@ getVisitField("exportShopVisits","exportVisits")?.addEventListener("click",()=>{
  }
 
  exportCSV(shopVisits,"velora-tap-shop-visits.csv");
+});
+
+/* CONNECT OPEN WHATSAPP BUTTON */
+const openWhatsAppButton = [...(
+ shopVisitForm?.querySelectorAll("button") || []
+)].find(button =>
+ button.textContent.trim().includes("Open WhatsApp")
+);
+
+openWhatsAppButton?.addEventListener("click",event=>{
+ event.preventDefault();
+ openWhatsAppFromForm();
 });
 
 /* =====================================================
