@@ -1401,8 +1401,7 @@ function closeRecordEditor(){
  editingRow=null;
 }
 
-$("closeEditorButton")?.addEventListener("click",closeRecordEditor);
-$("cancelEditorButton").addEventListener("click",closeRecordEditor);
+$("cancelEditorButton")?.addEventListener("click",closeRecordEditor);
 
 $("recordEditorModal").addEventListener("click",event=>{
  if(event.target===$("recordEditorModal")){
