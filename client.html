@@ -643,6 +643,9 @@
       <button class="nav-btn" data-page="business"><span class="nav-icon">▣</span> My Business</button>
       <button class="nav-btn" data-page="branches"><span class="nav-icon">⌖</span> Branches</button>
       <button class="nav-btn" data-page="profile"><span class="nav-icon">✎</span> Digital Profile</button>
+      <button class="nav-btn" data-page="mycard">
+  <span class="nav-icon">▣</span> My Digital Card
+</button>
 
       <div class="nav-label">NFC & Insights</div>
       <button class="nav-btn" data-page="cards"><span class="nav-icon">▤</span> NFC Cards</button>
@@ -766,6 +769,144 @@
           </div>
 
           <div id="profileDetails" class="panel loading">Loading profile...</div>
+        </section>
+        
+        </section>
+
+        <!-- MY DIGITAL CARD -->
+        <section class="page hidden" id="page-mycard">
+
+          <h1 class="section-title">My Digital Card</h1>
+          <p class="section-description">
+            Manage your personal digital identity, company portfolio and contact links.
+          </p>
+
+          <div class="notice">
+            Your personal digital card is separate from your existing business profile.
+          </div>
+
+          <div class="panel">
+            <h3>Personal Information</h3>
+
+            <div class="field">
+              <label>Full Name</label>
+              <input id="pcName" type="text">
+            </div>
+
+            <div class="field">
+              <label>Professional Title</label>
+              <input id="pcTitle" type="text">
+            </div>
+
+            <div class="field">
+              <label>Short Introduction</label>
+              <textarea id="pcBio" rows="3"></textarea>
+            </div>
+
+            <div class="field">
+              <label>Profile Photo URL</label>
+              <input id="pcPhoto" type="url">
+            </div>
+
+            <button class="btn btn-primary" id="savePersonalCard" type="button">
+              Save Personal Information
+            </button>
+          </div>
+
+          <div class="panel">
+            <h3>Company Portfolio</h3>
+            <div class="field">
+              <label>Company Portfolio JSON</label>
+              <textarea id="pcCompanies" rows="12"></textarea>
+            </div>
+            <button class="btn btn-primary" id="saveCompanies" type="button">
+              Save Company Portfolio
+            </button>
+          </div>
+
+          <div class="panel">
+            <h3>Contact & Social Links</h3>
+
+            <div class="field">
+              <label>WhatsApp Number</label>
+              <input id="pcWhatsapp" type="tel">
+            </div>
+
+            <div class="field">
+              <label>Email Address</label>
+              <input id="pcEmail" type="email">
+            </div>
+
+            <div class="field">
+              <label>Website URL</label>
+              <input id="pcWebsite" type="url">
+            </div>
+
+            <div class="field">
+              <label>Social Links JSON</label>
+              <textarea id="pcSocial" rows="5"></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="saveContactLinks" type="button">
+              Save Contact & Social Links
+            </button>
+          </div>
+
+          <div class="panel">
+            <h3>Public Profile & Sharing</h3>
+
+            <div class="field">
+              <label>Public Profile URL</label>
+              <input id="pcPublicUrl" type="url" readonly>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-outline" id="copyPersonalUrl" type="button">Copy URL</button>
+              <button class="btn btn-outline" id="previewPersonalCard" type="button">Preview</button>
+              <button class="btn btn-primary" id="generatePersonalQR" type="button">Generate QR</button>
+            </div>
+
+            <div id="personalQRCode" style="margin-top:20px"></div>
+
+            <button class="btn btn-outline" id="downloadPersonalQR" type="button">
+              Download QR
+            </button>
+
+            <button class="btn btn-primary" id="publishPersonalCard" type="button">
+              Publish My Card
+            </button>
+          </div>
+
+          <div class="panel">
+            <h3>Personal Card Analytics</h3>
+
+            <div class="grid">
+              <div class="stat-card">
+                <div class="stat-top">NFC Taps</div>
+                <div class="stat-number" id="pcNfc">0</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">QR Scans</div>
+                <div class="stat-number" id="pcQr">0</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">Profile Views</div>
+                <div class="stat-number" id="pcViews">0</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-top">Link Clicks</div>
+                <div class="stat-number" id="pcClicks">0</div>
+              </div>
+            </div>
+
+            <div id="personalCardEvents" class="loading">
+              Analytics will appear here.
+            </div>
+          </div>
+
         </section>
 
         <!-- NFC CARDS -->
@@ -1010,6 +1151,7 @@
       business: "My Business",
       branches: "Branches",
       profile: "Digital Profile",
+      mycard: "My Digital Card",
       cards: "NFC Cards",
       qr: "QR Generator",
       analytics: "Analytics",
@@ -1285,7 +1427,21 @@
       if (!clientRecord) return;
 
       const clientId = clientRecord.id;
+   
+// Load personal digital card from Supabase
+const { data: personalCard, error: personalCardError } =
+  await supabaseClient
+    .from("personal_digital_cards")
+    .select("*")
+    .eq("client_id", clientId)
+    .maybeSingle();
 
+if (personalCardError) {
+  console.error("Personal card loading error:", personalCardError);
+  throw personalCardError;
+}
+
+personalDigitalCard = personalCard;
       const tasks = await Promise.allSettled([
         getRows("businesses", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
         getRows("orders", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
@@ -1411,6 +1567,7 @@
         business: renderBusiness,
         branches: renderBranches,
         profile: renderProfile,
+        mycard: renderMyDigitalCard,
         cards: renderCards,
         analytics: renderAnalytics,
         activity: renderActivity,
@@ -1537,6 +1694,142 @@
       if (profileButton) profileButton.addEventListener("click", () => navigateTo("support"));
     }
 
+    
+// ======================================================
+// MY DIGITAL CARD - PROFILE RENDERING
+// ======================================================
+
+function renderMyDigitalCard() {
+  const card = personalDigitalCard;
+
+  if (!card) {
+    showEmpty("page-mycard", "Your personal digital card could not be loaded.");
+    return;
+  }
+
+  $("pcName").value = card.full_name || "";
+  $("pcTitle").value = card.job_title || "";
+  $("pcBio").value = card.bio || "";
+  $("pcPhoto").value = card.photo_url || "";
+
+  $("pcCompanies").value =
+    JSON.stringify(card.companies || [], null, 2);
+
+  $("pcWhatsapp").value = card.whatsapp_number || "";
+  $("pcEmail").value = card.email || "";
+  $("pcWebsite").value = card.website_url || "";
+
+  $("pcSocial").value =
+    JSON.stringify(card.social_links || {}, null, 2);
+
+  $("pcPublicUrl").value =
+    "https://aboobakkerfahiz57-design.github.io/velora-tap/card.html?slug=" +
+    encodeURIComponent(card.slug);
+
+  $("personalCardStatus").textContent =
+    card.is_published ? "Published" : "Unpublished";
+}
+
+// ======================================================
+// SAVE PERSONAL DIGITAL CARD
+// ======================================================
+
+async function saveMyDigitalCard(fields) {
+  if (!personalDigitalCard || !clientRecord) {
+    showToast("Personal card not loaded.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("personal_digital_cards")
+    .update({
+      ...fields,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", personalDigitalCard.id)
+    .eq("client_id", clientRecord.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Personal card save error:", error);
+    showToast(error.message);
+    return;
+  }
+
+  personalDigitalCard = data;
+  renderMyDigitalCard();
+
+  showToast("Personal digital card updated successfully.");
+}
+
+    
+// ======================================================
+// MY DIGITAL CARD - BUTTON CONNECTIONS
+// ======================================================
+
+// Save personal information
+$("savePersonalCard").addEventListener("click", async () => {
+  try {
+    const fullName = $("pcName").value.trim();
+
+    if (!fullName) {
+      showToast("Please enter your full name.");
+      return;
+    }
+
+    await saveMyDigitalCard({
+      full_name: fullName,
+      job_title: $("pcTitle").value.trim(),
+      bio: $("pcBio").value.trim(),
+      photo_url: $("pcPhoto").value.trim() || null
+    });
+  } catch (error) {
+    console.error(error);
+    showToast("Could not save personal information.");
+  }
+});
+
+// Save company portfolio
+$("saveCompanies").addEventListener("click", async () => {
+  try {
+    const companies = JSON.parse($("pcCompanies").value);
+
+    if (!Array.isArray(companies)) {
+      throw new Error("Company portfolio must be a JSON array.");
+    }
+
+    await saveMyDigitalCard({ companies });
+  } catch (error) {
+    console.error(error);
+    showToast("Invalid company JSON. Please check the format.");
+  }
+});
+
+// Save contact and social links
+$("saveContactLinks").addEventListener("click", async () => {
+  try {
+    const socialLinks = JSON.parse($("pcSocial").value || "{}");
+
+    if (
+      !socialLinks ||
+      typeof socialLinks !== "object" ||
+      Array.isArray(socialLinks)
+    ) {
+      throw new Error("Social links must be a JSON object.");
+    }
+
+    await saveMyDigitalCard({
+      whatsapp_number: $("pcWhatsapp").value.trim(),
+      email: $("pcEmail").value.trim(),
+      website_url: $("pcWebsite").value.trim(),
+      social_links: socialLinks
+    });
+  } catch (error) {
+    console.error(error);
+    showToast("Invalid social links JSON. Please check the format.");
+  }
+});
     function renderCards() {
       if (!cards.length) {
         setHTML("cardsContent", showEmpty("No NFC cards assigned", "Your assigned NFC cards will appear here."));
@@ -1568,6 +1861,7 @@
     function renderAnalytics() {
       const count = type => events.filter(event => event.event_type === type).length;
 
+      
       const nfc = count("nfc_tap");
       const qr = count("qr_scan");
       const views = count("profile_view");
