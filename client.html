@@ -1830,6 +1830,116 @@ $("saveContactLinks").addEventListener("click", async () => {
     showToast("Invalid social links JSON. Please check the format.");
   }
 });
+
+    
+// ==========================================
+// PERSONAL DIGITAL CARD - SHARING BUTTONS
+// ==========================================
+
+const personalCardUrl = () => {
+  return $("pcPublicUrl").value.trim();
+};
+
+// COPY URL
+$("copyPersonalUrl").addEventListener("click", async () => {
+  const url = personalCardUrl();
+  if (!url) return showToast("Profile URL is not available.");
+
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("Profile URL copied!");
+  } catch (error) {
+    $("pcPublicUrl").select();
+    document.execCommand("copy");
+    showToast("Profile URL copied!");
+  }
+});
+
+// PREVIEW
+$("previewPersonalCard").addEventListener("click", () => {
+  const url = personalCardUrl();
+  if (!url) return showToast("Profile URL is not available.");
+
+  window.open(url, "_blank", "noopener");
+});
+
+// GENERATE QR
+$("generatePersonalQR").addEventListener("click", () => {
+  const url = personalCardUrl();
+  if (!url) return showToast("Profile URL is not available.");
+
+  const container = $("personalQRCode");
+  container.innerHTML = "";
+
+  if (typeof QRCode === "undefined") {
+    return showToast("QR library could not load. Refresh the page.");
+  }
+
+  new QRCode(container, {
+    text: url,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  showToast("QR code generated!");
+});
+
+// DOWNLOAD QR
+$("downloadPersonalQR").addEventListener("click", () => {
+  const container = $("personalQRCode");
+  const canvas = container.querySelector("canvas");
+  const image = container.querySelector("img");
+
+  let imageUrl = "";
+
+  if (canvas) {
+    imageUrl = canvas.toDataURL("image/png");
+  } else if (image && image.src) {
+    imageUrl = image.src;
+  } else {
+    return showToast("Generate your QR code first.");
+  }
+
+  const link = document.createElement("a");
+  link.href = imageUrl;
+  link.download = "Fahiz-Personal-Digital-Card-QR.png";
+  link.click();
+});
+
+// PUBLISH CARD
+$("publishPersonalCard").addEventListener("click", async () => {
+  if (!personalDigitalCard || !clientRecord) {
+    return showToast("Personal card is not loaded.");
+  }
+
+  const confirmed = confirm(
+    "Publish your personal digital card? Anyone with the link will be able to view it."
+  );
+
+  if (!confirmed) return;
+
+  const { data, error } = await supabaseClient
+    .from("personal_digital_cards")
+    .update({
+      is_published: true,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", personalDigitalCard.id)
+    .eq("client_id", clientRecord.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Publish error:", error);
+    return showToast(error.message);
+  }
+
+  personalDigitalCard = data;
+  renderMyDigitalCard();
+  showToast("Your personal card is published!");
+});
+
     function renderCards() {
       if (!cards.length) {
         setHTML("cardsContent", showEmpty("No NFC cards assigned", "Your assigned NFC cards will appear here."));
