@@ -168,7 +168,7 @@
 (() => {
   "use strict";
   const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4Lw6rMCk4S";
+  const SUPABASE_ANON_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
   const params = new URLSearchParams(location.search);
   const slug = params.get("slug") || "aboobakkar-fahiz";
   const $ = (id) => document.getElementById(id);
@@ -177,11 +177,12 @@
   const defaultBio = "Building businesses through technology, digital innovation and entrepreneurship.";
   let cardData = null;
 
+  // Attach welcome interaction before any network request.
+  $("enterBtn").addEventListener("click", () => $("welcome").classList.add("hide"));
+
   function showError() { $("loading").classList.add("hidden"); $("error").classList.remove("hidden"); }
   function setWelcome() {
-    const w = $("welcome");
-    $("enterBtn").addEventListener("click", () => w.classList.add("hide"));
-    // Welcome screen is intentionally shown on each fresh visit.
+    // Welcome overlay is already wired before the Supabase request begins.
   }
   function setActions(data) {
     const displayName = data.full_name || "Aboobakkar Fahiz";
