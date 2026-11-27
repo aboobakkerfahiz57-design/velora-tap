@@ -176,6 +176,22 @@
   const email = "aboobakkerfahiz6@gmail.com";
   const defaultBio = "Building businesses through technology, digital innovation and entrepreneurship.";
   let cardData = null;
+  async function trackPersonalEvent(cardId, eventType, source = "direct", actionKey = null) {
+  try {
+    const analyticsClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { error } = await analyticsClient.from("personal_digital_card_events").insert({
+      personal_card_id: cardId,
+      event_type: eventType,
+      source,
+      action_key: actionKey
+    });
+
+    if (error) console.error("Analytics tracking error:", error);
+  } catch (error) {
+    console.error("Analytics tracking failed:", error);
+  }
+}
 
   // Attach welcome interaction before any network request.
   $("enterBtn").addEventListener("click", () => $("welcome").classList.add("hide"));
@@ -196,6 +212,18 @@
     $("emailLink").href = `mailto:${mail}`;
     $("emailLink").textContent = mail;
     $("whatsappLink").textContent = data.whatsapp_number || "+91 80885 90273";
+    $("whatsappLink").textContent = data.whatsapp_number || "+91 80885 90273";
+
+// ADD THESE LISTENERS HERE
+$("whatsappTop").addEventListener("click", () => {
+  trackPersonalEvent(data.id, "whatsapp_click", "direct", "whatsapp");
+});
+
+$("emailTop").addEventListener("click", () => {
+  trackPersonalEvent(data.id, "email_click", "direct", "email");
+});
+
+// EXISTING CODE CONTINUES
     $("saveContact").addEventListener("click", () => {
       const vcard = ["BEGIN:VCARD","VERSION:3.0",`FN:${displayName}`,`TITLE:${data.job_title || "Founder & CEO"}`,`EMAIL:${mail}`,`TEL;TYPE=CELL:${data.whatsapp_number || phone}`,`URL:${location.href}`,"END:VCARD"].join("\r\n");
       const blob = new Blob([vcard], {type:"text/vcard;charset=utf-8"});
@@ -217,6 +245,20 @@
       const {data, error} = await client.from("personal_digital_cards").select("*").eq("slug", slug).eq("is_published", true).maybeSingle();
       if (error || !data) { showError(); return; }
       cardData = data;
+      const sourceParam = new URLSearchParams(location.search).get("src");
+const source = ["qr", "nfc"].includes(sourceParam) ? sourceParam : "direct";
+
+// Record profile visit
+await trackPersonalEvent(data.id, "profile_view", source);
+
+// Record how the visitor arrived
+if (source === "qr") {
+  await trackPersonalEvent(data.id, "qr_scan", "qr");
+}
+
+if (source === "nfc") {
+  await trackPersonalEvent(data.id, "nfc_tap", "nfc");
+}
       $("name").textContent = data.full_name || "Aboobakkar Fahiz";
       $("title").textContent = data.job_title || "Founder & CEO";
       $("bio").textContent = data.bio || defaultBio;
