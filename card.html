@@ -1,299 +1,236 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101827">
-  <title>Aboobakkar Fahiz | Digital Business Card</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b12">
+  <meta name="description" content="Aboobakkar Fahiz — Founder & CEO. Connect with Fahiz and explore his business portfolio.">
+  <meta property="og:title" content="Aboobakkar Fahiz | Digital Business Card">
+  <meta property="og:description" content="Founder, entrepreneur and business builder from Mangaluru.">
+  <meta property="og:type" content="profile">
+  <title>Aboobakkar Fahiz | Digital Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 35px 16px;
-      font-family: Arial, sans-serif;
-      background: #f1f3f6;
-      color: #172033;
-    }
-
-    .card {
-      max-width: 620px;
-      margin: auto;
-      background: white;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0,0,0,.09);
-    }
-
-    .hero {
-      background: linear-gradient(135deg, #101827, #263d59);
-      color: white;
-      padding: 42px 25px 35px;
-      text-align: center;
-    }
-
-    .photo {
-      width: 112px;
-      height: 112px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid white;
-      background: #dce2e9;
-      margin-bottom: 15px;
-    }
-
-    h1 { margin: 8px 0; font-size: 27px; }
-    .title { color: #d8c18b; font-weight: bold; }
-    .bio { line-height: 1.6; color: #e0e6ed; }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 18px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 14px;
-      border: 0;
-      cursor: pointer;
-      background: #d8c18b;
-      color: #172033;
-    }
-
-    .btn.secondary {
-      background: white;
-      color: #172033;
-    }
-
-    .content { padding: 25px; }
-
-    .section { margin-bottom: 27px; }
-    h2 { font-size: 19px; margin-bottom: 14px; }
-
-    .company {
-      padding: 15px;
-      border: 1px solid #e6eaf0;
-      border-radius: 12px;
-      margin-bottom: 11px;
-    }
-
-    .company strong { font-size: 16px; }
-    .company p { color: #687386; margin: 7px 0 0; line-height: 1.5; }
-
-    .nested {
-      margin: 12px 0 0 12px;
-      padding-left: 13px;
-      border-left: 2px solid #d8c18b;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 9px 12px;
-      margin: 4px;
-      border-radius: 20px;
-      background: #f0f2f5;
-      font-size: 13px;
-    }
-
-    .contact-link {
-      display: block;
-      padding: 13px;
-      margin: 8px 0;
-      background: #f5f6f8;
-      color: #172033;
-      text-decoration: none;
-      border-radius: 10px;
-      overflow-wrap: anywhere;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #7b8492;
-      font-size: 12px;
-      border-top: 1px solid #edf0f3;
-    }
-
-    .status { text-align: center; padding: 50px 20px; }
+    :root{--bg:#070910;--panel:#101522;--panel2:#151c2b;--line:rgba(255,255,255,.11);--gold:#d7b875;--gold2:#f2dfb1;--text:#f7f7f8;--muted:#a8afbd;--violet:#8e72ff}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:"DM Sans",sans-serif;background:radial-gradient(ellipse at 50% -10%,rgba(142,114,255,.18),transparent 42%),radial-gradient(ellipse at 90% 35%,rgba(215,184,117,.09),transparent 35%),var(--bg);padding:22px 14px 40px;overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
+    .wrap{width:min(100%,480px);margin:0 auto;perspective:1200px;position:relative}
+    .card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.14);border-radius:30px;background:linear-gradient(160deg,rgba(24,31,47,.97),rgba(9,12,20,.98) 58%);box-shadow:0 28px 90px rgba(0,0,0,.58),0 0 50px rgba(142,114,255,.08);transform-style:preserve-3d;animation:cardIn .9s cubic-bezier(.2,.8,.2,1) both}
+    .card:before{content:"";position:absolute;inset:-2px;background:linear-gradient(120deg,transparent 15%,rgba(215,184,117,.22),transparent 38%,rgba(142,114,255,.18),transparent 70%);transform:translateX(-80%);animation:shine 8s ease-in-out infinite;pointer-events:none}
+    .hero{position:relative;text-align:center;padding:34px 25px 28px;background:radial-gradient(circle at 50% 0,rgba(215,184,117,.17),transparent 58%);z-index:1}
+    .eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:20px}
+    .avatar-ring{width:142px;height:142px;margin:0 auto 18px;padding:4px;border-radius:50%;background:conic-gradient(from 20deg,var(--gold),#fff0c7,#8265e9,var(--gold));box-shadow:0 0 35px rgba(215,184,117,.2);animation:float 5s ease-in-out infinite}
+    .avatar{width:100%;height:100%;object-fit:cover;object-position:center 22%;border-radius:50%;border:4px solid #101522;display:block;background:#222}
+    h1{font:800 clamp(25px,7vw,32px)/1.15 Manrope,sans-serif;margin:0;letter-spacing:-1px}
+    .role{margin:9px 0 0;color:var(--gold2);font-weight:700;font-size:13px;letter-spacing:.5px}
+    .location{margin:8px 0 0;color:var(--muted);font-size:12px}
+    .bio{max-width:350px;margin:18px auto 0;color:#d2d6df;font-size:13px;line-height:1.7}
+    .honour{display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:8px 12px;border:1px solid rgba(215,184,117,.27);border-radius:30px;background:rgba(215,184,117,.07);font-size:10px;color:#f1dfb7}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:23px}
+    .btn{min-height:47px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-weight:700;font-size:12px;border:1px solid var(--line);transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}
+    .btn:hover{transform:translateY(-3px);box-shadow:0 12px 25px rgba(0,0,0,.25)}
+    .primary{background:linear-gradient(110deg,#f0d99f,#bd9855);color:#17130b;border:0}
+    .secondary{background:rgba(255,255,255,.055);color:#fff}
+    .wide{grid-column:1/-1}
+    .section{position:relative;padding:24px 22px;border-top:1px solid var(--line);z-index:1}
+    .section-title{font:700 14px Manrope,sans-serif;letter-spacing:.2px;margin:0 0 15px;display:flex;align-items:center;gap:9px}
+    .section-title:before{content:"";width:3px;height:17px;border-radius:5px;background:linear-gradient(var(--gold2),var(--violet))}
+    .company{border:1px solid var(--line);border-radius:16px;padding:15px;margin:10px 0;background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.018));}
+    .company-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .company-name{font:800 13px Manrope,sans-serif;letter-spacing:.3px}
+    .company-tag{font-size:9px;color:var(--gold2);border:1px solid rgba(215,184,117,.25);border-radius:20px;padding:5px 8px;white-space:nowrap}
+    .company-desc{font-size:11px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+    .subcompany{margin:11px 0 0 10px;padding:10px 11px;border-left:2px solid rgba(215,184,117,.55);background:rgba(0,0,0,.16);border-radius:0 10px 10px 0}
+    .subcompany strong{font-size:11px;display:block}
+    .subcompany span{font-size:10px;color:var(--muted);display:block;margin-top:4px;line-height:1.45}
+    .service-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .service{padding:11px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.035);font-size:10px;color:#e5e7ec;line-height:1.4}
+    .service:before{content:"✦";color:var(--gold);margin-right:7px}
+    .social-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .social{display:flex;align-items:center;gap:9px;padding:12px;border-radius:13px;text-decoration:none;color:#f4f4f6;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:11px;font-weight:600;transition:.2s}
+    .social:hover{border-color:rgba(215,184,117,.5);transform:translateY(-2px)}
+    .social .ico{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:rgba(215,184,117,.12);color:var(--gold2);font-size:12px}
+    .contact-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:11px}
+    .contact-row:last-child{border:0}.contact-row span{color:var(--muted)}.contact-row a{color:#f5e3bb;text-decoration:none;text-align:right;overflow-wrap:anywhere}
+    .footer{text-align:center;padding:20px 12px 22px;border-top:1px solid var(--line);font-size:9px;color:#7f8797;letter-spacing:.5px}
+    .footer b{color:var(--gold2);font-weight:700}
+    .welcome{position:fixed;z-index:20;inset:0;display:grid;place-items:center;padding:24px;background:rgba(3,5,10,.92);backdrop-filter:blur(18px);transition:opacity .6s,visibility .6s}
+    .welcome.hide{opacity:0;visibility:hidden}
+    .welcome-box{width:min(100%,380px);text-align:center;padding:34px 25px;border-radius:26px;border:1px solid rgba(215,184,117,.35);background:linear-gradient(145deg,#1a2030,#090c14);box-shadow:0 25px 90px #000}
+    .welcome-mark{font:800 11px Manrope;letter-spacing:4px;color:var(--gold2)}
+    .welcome h2{font:800 26px Manrope;margin:18px 0 9px}
+    .welcome p{font-size:12px;line-height:1.7;color:var(--muted);margin:0 0 22px}
+    .welcome button{width:100%;height:48px;border:0;border-radius:14px;background:linear-gradient(110deg,#f0d99f,#bd9855);font-weight:800;color:#17130b;cursor:pointer}
+    .loading,.error{width:min(100%,480px);margin:12vh auto;text-align:center;padding:30px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font-size:13px}
+    .hidden{display:none!important}
+    @keyframes cardIn{from{opacity:0;transform:translateY(30px) rotateX(5deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes shine{0%,65%,100%{transform:translateX(-90%)}80%{transform:translateX(90%)}}
+    @media(min-width:700px){body{padding-top:35px}.wrap{width:min(100%,460px)}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
-
 <body>
-  <main class="card">
-    <div id="profile" class="status">Loading digital business card...</div>
+  <div id="welcome" class="welcome">
+    <div class="welcome-box">
+      <div class="welcome-mark">A PERSONAL INTRODUCTION</div>
+      <h2>Welcome</h2>
+      <p>Welcome to my digital business card. Explore my work, discover the businesses I build, and connect with me directly.</p>
+      <button id="enterBtn" type="button">Explore My Profile&nbsp; →</button>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">Loading digital business card…</div>
+  <div id="error" class="error hidden">This digital card is not available or has not been published.</div>
+
+  <main id="profile" class="wrap hidden">
+    <article class="card" id="card">
+      <header class="hero">
+        <div class="eyebrow">Founder · Entrepreneur · Business Builder</div>
+        <div class="avatar-ring"><img id="photo" class="avatar" src="fahiz-profile.jpg" alt="Aboobakkar Fahiz"></div>
+        <h1 id="name">Aboobakkar Fahiz</h1>
+        <div class="role" id="title">Founder &amp; CEO</div>
+        <div class="location">Mangaluru, Karnataka, India</div>
+        <p class="bio" id="bio">Building businesses through technology, digital innovation and entrepreneurship.</p>
+        <div class="honour">✦ Former Vice President · ACSA, Dakshina Kannada District</div>
+        <div class="actions">
+          <button class="btn primary" id="saveContact">＋ Save Contact</button>
+          <a class="btn secondary" id="whatsappTop" target="_blank" rel="noopener">◉ WhatsApp Me</a>
+          <a class="btn secondary wide" id="emailTop">✉ Send Email</a>
+        </div>
+      </header>
+
+      <section class="section">
+        <h2 class="section-title">Business Portfolio</h2>
+        <div class="company">
+          <div class="company-head"><div class="company-name">COREVA BUSINESS SOLUTIONS</div><span class="company-tag">BUSINESS ECOSYSTEM</span></div>
+          <p class="company-desc">A business-solutions ecosystem connecting property, digital innovation, finance and business support.</p>
+        </div>
+        <div class="company">
+          <div class="company-head"><div class="company-name">VELORA DIGITAL</div><span class="company-tag">MAIN COMPANY</span></div>
+          <p class="company-desc">Web design, development and digital experiences that help brands grow.</p>
+          <div class="subcompany"><strong>VELORA TAP</strong><span>NFC digital business cards, QR solutions and smart customer connection tools.</span></div>
+        </div>
+        <div class="company">
+          <div class="company-head"><div class="company-name">TBD GROUP.in</div><span class="company-tag">GROUP COMPANY</span></div>
+          <div class="subcompany"><strong>TBD Builders &amp; Developers</strong><span>Construction and building development.</span></div>
+          <div class="subcompany"><strong>AURELIV Interiors.Design</strong><span>Interior design and space planning.</span></div>
+          <div class="subcompany"><strong>SR PRIME Properties &amp; Real Estate Developers</strong><span>Property services and real estate development.</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Services &amp; Expertise</h2>
+        <div class="service-grid">
+          <div class="service">Website Design &amp; Development</div>
+          <div class="service">Digital Experiences &amp; Branding</div>
+          <div class="service">3D Design &amp; Motion Experiences</div>
+          <div class="service">NFC Business Cards &amp; Solutions</div>
+          <div class="service">QR Codes &amp; Digital Profiles</div>
+          <div class="service">Business Technology Solutions</div>
+          <div class="service">Construction &amp; Development</div>
+          <div class="service">Interior Design</div>
+          <div class="service">Properties &amp; Real Estate</div>
+          <div class="service">Business Solutions &amp; Support</div>
+          <div class="service">Customer Engagement Solutions</div>
+          <div class="service">Digital Strategy &amp; Consulting</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Connect on Social Media</h2>
+        <div class="social-grid">
+          <a class="social" href="https://www.instagram.com/fahiz.official/" target="_blank" rel="noopener"><span class="ico">◎</span>Personal Instagram</a>
+          <a class="social" href="https://www.instagram.com/fahiz._.nsui/" target="_blank" rel="noopener"><span class="ico">◎</span>ACSA / Public Profile</a>
+          <a class="social" href="https://www.instagram.com/veloradigital.co.in/" target="_blank" rel="noopener"><span class="ico">◎</span>VELORA DIGITAL</a>
+          <a class="social" href="https://www.instagram.com/veloratap.in/" target="_blank" rel="noopener"><span class="ico">◎</span>VELORA TAP</a>
+          <a class="social wide" href="https://www.instagram.com/corevasolutions/" target="_blank" rel="noopener"><span class="ico">◎</span>COREVA Business Solutions</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Contact Details</h2>
+        <div class="contact-row"><span>Email</span><a id="emailLink" href="mailto:aboobakkerfahiz6@gmail.com">aboobakkerfahiz6@gmail.com</a></div>
+        <div class="contact-row"><span>WhatsApp</span><a id="whatsappLink" target="_blank" rel="noopener">+91 80885 90273</a></div>
+        <div class="contact-row"><span>VELORA DIGITAL</span><a href="https://veloradigital.co.in/" target="_blank" rel="noopener">veloradigital.co.in ↗</a></div>
+        <div class="contact-row"><span>COREVA</span><a href="https://aboobakkerfahiz57-design.github.io/coreva-website/" target="_blank" rel="noopener">Visit website ↗</a></div>
+      </section>
+      <footer class="footer">DIGITAL BUSINESS CARD · POWERED BY <b>VELORA TAP</b><br><br><button id="shareBtn" class="btn secondary" style="margin:auto;padding:0 22px;min-height:38px">↗ Share This Card</button></footer>
+    </article>
   </main>
 
 <script>
-const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4lQ_w6rMCk4S";
+(() => {
+  "use strict";
+  const SUPABASE_URL = "https://oxhympbowvttsffrvuwz.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_k2-dpsZmkOdzRy35_BA4Lw6rMCk4S";
+  const params = new URLSearchParams(location.search);
+  const slug = params.get("slug") || "aboobakkar-fahiz";
+  const $ = (id) => document.getElementById(id);
+  const phone = "+918088590273";
+  const email = "aboobakkerfahiz6@gmail.com";
+  const defaultBio = "Building businesses through technology, digital innovation and entrepreneurship.";
+  let cardData = null;
 
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const profile = document.getElementById("profile");
-const slug = new URLSearchParams(location.search).get("slug");
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;",
-    '"': "&quot;", "'": "&#39;"
-  })[char]);
-}
-
-function safeURL(value) {
-  try {
-    const url = new URL(value);
-    return ["https:", "http:"].includes(url.protocol) ? url.href : "";
-  } catch {
-    return "";
+  function showError() { $("loading").classList.add("hidden"); $("error").classList.remove("hidden"); }
+  function setWelcome() {
+    const w = $("welcome");
+    $("enterBtn").addEventListener("click", () => w.classList.add("hide"));
+    // Welcome screen is intentionally shown on each fresh visit.
   }
-}
-
-function renderCompanies(items) {
-  if (!Array.isArray(items)) return "";
-
-  return items.map(company => `
-    <div class="company">
-      <strong>${escapeHTML(company.name)}</strong>
-      ${company.description
-        ? `<p>${escapeHTML(company.description)}</p>` : ""}
-      ${company.companies
-        ? `<div class="nested">${renderCompanies(company.companies)}</div>`
-        : ""}
-    </div>
-  `).join("");
-}
-
-function makeContact(data) {
-  const phone = data.phone || data.whatsapp_number || "";
-  const vcard = [
-    "BEGIN:VCARD",
-    "VERSION:3.0",
-    `FN:${data.full_name || ""}`,
-    `TITLE:${data.job_title || ""}`,
-    phone ? `TEL:${phone}` : "",
-    data.email ? `EMAIL:${data.email}` : "",
-    data.website_url ? `URL:${data.website_url}` : "",
-    "END:VCARD"
-  ].filter(Boolean).join("\r\n");
-
-  const blob = new Blob([vcard], { type: "text/vcard" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "Aboobakkar-Fahiz.vcf";
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function renderCard(data) {
-  const whatsapp = (data.whatsapp_number || "").replace(/\D/g, "");
-  const website = safeURL(data.website_url);
-  const photo = safeURL(data.photo_url);
-
-  const social = Object.entries(data.social_links || {})
-    .map(([name, url]) => {
-      const safe = safeURL(url);
-      return safe
-        ? `<a class="contact-link" href="${escapeHTML(safe)}" target="_blank" rel="noopener">${escapeHTML(name)}</a>`
-        : "";
-    }).join("");
-
-  profile.className = "";
-
-  profile.innerHTML = `
-    <header class="hero">
-      ${photo
-        ? `<img class="photo" src="${escapeHTML(photo)}" alt="Profile photo">`
-        : ""}
-      <h1>${escapeHTML(data.full_name)}</h1>
-      <div class="title">${escapeHTML(data.job_title)}</div>
-      <p class="bio">${escapeHTML(data.bio)}</p>
-
-      <div class="actions">
-        <button class="btn" id="saveContact">Save Contact</button>
-        ${data.phone
-          ? `<a class="btn secondary" href="tel:${escapeHTML(data.phone)}">Call</a>` : ""}
-        ${whatsapp
-          ? `<a class="btn secondary" href="https://wa.me/${whatsapp}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
-        ${data.email
-          ? `<a class="btn secondary" href="mailto:${escapeHTML(data.email)}">Email</a>` : ""}
-        ${website
-          ? `<a class="btn secondary" href="${escapeHTML(website)}" target="_blank" rel="noopener">Website</a>` : ""}
-      </div>
-    </header>
-
-    <div class="content">
-      <section class="section">
-        <h2>Company Portfolio</h2>
-        ${renderCompanies(data.companies)}
-      </section>
-
-      <section class="section">
-        <h2>Services</h2>
-        ${(Array.isArray(data.services) ? data.services : [])
-          .map(item => `<span class="tag">${escapeHTML(item)}</span>`).join("")}
-      </section>
-
-      <section class="section">
-        <h2>Contact & Social Links</h2>
-        ${data.email
-          ? `<a class="contact-link" href="mailto:${escapeHTML(data.email)}">✉ ${escapeHTML(data.email)}</a>` : ""}
-        ${whatsapp
-          ? `<a class="contact-link" href="https://wa.me/${whatsapp}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
-        ${website
-          ? `<a class="contact-link" href="${escapeHTML(website)}" target="_blank" rel="noopener">Visit Website</a>` : ""}
-        ${social}
-      </section>
-    </div>
-
-    <footer>Digital Business Card · Powered by VELORA TAP</footer>
-  `;
-
-  document.getElementById("saveContact").addEventListener("click", () => {
-    makeContact(data);
-  });
-}
-
-async function loadCard() {
-  if (!slug) {
-    profile.textContent = "No digital card was specified.";
-    return;
+  function setActions(data) {
+    const displayName = data.full_name || "Aboobakkar Fahiz";
+    const wa = (data.whatsapp_number || phone).replace(/[^\d]/g, "");
+    const mail = data.email || email;
+    const message = `Hello Fahiz! I found your digital business card and would like to connect with you. Please share more information about your services and business solutions.`;
+    const waUrl = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
+    $("whatsappTop").href = waUrl;
+    $("whatsappLink").href = waUrl;
+    $("emailTop").href = `mailto:${mail}?subject=${encodeURIComponent("Enquiry from your digital business card")}&body=${encodeURIComponent("Hello Fahiz,\n\nI found your digital business card and would like to connect with you. Please get in touch with me.\n\nThank you.")}`;
+    $("emailLink").href = `mailto:${mail}`;
+    $("emailLink").textContent = mail;
+    $("whatsappLink").textContent = data.whatsapp_number || "+91 80885 90273";
+    $("saveContact").addEventListener("click", () => {
+      const vcard = ["BEGIN:VCARD","VERSION:3.0",`FN:${displayName}`,`TITLE:${data.job_title || "Founder & CEO"}`,`EMAIL:${mail}`,`TEL;TYPE=CELL:${data.whatsapp_number || phone}`,`URL:${location.href}`,"END:VCARD"].join("\r\n");
+      const blob = new Blob([vcard], {type:"text/vcard;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "Aboobakkar-Fahiz.vcf"; a.click();
+      URL.revokeObjectURL(url);
+    });
+    $("shareBtn").addEventListener("click", async () => {
+      const shareData = {title: `${displayName} | Digital Business Card`, text: "Connect with Aboobakkar Fahiz.", url: location.href};
+      if (navigator.share) { try { await navigator.share(shareData); } catch(e) {} }
+      else if (navigator.clipboard) { await navigator.clipboard.writeText(location.href); $("shareBtn").textContent = "✓ Link Copied"; }
+      else { prompt("Copy your digital card link:", location.href); }
+    });
   }
-
-  const { data, error } = await db
-    .from("personal_digital_cards")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .maybeSingle();
-
-  if (error) {
-    console.error(error);
-    profile.textContent = "Could not load the digital card. Please try again later.";
-    return;
+  async function loadCard() {
+    try {
+      if (!window.supabase) throw new Error("Supabase library unavailable");
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const {data, error} = await client.from("personal_digital_cards").select("*").eq("slug", slug).eq("is_published", true).maybeSingle();
+      if (error || !data) { showError(); return; }
+      cardData = data;
+      $("name").textContent = data.full_name || "Aboobakkar Fahiz";
+      $("title").textContent = data.job_title || "Founder & CEO";
+      $("bio").textContent = data.bio || defaultBio;
+      if (data.photo_url) $("photo").src = data.photo_url;
+      setActions(data);
+      $("loading").classList.add("hidden");
+      $("profile").classList.remove("hidden");
+      setWelcome();
+    } catch (err) {
+      console.error("Card load error:", err);
+      showError();
+    }
   }
-
-  if (!data) {
-    profile.textContent = "This digital card is not available or has not been published.";
-    return;
-  }
-
-  document.title = `${data.full_name} | Digital Business Card`;
-  renderCard(data);
-}
-
-loadCard();
+  loadCard();
+})();
 </script>
 </body>
 </html>
