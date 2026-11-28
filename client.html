@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VELORA TAP | Client Portal</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -1129,7 +1128,9 @@
     // ============================================================
 
     let currentUser = null;
-    let clientRecord = null;
+    llet personalDigitalCard = null;
+    let personalCardEvents = [];
+    et clientRecord = null;
     let businesses = [];
     let branches = [];
     let cards = [];
@@ -1442,6 +1443,29 @@ if (personalCardError) {
 }
 
 personalDigitalCard = personalCard;
+    // Load personal digital card analytics
+personalCardEvents = [];
+
+if (personalDigitalCard) {
+  const {
+    data: personalEvents,
+    error: personalEventsError
+  } = await supabaseClient
+    .from("personal_digital_card_events")
+    .select("event_type, source, action_key, created_at")
+    .eq("personal_card_id", personalDigitalCard.id)
+    .order("created_at", { ascending: false })
+    .limit(500);
+
+  if (personalEventsError) {
+    console.error(
+      "Personal card analytics loading error:",
+      personalEventsError
+    );
+  } else {
+    personalCardEvents = personalEvents || [];
+  }
+}  
       const tasks = await Promise.allSettled([
         getRows("businesses", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
         getRows("orders", q => q.eq("client_id", clientId).order("created_at", { ascending: false })),
@@ -1699,6 +1723,80 @@ personalDigitalCard = personalCard;
 // MY DIGITAL CARD - PROFILE RENDERING
 // ======================================================
 
+    // ======================================================
+// PERSONAL DIGITAL CARD ANALYTICS DISPLAY
+// ======================================================
+
+function renderPersonalCardAnalytics() {
+  const rows = personalCardEvents || [];
+
+  $("pcNfc").textContent =
+    rows.filter(e => e.event_type === "nfc_tap").length;
+
+  $("pcQr").textContent =
+    rows.filter(e => e.event_type === "qr_scan").length;
+
+  $("pcViews").textContent =
+    rows.filter(e => e.event_type === "profile_view").length;
+
+  $("pcClicks").textContent =
+    rows.filter(e =>
+      ["whatsapp_click", "email_click", "link_click"]
+        .includes(e.event_type)
+    ).length;
+
+  const container = $("personalCardEvents");
+  container.replaceChildren();
+
+  if (!rows.length) {
+    container.textContent = "No personal card activity yet.";
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-wrap";
+
+  const table = document.createElement("table");
+
+  const headers = ["Event", "Source", "Time"];
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+
+  headers.forEach(label => {
+    const th = document.createElement("th");
+    th.textContent = label;
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  rows.slice(0, 10).forEach(event => {
+    const tr = document.createElement("tr");
+
+    const values = [
+      (event.event_type || "").replaceAll("_", " "),
+      event.source || "direct",
+      event.created_at
+        ? new Date(event.created_at).toLocaleString()
+        : ""
+    ];
+
+    values.forEach(value => {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+  container.appendChild(wrapper);
+}
 function renderMyDigitalCard() {
   const card = personalDigitalCard;
 
@@ -1726,10 +1824,11 @@ function renderMyDigitalCard() {
     "https://aboobakkerfahiz57-design.github.io/velora-tap/card.html?slug=" +
     encodeURIComponent(card.slug);
 
-  $("personalCardStatus").textContent =
-    card.is_published ? "Published" : "Unpublished";
-}
+ $("personalCardStatus").textContent =
+  card.is_published ? "Published" : "Unpublished";
 
+renderPersonalCardAnalytics();
+}
 // ======================================================
 // SAVE PERSONAL DIGITAL CARD
 // ======================================================
