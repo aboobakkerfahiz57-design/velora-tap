@@ -378,18 +378,18 @@ tr:hover td{background:#fbfdfb}
 </div>
 
 <!-- RECORD EDITOR MODAL -->
-<div id="recordModal" class="modal-backdrop hidden">
+<div id="recordEditorModal" class="modal-backdrop hidden">
  <div class="modal">
   <div class="modal-head">
-   <h2 id="modalTitle">Add Record</h2>
+   <h2 id="editorTitle">Add Record</h2>
    <button class="icon-btn" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <p id="modalDescription" class="muted">Enter the record details below.</p>
-  <form id="recordForm">
-   <div id="formFields" class="form-grid"></div>
+  <form id="recordEditorForm">
+   <div id="editorFields" class="form-grid"></div>
    <div class="modal-actions">
-    <button type="button" class="btn secondary" id="cancelModal">Cancel</button>
-    <button type="submit" class="btn primary" id="saveRecord"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
+    <button type="button" class="btn secondary" id="cancelEditorButton">Cancel</button>
+    <button type="submit" class="btn primary" id="saveRecordButton"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
    </div>
    <div id="modalError" class="error"></div>
   </form>
@@ -1400,6 +1400,7 @@ function closeRecordEditor(){
  $("recordEditorModal").classList.add("hidden");
  editingRow=null;
 }
+ $("closeModal").addEventListener("click", closeRecordEditor);
 
 $("cancelEditorButton")?.addEventListener("click",closeRecordEditor);
 
